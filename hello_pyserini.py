@@ -1,3 +1,6 @@
+import os
+os.environ['PYSERINI_CACHE'] = r'D:\PyseriniCache'
+
 from pyserini.search.lucene import LuceneSearcher
 
 # Download and open a small, ready-made index (first run will fetch to your cache)
@@ -12,4 +15,4 @@ hits = searcher.search('what is the capital of australia?', k=5)
 for i, h in enumerate(hits, 1):
     print(f'{i:2d}. docid={h.docid} score={h.score:.3f}')
     # If you want the raw text:
-    # print(searcher.doc(h.docid).raw())
+    print(searcher.doc(h.docid).raw())
