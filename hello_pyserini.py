@@ -3,7 +3,7 @@ os.environ['PYSERINI_CACHE'] = r'D:\PyseriniCache'
 
 from pyserini.search.lucene import LuceneSearcher
 
-# Download and open a small, ready-made index (first run will fetch to your cache)
+# Download and open a small, ready-made index (first run will fetch to cache)
 searcher = LuceneSearcher.from_prebuilt_index('msmarco-v1-passage')
 
 # Optional: tweak BM25 params
