@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Read prompt template
 prompt_template = Path("prompt.txt").read_text(encoding="utf-8")
-
+#TREC_DL colelction
 # Read topic and docs file
 docs_file = Path("outputs/topic_and_docs_q524332.txt").read_text(encoding="utf-8")
 
@@ -36,6 +36,8 @@ for idx, (doc_num, docid, passage_json) in enumerate(doc_blocks, 1):
     body = {
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": 300,
+        "temperature": 0.0,
+        "top_p": 1.0,
         "messages": [
             {"role": "user", "content": [{"type": "text", "text": prompt}]}
         ]

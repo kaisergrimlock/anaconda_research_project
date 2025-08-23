@@ -58,7 +58,8 @@ for idx, (doc_num, docid, passage_json) in enumerate(doc_blocks, 1):
     body = {
         "prompt": to_text(prompt),
         "max_tokens": 300,
-        "temperature": 0
+        "temperature": 0,
+        "top_p": 1.0,
     }
 
     resp = bedrock.invoke_model(

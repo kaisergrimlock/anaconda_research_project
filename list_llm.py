@@ -1,7 +1,7 @@
 import boto3
 
 # Create Bedrock client
-bedrock = boto3.client("bedrock", region_name="ap-southeast-2")  # Change region if needed
+bedrock = boto3.client("bedrock", region_name="us-west-2")  # Change region if needed
 
 # List available models
 response = bedrock.list_foundation_models()
