@@ -1,3 +1,4 @@
+import math
 import boto3, json, re
 from pathlib import Path
 
@@ -19,7 +20,7 @@ doc_blocks = re.findall(
 )
 
 # --- Bedrock setup ---
-bedrock = boto3.client("bedrock-runtime", region_name="ap-southeast-2")
+bedrock = boto3.client("bedrock-runtime", region_name="us-west-2")
 
 # --- List of models to evaluate ---
 models = [
@@ -34,6 +35,9 @@ inference_config = {
     "temperature": 0.0,
     "topP": 1.0,
 }
+
+def round_half_up(n):
+    return math.floor(n + 0.5)
 
 for model_id in models:
     print(f"\n--- Running inference for model: {model_id} ---")
@@ -85,6 +89,6 @@ for model_id in models:
         f.write(f"# Query ID: {qid}\n")
         f.write("docid\trelevance\n")
         for docid, llm_score in llm_labels:
-            f.write(f"{docid}\t{llm_score}\n")
+            f.write(f"{docid}\t{round_half_up(llm_score)}\n")
 
     print(f"Wrote results to: {out_path}")

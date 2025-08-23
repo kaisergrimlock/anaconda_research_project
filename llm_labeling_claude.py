@@ -1,3 +1,4 @@
+import math
 import boto3, json, re
 from pathlib import Path
 
@@ -58,6 +59,8 @@ for idx, (doc_num, docid, passage_json) in enumerate(doc_blocks, 1):
         llm_score = ""
     llm_labels.append((docid, llm_score))
 
+def round_half_up(n):
+    return math.floor(n + 0.5)
 
 # Write to TSV
 safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
@@ -66,6 +69,9 @@ with out_path.open("w", encoding="utf-8", newline="") as f:
     f.write(f"# Query ID: {qid}\n")
     f.write("docid\trelevance\n")
     for docid, llm_score in llm_labels:
+        rounded_score = round_half_up(float(llm_score)) if llm_score else ""
         f.write(f"{docid}\t{llm_score}\n")
 
 print(f"Wrote: {out_path}")
+
+
