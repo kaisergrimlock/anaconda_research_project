@@ -37,7 +37,11 @@ inference_config = {
 }
 
 def round_half_up(n):
-    return math.floor(n + 0.5)
+    if(n != ''):
+        n = float(n)
+        return math.floor(n + 0.5)
+    else:
+        return n
 
 for model_id in models:
     print(f"\n--- Running inference for model: {model_id} ---")
