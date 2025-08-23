@@ -29,7 +29,7 @@ topic = query.text
 print(f"Query {qid}: {topic}\n")
 
 # 4) Retrieve top 10 docs for this query
-hits = searcher.search(topic, k=10)
+hits = searcher.search(topic, k=20)
 
 # 5) Print results with topic, docid, relevance, and raw doc text
 print(f"Top 10 results for query {qid} ({topic}):\n")
