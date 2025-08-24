@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 
 input_path = "outputs/topic_and_docs_q524332.txt"
-output_path = "outputs/topic_and_docs_q524332_modified.txt"
+output_path = "outputs/topic_and_docs_q524332_modified_thai.txt"
 insert_phrase = input("Enter the phrase to insert randomly into passages: ")
 
 with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", encoding="utf-8") as outfile:
