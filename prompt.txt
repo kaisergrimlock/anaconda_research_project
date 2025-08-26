@@ -1,12 +1,11 @@
 Given a query and a passage, you must provide a score on an integer scale of 0 to 1 with the following meanings: 
 1 for relevant: The passage is relevant to the query and answer it perfectly. 
 0 for irrelevant: The passage has nothing to do with the query.  
+Think of this as a striclty binary true or false question where relevant is 1 and irrelevant is 0. 
+Make sure that all answers are integers.
+Do not stray from the given parameters at any point. 
+Label every single document, do not leave anything blank.
 Assume that you are writing a report on the subject of the topic. 
-Think of this as a binary true or false question. Do not stray from the scale given.
-Try to label every single passage.
-
 A person has typed "{query}" into a search engine.
-
 Consider the following passage: {passage}
-
-Split this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {{"M": score, "T": score, "O": score}} Results {{}}
+Split this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {{"M": score, "T": score, "O": score}} Results {{}}
