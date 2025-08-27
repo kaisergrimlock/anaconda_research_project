@@ -4,7 +4,7 @@ from pathlib import Path
 
 # --- Read prompt & inputs ---
 prompt_template = Path("prompt.txt").read_text(encoding="utf-8")
-docs_file = Path("outputs/topic_and_docs_q524332_modified_eng.txt").read_text(encoding="utf-8")
+docs_file = Path("outputs/topic_and_docs_q524332_modified_viet.txt").read_text(encoding="utf-8")
 
 # --- Extract topic + qid ---
 qid_match = re.search(r"Query ID:\s*(\d+)", docs_file)
@@ -107,7 +107,7 @@ for model_id in models:
 
     # --- Write results for this model ---
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
-    out_path = Path(f"outputs/llm_label/llm_labels_q{qid}_{safe_model}_modified_eng.tsv")
+    out_path = Path(f"outputs/llm_label/llm_labels_q{qid}_{safe_model}_modified_viet.tsv")
     with out_path.open("w", encoding="utf-8", newline="") as f:
         f.write(f"# Query ID: {qid}\n")
         f.write("docid\trelevance\n")
@@ -115,7 +115,7 @@ for model_id in models:
             f.write(f"{docid}\t{llm_score}\n")
 
     # --- Write response log to JSON ---
-    log_path = Path(f"outputs/logs/llm_responses_q{qid}_{safe_model}_modified_eng.json")
+    log_path = Path(f"outputs/logs/llm_responses_q{qid}_{safe_model}_modified_viet.json")
     with log_path.open("w", encoding="utf-8") as log_file:
         json.dump(response_log, log_file, indent=2, ensure_ascii=False)
 
