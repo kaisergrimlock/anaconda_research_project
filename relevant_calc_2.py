@@ -2,104 +2,88 @@ import pandas as pd
 from pathlib import Path
 from collections import defaultdict
 
+# --- Config ---
 ROOT = Path("outputs/llm_label")
-files = sorted(ROOT.glob("llm_labels_q524332_*.tsv"))
+PATTERN = "llm_labels_q524332_*.tsv"
 
-# Helpers
-def is_original(name: str) -> bool:
-    return not any(x in name for x in ["viet", "eng", "thai", "translated"])
+# --- Helpers ---
+def is_original(p: Path) -> bool:
+    name = p.name.lower()
+    return not any(tag in name for tag in ["viet", "eng_2", "eng", "thai", "translated"])
 
-def is_eng(name: str) -> bool:
-    return "eng" in name
-
-def is_viet(name: str) -> bool:
-    return "viet" in name
+def variant_of(p: Path) -> str:
+    name = p.name.lower()
+    if "eng_2" in name: return "eng_2"
+    if "eng" in name:   return "eng"
+    if "viet" in name:  return "viet"
+    return "other"
 
 def base_key(p: Path) -> str:
-    # Group up to the model identifier chunk, e.g.
-    # llm_labels_q524332_anthropic.claude-3-haiku-20240307-v1_0_...
     parts = p.stem.split("_")
     return "_".join(parts[:4])
 
-# Group files by base model
+def read_labels(path: Path):
+    df = pd.read_csv(path, sep="\t", comment="#", usecols=["docid", "relevance"])
+    df["docid"] = df["docid"].astype(str)
+    df["relevance"] = pd.to_numeric(df["relevance"], errors="coerce")
+    return df.dropna(subset=["relevance"])
+
+# --- Load files and group ---
+files = sorted(ROOT.glob(PATTERN))
 groups = defaultdict(list)
 for f in files:
     groups[base_key(f)].append(f)
 
-for base, group_files in groups.items():
-    # Identify original / eng / viet within the group
-    original = next((f for f in group_files if is_original(f.name)), None)
-    eng     = next((f for f in group_files if is_eng(f.name)), None)
-    viet    = next((f for f in group_files if is_viet(f.name)), None)
+# Collect summary rows
+summary_rows = []
 
-    if not (eng and viet):
-        print(f"[SKIP] Need both eng & viet variants in group: {base}")
+for base, fs in groups.items():
+    originals = [f for f in fs if is_original(f)]
+    if not originals:
+        print(f"[SKIP] No original found for group: {base}")
         continue
 
-    # Load required files (original optional but useful to include)
-    usecols = ["docid", "relevance"]
-    df_eng  = pd.read_csv(eng,  sep="\t", comment="#", usecols=usecols).rename(columns={"relevance":"eng"})
-    df_viet = pd.read_csv(viet, sep="\t", comment="#", usecols=usecols).rename(columns={"relevance":"viet"})
+    original_file = originals[0]
+    print(f"\n=== Flip Analysis for base model: {base} ===")
 
-    df = pd.merge(df_eng, df_viet, on="docid", how="inner")
+    # Load original labels
+    df_orig = read_labels(original_file)
+    s_ref = dict(zip(df_orig["docid"], df_orig["relevance"].astype(int)))
 
-    if original:
-        df_orig = pd.read_csv(original, sep="\t", comment="#", usecols=usecols).rename(columns={"relevance":"orig"})
-        df = pd.merge(df, df_orig, on="docid", how="left")
-    else:
-        df["orig"] = pd.NA
+    for f in fs:
+        if f == original_file:
+            continue
 
-    # Clean and cast
-    df = df.dropna(subset=["eng", "viet"])  # keep only rows where both variants have labels
-    if df.empty:
-        print(f"[SKIP] No overlapping docids for eng vs viet in group: {base}")
-        continue
+        # Load variant labels
+        df_variant = read_labels(f)
+        s_var = dict(zip(df_variant["docid"], df_variant["relevance"].astype(int)))
 
-    df["eng"]  = df["eng"].astype(int)
-    df["viet"] = df["viet"].astype(int)
-    # orig might be NaN; cast safely
-    df["orig"] = pd.to_numeric(df["orig"], errors="coerce").astype("Int64")
+        # Find overlapping docids
+        overlap = set(s_ref.keys()) & set(s_var.keys())
+        if not overlap:
+            print(f"[SKIP] No overlapping docids for {f.name}.")
+            continue
 
-    # For each document: who marked it relevant?
-    # Categories:
-    # - "ENG_ONLY": eng==1 and viet==0
-    # - "VIET_ONLY": viet==1 and eng==0
-    # - "BOTH": eng==1 and viet==1
-    # - "NEITHER": eng==0 and viet==0
-    def winner(row):
-        if row.eng == 1 and row.viet == 0: return "ENG_ONLY"
-        if row.eng == 0 and row.viet == 1: return "VIET_ONLY"
-        if row.eng == 1 and row.viet == 1: return "BOTH"
-        return "NEITHER"
+        flips_1_to_0 = sum(1 for d in overlap if s_ref[d] == 1 and s_var[d] == 0)
+        flips_0_to_1 = sum(1 for d in overlap if s_ref[d] == 0 and s_var[d] == 1)
 
-    df["winner"] = df.apply(winner, axis=1)
+        vlabel = variant_of(f)
+        print(f"[{vlabel.upper():8}] 1→0 flips: {flips_1_to_0} | 0→1 flips: {flips_0_to_1} | Overlap: {len(overlap)}")
 
-    # Totals
-    eng_only   = (df["winner"] == "ENG_ONLY").sum()
-    viet_only  = (df["winner"] == "VIET_ONLY").sum()
-    both       = (df["winner"] == "BOTH").sum()
-    neither    = (df["winner"] == "NEITHER").sum()
+        summary_rows.append({
+            "base": base,
+            "variant_file": f.name,
+            "variant": vlabel,
+            "original_file": original_file.name,
+            "n_overlap": len(overlap),
+            "Flips_1_to_0": flips_1_to_0,
+            "Flips_0_to_1": flips_0_to_1
+        })
 
-    print(f"\n=== {base} ===")
-    print(f"ENG_ONLY:  {eng_only}")
-    print(f"VIET_ONLY: {viet_only}")
-    print(f"BOTH:      {both}")
-    print(f"NEITHER:   {neither}")
-
-    # Also show total relevant counts per variant across all docs
-    total_relevant_eng  = (df["eng"] == 1).sum()
-    total_relevant_viet = (df["viet"] == 1).sum()
-    print(f"Total relevant (ENG):  {total_relevant_eng}")
-    print(f"Total relevant (VIET): {total_relevant_viet}")
-
-    # Optional: compare against original if you want to see which variant agrees with orig==1 more often
-    if df["orig"].notna().any():
-        eng_agrees_with_orig1  = ((df["orig"] == 1) & (df["eng"] == 1)).sum()
-        viet_agrees_with_orig1 = ((df["orig"] == 1) & (df["viet"] == 1)).sum()
-        print(f"Agree with ORIG==1 (ENG):  {eng_agrees_with_orig1}")
-        print(f"Agree with ORIG==1 (VIET): {viet_agrees_with_orig1}")
-
-    # Write per-doc CSV so you can inspect exactly which docs each variant marked relevant
-    out_csv = ROOT / f"{base}_eng_vs_viet_per_doc.csv"
-    df[["docid", "orig", "eng", "viet", "winner"]].to_csv(out_csv, index=False)
-    print(f"Saved per-doc analysis: {out_csv}")
+# --- Save summary ---
+if summary_rows:
+    out_csv = ROOT / "comparison_label_flips.csv"
+    pd.DataFrame(summary_rows).to_csv(out_csv, index=False)
+    print(f"\nSaved label flip summary: {out_csv}")
+else:
+    print("\nNo label flips calculated.")
