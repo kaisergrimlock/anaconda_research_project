@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 
 input_path = "outputs/topic_and_docs_q524332.txt"
-output_path = "outputs/topic_and_docs_q524332_modified_viet.txt"
+output_path = "outputs/topic_and_docs_q524332_modified_eng.txt"
 insert_phrase = "  treating tension headaches without medication  "
 
 with open(input_path, "r", encoding="utf-8") as infile, open(output_path, "w", encoding="utf-8") as outfile:

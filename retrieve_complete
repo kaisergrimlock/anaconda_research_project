@@ -19,12 +19,27 @@ for p in [r'D:\PyseriniCache', r'D:\ir_datasets', r'D:\ir_tmp']:
 from pyserini.search.lucene import LuceneSearcher
 import ir_datasets
 
-# --- MS MARCO Passage: dev subset (IR Datasets id)
-DATASET_ID = 'msmarco-passage/dev/small'   # ← changed from TREC-DL 2019
+# -------------------------
+# Choose your TREC-DL setup
+# -------------------------
+TRECDL_YEAR = "2019"        # "2019" or "2020"
+LEVEL       = "passage"     # "passage" or "document"
+
+if LEVEL == "passage":
+    DATASET_ID = f"msmarco-passage/trec-dl-{TRECDL_YEAR}/judged"
+    INDEX_NAME = "msmarco-v1-passage"   # matches MS MARCO v1 passage IDs used by TREC-DL
+elif LEVEL == "document":
+    DATASET_ID = f"msmarco-document/trec-dl-{TRECDL_YEAR}/judged"
+    INDEX_NAME = "msmarco-v1-doc"       # matches MS MARCO v1 document IDs used by TREC-DL
+else:
+    raise ValueError("LEVEL must be 'passage' or 'document'")
+
+# Load TREC-DL dataset
 ds = ir_datasets.load(DATASET_ID)
 
-# --- Searcher: MS MARCO v1 passage index (matches docids in the dev subset)
-searcher = LuceneSearcher.from_prebuilt_index('msmarco-v1-passage')
+# Searcher for the matching collection
+searcher = LuceneSearcher.from_prebuilt_index(INDEX_NAME)
+# You can tweak BM25 if you like; these are MS MARCO-ish settings.
 searcher.set_bm25(k1=0.82, b=0.68)
 
 # Build qrels dict {qid: {docid: relevance}}
@@ -32,11 +47,16 @@ qrels = {}
 for q in ds.qrels_iter():
     qrels.setdefault(str(q.query_id), {})[q.doc_id] = int(q.relevance)
 
-# Grab a query (MS MARCO dev-small has thousands of queries)
+# Helper to robustly extract the query text (field name differs across some datasets)
+def _query_text(q):
+    return getattr(q, "text", getattr(q, "title", getattr(q, "query", "")))
+
+# TREC-DL has a small set of judged queries (e.g., 43 in 2019, 54 in 2020 for passage)
 queries = list(ds.queries_iter())
-query = queries[2]  # pick one (0-based index); change as you like
+query = queries[0]  # pick whichever you want
 qid = str(query.query_id)
-topic = query.text
+topic = _query_text(query)
+
 print(f"Dataset: {DATASET_ID}")
 print(f"Total queries loaded: {len(queries)}")
 print(f"Query {qid}: {topic}\n")
@@ -52,7 +72,7 @@ for i, h in enumerate(hits, 1):
     doc_text = doc.raw() if doc is not None else ""
     results.append({
         "query": topic,
-        "passage": doc_text,
+        "passage" if LEVEL == "passage" else "document": doc_text,
         "docid": h.docid,
         "score": h.score,
         "relevance": qrels.get(qid, {}).get(h.docid, None)  # may be None if unjudged
@@ -61,19 +81,23 @@ for i, h in enumerate(hits, 1):
 # Write outputs
 out_dir = Path("outputs"); out_dir.mkdir(exist_ok=True)
 
-labels_path = out_dir / f"labels_msmarco_devsmall_q{qid}.tsv"
+suffix = f"trecdl_{LEVEL}_{TRECDL_YEAR}_q{qid}"
+labels_path = out_dir / f"labels_{suffix}.tsv"
 with labels_path.open("w", encoding="utf-8", newline="") as f:
     f.write(f"# Dataset: {DATASET_ID}\n# Query ID: {qid}\n# Topic: {topic}\n")
     f.write("docid\trelevance\tscore\n")
     for r in results:
         f.write(f"{r['docid']}\t{r['relevance']}\t{r['score']:.4f}\n")
 
-docs_path = out_dir / f"topic_and_docs_msmarco_devsmall_q{qid}.txt"
+docs_path = out_dir / f"topic_and_docs_{suffix}.txt"
 with docs_path.open("w", encoding="utf-8") as f:
     f.write(f"Dataset: {DATASET_ID}\nQuery ID: {qid}\nTopic: {topic}\n\n")
     for i, r in enumerate(results, 1):
-        f.write(f"Doc {i}: {r['docid']} (rel={r['relevance']}, score={r['score']:.3f})\n")
-        f.write("Passage:\n" + (r["passage"] or "") + "\n" + "-"*80 + "\n\n")
+        rel = r["relevance"]
+        score = r["score"]
+        f.write(f"Doc {i}: {r['docid']} (rel={rel}, score={score:.3f})\n")
+        body_key = "passage" if LEVEL == "passage" else "document"
+        f.write(("Passage:\n" if LEVEL == "passage" else "Document:\n") + (r[body_key] or "") + "\n" + "-"*80 + "\n\n")
 
 print(f"Wrote: {labels_path}")
 print(f"Wrote: {docs_path}")
