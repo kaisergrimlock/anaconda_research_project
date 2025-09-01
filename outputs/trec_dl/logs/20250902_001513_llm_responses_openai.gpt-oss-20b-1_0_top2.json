@@ -1,0 +1,914 @@
+[
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "8260035",
+    "query_vi": "chi phí sàn bê tông nội thất",
+    "passage_injected": "Stained Concrete chi phí sàn bê tông nội thất Pricing - Interior Ver. 4.3. Thank you for visiting our Concrete Staining Cost page, we will go over some of the options that are available for concrete staining for interior floors and the pricing for them. First, let's make sure you are using the right estimator for your project, here's a quick primer on concrete staining.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"cost of interior concrete flooring\" into a search engine.\nConsider the following passage: Stained Concrete Pricing - Interior Ver. 4.3. Thank you for visiting our Concrete Staining Cost page, we will go over some of the options that are available for concrete staining for interior floors and the pricing for them. First, let's make sure you are using the right estimator for your project, here's a quick primer on concrete staining.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":2,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "24059197-bbb5-4c40-9fb9-808f2efbabca",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:17 GMT",
+          "content-type": "application/json",
+          "content-length": "1342",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "24059197-bbb5-4c40-9fb9-808f2efbabca"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"cost of interior concrete flooring\". The passage is about stained concrete pricing for interior floors. So it is relevant. It contains pricing info. So M (match) high. T (trustworthiness) unknown but likely moderate. So O maybe 2 or 3. The passage is dedicated to interior concrete staining cost. The query is cost of interior concrete flooring. The passage addresses cost. So 3? It says \"we will go over some of the options that are available for concrete staining for interior floors and the pricing for them.\" That is exactly cost. So 3. Trustworthiness maybe 2. So final O maybe 3. Provide JSON: {\"M\":3,\"T\":2,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":2,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 398,
+        "outputTokens": 273,
+        "totalTokens": 671
+      },
+      "metrics": {
+        "latencyMs": 1074
+      }
+    }
+  },
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "8259116",
+    "query_vi": "chi phí sàn bê tông nội thất",
+    "passage_injected": "Browse hundreds of concrete floor photos in kitchens, living rooms, business lobbies and more. Find out average prices and what design features contribute to the cost of concrete flooring. Get answers to chi phí sàn bê tông nội thất common questions about the comfort and maintenance of concrete floors. Watch 68 videos with design ideas, and installation & maintenance tips for interior concrete floors. Get professional tips and design ideas for using stains to enhance concrete floors. Learn how polishing produces concrete floors with a high-gloss finish that never needs waxing.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"cost of interior concrete flooring\" into a search engine.\nConsider the following passage: Browse hundreds of concrete floor photos in kitchens, living rooms, business lobbies and more. Find out average prices and what design features contribute to the cost of concrete flooring. Get answers to common questions about the comfort and maintenance of concrete floors. Watch 68 videos with design ideas, and installation & maintenance tips for interior concrete floors. Get professional tips and design ideas for using stains to enhance concrete floors. Learn how polishing produces concrete floors with a high-gloss finish that never needs waxing.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":2,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "b78e5a32-e378-41e1-8487-a2de592978cb",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:19 GMT",
+          "content-type": "application/json",
+          "content-length": "1937",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "b78e5a32-e378-41e1-8487-a2de592978cb"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"cost of interior concrete flooring\". The passage: \"Browse hundreds of concrete floor photos in kitchens, living rooms, business lobbies and more. Find out average prices and what design features contribute to the cost of concrete flooring. Get answers to common questions about the comfort and maintenance of concrete floors. Watch 68 videos with design ideas, and installation & maintenance tips for interior concrete floors. Get professional tips and design ideas for using stains to enhance concrete floors. Learn how polishing produces concrete floors with a high-gloss finish that never needs waxing.\"\n\nThis passage indeed addresses cost of interior concrete flooring: \"Find out average prices and what design features contribute to the cost of concrete flooring.\" So it's relevant. The passage is dedicated to query? It mentions cost. So M likely 3. Trustworthiness? Not sure. It's likely a website with many photos and videos. Could be credible. But we don't have info. I'd give T 2 maybe. O final maybe 3? But trustworthiness might lower. But overall it's relevant. I'd give M=3, T=2, O=3? But O should reflect overall. If trustworthiness moderate, but still relevant. I'd give O=3. Let's produce JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":2,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 425,
+        "outputTokens": 373,
+        "totalTokens": 798
+      },
+      "metrics": {
+        "latencyMs": 1505
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501557",
+    "query_vi": "định nghĩa phán quyết tuyên bố",
+    "passage_injected": "An action or proceeding is not open định nghĩa phán quyết tuyên bố to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: An action or proceeding is not open to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "ef62a55c-434f-4813-833b-5c1c6b57874e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:20 GMT",
+          "content-type": "application/json",
+          "content-length": "1466",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "ef62a55c-434f-4813-833b-5c1c6b57874e"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"An action or proceeding is not open to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.\"\n\nThis passage does mention declaratory judgment but not definition. It gives some info but not a clear definition. So relevance: somewhat related but not fully. So M maybe 1? The passage is somewhat relevant but not a clear definition. So M=1. Trustworthiness: unknown, but likely legal text, maybe trustworthy. T maybe 2? But we don't have source. Could be 2. O final: maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 381,
+        "outputTokens": 298,
+        "totalTokens": 679
+      },
+      "metrics": {
+        "latencyMs": 1290
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "2174992",
+    "query_vi": "định nghĩa phán quyết tuyên bố",
+    "passage_injected": "Breesâ Eighth Cause of Action, for âDeclaratory Judgment,â Fails to State a Claim Against Both Miller and. ISM định nghĩa phán quyết tuyên bố ...........................................................................................................................",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Breesâ Eighth Cause of Action, for âDeclaratory Judgment,â Fails to State a Claim Against Both Miller and. ISM ...........................................................................................................................\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":2,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "3f4525b5-58f4-45e7-bdf2-50791c6f574b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:22 GMT",
+          "content-type": "application/json",
+          "content-length": "1360",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "3f4525b5-58f4-45e7-bdf2-50791c6f574b"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"Brees’ Eighth Cause of Action, for 'Declaratory Judgment,' Fails to State a Claim Against Both Miller and. ISM ...........................................................................................................................\"\n\nThis passage is about a legal case, not a definition. So it's not relevant. So M=0. Trustworthiness? It's a snippet from a legal case, maybe trustworthy but irrelevant. T maybe 2? But trustworthiness is about the page's reliability. It's a legal case snippet, likely trustworthy. But since it's irrelevant, maybe T=2. O final: 0. So output: {\"M\":0,\"T\":2,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":2,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 368,
+        "outputTokens": 261,
+        "totalTokens": 629
+      },
+      "metrics": {
+        "latencyMs": 1180
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "985988",
+    "query_vi": "định nghĩa của một sigmet",
+    "passage_injected": "ï· SIGMET 1 is the type of the message and the sequential number of the day; ï· VALID 150435/150835 is the period of validity of the message. It định nghĩa của một sigmet follows the same standard of the. date/time of the header.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition of a sigmet\" into a search engine.\nConsider the following passage: ï· SIGMET 1 is the type of the message and the sequential number of the day; ï· VALID 150435/150835 is the period of validity of the message. It follows the same standard of the. date/time of the header.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "61965f23-1ff5-401a-8f07-e4fbfd3ed073",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:24 GMT",
+          "content-type": "application/json",
+          "content-length": "1169",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "61965f23-1ff5-401a-8f07-e4fbfd3ed073"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition of a sigmet\". The passage: \"SIGMET 1 is the type of the message and the sequential number of the day; VALID 150435/150835 is the period of validity of the message. It follows the same standard of the. date/time of the header.\" This is partial info about SIGMET but not a definition. So relevance: somewhat related but not clear definition. So M maybe 1. Trustworthiness: unknown, but likely low. T maybe 1. O maybe 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 384,
+        "outputTokens": 247,
+        "totalTokens": 631
+      },
+      "metrics": {
+        "latencyMs": 988
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "2683747",
+    "query_vi": "định nghĩa của một sigmet",
+    "passage_injected": "Related to convective: Convective precipitation, convective định nghĩa của một sigmet SIGMET convection Air heated by a space heater rises and is replaced by cool air, creating a convection current that circulates hot air throughout a room. conÂ·vecÂ·tion (kÉn-vÄkâ²shÉn) n. 1. The act or process of conveying; transmission. 2. Physics a.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition of a sigmet\" into a search engine.\nConsider the following passage: Related to convective: Convective precipitation, convective SIGMET convection Air heated by a space heater rises and is replaced by cool air, creating a convection current that circulates hot air throughout a room. conÂ·vecÂ·tion (kÉn-vÄkâ²shÉn) n. 1. The act or process of conveying; transmission. 2. Physics a.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "545aadfc-834e-4b6b-8d32-d94523a6b7ea",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:25 GMT",
+          "content-type": "application/json",
+          "content-length": "961",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "545aadfc-834e-4b6b-8d32-d94523a6b7ea"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition of a sigmet\". The passage is about convective precipitation, convection, etc. It does not define sigmet. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? The passage seems random, not trustworthy. So T=0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 414,
+        "outputTokens": 191,
+        "totalTokens": 605
+      },
+      "metrics": {
+        "latencyMs": 825
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "744167",
+    "query_vi": "Sự khác biệt giữa mcdouble và double cheeseburger",
+    "passage_injected": "The Double Cheeseburger is priced at $1.49 and my Triple Cheeseburger was priced at $2.19. I just donât understand the point of paying 70-cents for an extra burger patty when you can just Sự khác biệt giữa mcdouble và double cheeseburger get two McDoubles for $2.00. Obviously the value of the Triple Cheeseburger makes no sense when youâre comparing menu items.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between a mcdouble and a double cheeseburger\" into a search engine.\nConsider the following passage: The Double Cheeseburger is priced at $1.49 and my Triple Cheeseburger was priced at $2.19. I just donât understand the point of paying 70-cents for an extra burger patty when you can just get two McDoubles for $2.00. Obviously the value of the Triple Cheeseburger makes no sense when youâre comparing menu items.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "8ab64c2f-e69c-43a8-880e-dd610b2a0d32",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:26 GMT",
+          "content-type": "application/json",
+          "content-length": "1285",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "8ab64c2f-e69c-43a8-880e-dd610b2a0d32"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate passage relative to query: \"difference between a mcdouble and a double cheeseburger\". Passage: talks about Double Cheeseburger price, Triple Cheeseburger, paying extra patty, two McDoubles for $2.00. It mentions McDouble but not difference. It doesn't explain difference. So it's somewhat related but not answering. So M (match to intent) maybe 1. T (trustworthiness) maybe 2? The passage seems like a user comment, not official source. So trust maybe low. But we need to assign 0-3. I'd say M=1, T=1, O=1. Because it's related but not answering. So output: {\"M\":1,\"T\":1,\"O\":1}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 420,
+        "outputTokens": 280,
+        "totalTokens": 700
+      },
+      "metrics": {
+        "latencyMs": 1153
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "2226093",
+    "query_vi": "Sự khác biệt giữa mcdouble và double cheeseburger",
+    "passage_injected": "The difference is that the Mighty Kid's Meal provides more food than what is typically found in a Happy Meal, providing a McDouble (a cheeseburger consisting of two patties and one slice of cheese) instead of Sự khác biệt giữa mcdouble và double cheeseburger a cheeseburger or a hamburger, and more Chicken McNuggets (6 versus 4), plus a larger drink (16oz vs 12oz).",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between a mcdouble and a double cheeseburger\" into a search engine.\nConsider the following passage: The difference is that the Mighty Kid's Meal provides more food than what is typically found in a Happy Meal, providing a McDouble (a cheeseburger consisting of two patties and one slice of cheese) instead of a cheeseburger or a hamburger, and more Chicken McNuggets (6 versus 4), plus a larger drink (16oz vs 12oz).\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "147692af-30bd-4839-a9ae-043db4017eb3",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:28 GMT",
+          "content-type": "application/json",
+          "content-length": "1451",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "147692af-30bd-4839-a9ae-043db4017eb3"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query: \"difference between a mcdouble and a double cheeseburger\". The passage: \"The difference is that the Mighty Kid's Meal provides more food than what is typically found in a Happy Meal, providing a McDouble (a cheeseburger consisting of two patties and one slice of cheese) instead of a cheeseburger or a hamburger, and more Chicken McNuggets (6 versus 4), plus a larger drink (16oz vs 12oz).\"\n\nThis passage mentions McDouble definition but not double cheeseburger. It does not answer difference between McDouble and double cheeseburger. So relevance is low. M: 1 (related but not answer). T: trustworthiness? It's a random passage, maybe from a website. Hard to gauge. Probably 1. O: combine: maybe 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 412,
+        "outputTokens": 312,
+        "totalTokens": 724
+      },
+      "metrics": {
+        "latencyMs": 1383
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "5077707",
+    "query_vi": "Sự khác biệt giữa rn và bsn",
+    "passage_injected": "Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly Sự khác biệt giữa rn và bsn confused. Thanks.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused. Thanks.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a7175fc0-63ae-409d-8812-57bd43e15ecf",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:30 GMT",
+          "content-type": "application/json",
+          "content-length": "1805",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a7175fc0-63ae-409d-8812-57bd43e15ecf"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"difference between rn and bsn\". The passage: \"Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused. Thanks.\"\n\nThis passage is directly addressing the query. It says \"What is the difference between a BSN and an RN.\" So it's relevant. It might not give the answer but it acknowledges the question. So it's highly relevant? The passage is basically the question itself, not the answer. The query is \"difference between rn and bsn\". The passage is a question, not an answer. So does it contain the answer? No. So it's not perfectly relevant. It's highly relevant? It has some answer? It doesn't provide answer. So maybe it's related but not answering. So score M maybe 1. T: trustworthiness? It's a user question, not a reliable source. So T maybe 1. O: overall maybe 1. But maybe we consider that the passage is a question, not an answer. So it's not answering. So 1. So produce JSON: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 388,
+        "outputTokens": 388,
+        "totalTokens": 776
+      },
+      "metrics": {
+        "latencyMs": 1480
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "8283527",
+    "query_vi": "Sự khác biệt giữa rn và bsn",
+    "passage_injected": "0 Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the Sự khác biệt giữa rn và bsn BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: 0 Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":1,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "6fdaf0ca-7e6b-4d92-a644-9a3d6ba61db6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:32 GMT",
+          "content-type": "application/json",
+          "content-length": "1261",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "6fdaf0ca-7e6b-4d92-a644-9a3d6ba61db6"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"difference between rn and bsn\". The passage: \"Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused.\"\n\nThis passage is directly addressing the query. It contains the question and some confusion. It doesn't give the answer but it is relevant. So M (match) high: maybe 2. T (trustworthiness) unknown: maybe 1. O final: maybe 2. So produce JSON: {\"M\":2,\"T\":1,\"O\":2}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":1,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 388,
+        "outputTokens": 268,
+        "totalTokens": 656
+      },
+      "metrics": {
+        "latencyMs": 1184
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "8273018",
+    "query_vi": "cá vàng có phát triển không",
+    "passage_injected": "Goldfish Hanging Plant â How To Grow Goldfish Houseplant. Goldfish plants (Columnea gloriosa) come to us from the Central and South American tropics and derive their common name from the unusual shape of their flowers, which with some cá vàng có phát triển không imagination, resemble fish. Under ideal conditions, the goldfish hanging plant blooms prolifically in a variety of reds, oranges and yellows.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: Goldfish Hanging Plant â How To Grow Goldfish Houseplant. Goldfish plants (Columnea gloriosa) come to us from the Central and South American tropics and derive their common name from the unusual shape of their flowers, which with some imagination, resemble fish. Under ideal conditions, the goldfish hanging plant blooms prolifically in a variety of reds, oranges and yellows.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4655298b-0311-4bfa-baff-9d5b292824c8",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:33 GMT",
+          "content-type": "application/json",
+          "content-length": "973",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4655298b-0311-4bfa-baff-9d5b292824c8"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"do goldfish grow\". The query likely about whether goldfish grow (i.e., fish growth). The passage is about goldfish hanging plant, not fish. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? It's a random passage about plant. So T=0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 407,
+        "outputTokens": 196,
+        "totalTokens": 603
+      },
+      "metrics": {
+        "latencyMs": 892
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "8635981",
+    "query_vi": "định nghĩa nhân chủng học về môi trường",
+    "passage_injected": "By định nghĩa nhân chủng học về môi trường K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment..",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: By K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment..\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "9be692ca-c1be-44d8-9fa5-0fab92205bca",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:35 GMT",
+          "content-type": "application/json",
+          "content-length": "1281",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "9be692ca-c1be-44d8-9fa5-0fab92205bca"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"anthropological definition of environment\". The passage defines cultural ecology, which is an anthropological theory about adaptation to environment. The query: \"anthropological definition of environment\". The passage does not give definition of environment itself, but gives definition of cultural ecology. So it's somewhat related but not directly answering. So M maybe 1 (related). T trustworthiness: K. Kris Hirst, presumably a scholar, but not sure. Likely trustworthy. So T maybe 2. O final maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 388,
+        "outputTokens": 252,
+        "totalTokens": 640
+      },
+      "metrics": {
+        "latencyMs": 1057
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "1726",
+    "query_vi": "định nghĩa nhân chủng học về môi trường",
+    "passage_injected": "Biological Anthropology. The graduate program in biological anthropology at CU Boulder định nghĩa nhân chủng học về môi trường offers training in several areas, including primatology, human biology, and paleoanthropology. We share an interest in human ecology, the broad integrative area of anthropology that focuses on the interactions of culture, biology and the environment.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: Biological Anthropology. The graduate program in biological anthropology at CU Boulder offers training in several areas, including primatology, human biology, and paleoanthropology. We share an interest in human ecology, the broad integrative area of anthropology that focuses on the interactions of culture, biology and the environment.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "d491f494-f374-4770-b2b8-1510c623a1b7",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:37 GMT",
+          "content-type": "application/json",
+          "content-length": "1591",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "d491f494-f374-4770-b2b8-1510c623a1b7"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"anthropological definition of environment\". The passage: \"Biological Anthropology. The graduate program in biological anthropology at CU Boulder offers training in several areas, including primatology, human biology, and paleoanthropology. We share an interest in human ecology, the broad integrative area of anthropology that focuses on the interactions of culture, biology and the environment.\"\n\nThe query: \"anthropological definition of environment\". The passage mentions \"human ecology\" and \"interactions of culture, biology and the environment\". It does not give a definition of environment. So it's somewhat related but not answering. So M (match) maybe 1. T (trustworthiness) maybe 2? The page is from CU Boulder, presumably trustworthy. But the passage is not directly answering. So O maybe 1. So produce JSON: {\"M\":1,\"T\":2,\"O\":1}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 389,
+        "outputTokens": 311,
+        "totalTokens": 700
+      },
+      "metrics": {
+        "latencyMs": 1286
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "8418683",
+    "query_vi": "thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp",
+    "passage_injected": "Presynaptic Knob Definition of Presynaptic Knob :An area at the end thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp of an axon that contains neurotransmitters in synaptic vesicles. Presynaptic Knob is part of the Chemical Synapse Component group.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"axon terminals or synaptic knob definition\" into a search engine.\nConsider the following passage: Presynaptic Knob Definition of Presynaptic Knob :An area at the end of an axon that contains neurotransmitters in synaptic vesicles. Presynaptic Knob is part of the Chemical Synapse Component group.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":2,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "d1c1ee8d-900b-425f-9d55-4b626b80874d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:38 GMT",
+          "content-type": "application/json",
+          "content-length": "1219",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "d1c1ee8d-900b-425f-9d55-4b626b80874d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"axon terminals or synaptic knob definition\". The passage: \"Presynaptic Knob Definition of Presynaptic Knob :An area at the end of an axon that contains neurotransmitters in synaptic vesicles. Presynaptic Knob is part of the Chemical Synapse Component group.\"\n\nThis is highly relevant: it defines presynaptic knob, which is axon terminal. So M=3. Trustworthiness? The passage seems generic, but no source. Might be moderate. T=2. O=3? The overall score maybe 3. Provide JSON: {\"M\":3,\"T\":2,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":2,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 378,
+        "outputTokens": 258,
+        "totalTokens": 636
+      },
+      "metrics": {
+        "latencyMs": 1075
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "2408264",
+    "query_vi": "thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp",
+    "passage_injected": "Neurotransmitters are chemicals that transmit messages from one nerve cell (neuron) to another. The thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp nerve impulse travels from the first nerve cell through the axonâa single smooth body arising from the nerve cellâ to the axon terminal and the synaptic knobs.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"axon terminals or synaptic knob definition\" into a search engine.\nConsider the following passage: Neurotransmitters are chemicals that transmit messages from one nerve cell (neuron) to another. The nerve impulse travels from the first nerve cell through the axonâa single smooth body arising from the nerve cellâ to the axon terminal and the synaptic knobs.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":2,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e5d39390-2c3d-4653-bf81-abffb840eef5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:40 GMT",
+          "content-type": "application/json",
+          "content-length": "1431",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e5d39390-2c3d-4653-bf81-abffb840eef5"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"axon terminals or synaptic knob definition\". The passage: \"Neurotransmitters are chemicals that transmit messages from one nerve cell (neuron) to another. The nerve impulse travels from the first nerve cell through the axon—a single smooth body arising from the nerve cell—to the axon terminal and the synaptic knobs.\"\n\nThis passage does mention axon terminal and synaptic knobs, but does not define them. The query is definition. The passage partially addresses but not fully. So M (match) maybe 2 (highly relevant). T (trustworthiness) unknown; but it's a generic passage, likely from a credible source? We don't know. Could assign 2. O final maybe 2. So output: {\"M\":2,\"T\":2,\"O\":2}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":2,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 389,
+        "outputTokens": 292,
+        "totalTokens": 681
+      },
+      "metrics": {
+        "latencyMs": 1281
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "47210",
+    "query_vi": "nguyên nhân của phì đại thất trái",
+    "passage_injected": "The last common cause of right ventricular hypertrophy is the ventricular septal defect. This is a disease affecting the ventricular septum. The nguyên nhân của phì đại thất trái ventricular septum, on the other hand, is the wall that divides the right and left ventricles of the heart. Symptoms of Right Ventricular Hypertrophy",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"causes of left ventricular hypertrophy\" into a search engine.\nConsider the following passage: The last common cause of right ventricular hypertrophy is the ventricular septal defect. This is a disease affecting the ventricular septum. The ventricular septum, on the other hand, is the wall that divides the right and left ventricles of the heart. Symptoms of Right Ventricular Hypertrophy\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "fe36a527-2d5b-4036-8052-2c922a71918a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:41 GMT",
+          "content-type": "application/json",
+          "content-length": "956",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "fe36a527-2d5b-4036-8052-2c922a71918a"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"causes of left ventricular hypertrophy\". The passage is about right ventricular hypertrophy and ventricular septal defect. It's not relevant. So M=0, T maybe 0? Trustworthiness? The passage seems generic, not trustworthy. So T=0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 391,
+        "outputTokens": 186,
+        "totalTokens": 577
+      },
+      "metrics": {
+        "latencyMs": 790
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "5197130",
+    "query_vi": "nguyên nhân của phì đại thất trái",
+    "passage_injected": "Right ventricular hypertrophy. Description, Causes and Risk Factors: Abbreviation: RVH. Right ventricular hypertrophy is the increase or the enlargement in the size of the right ventricle of the heart. The right ventricle is responsible for pumping blood towards the lungs. In the lungs, blood is mixed with oxygen and nguyên nhân của phì đại thất trái then pumped back to the left ventricle to be eventually distributed to the brain and to other parts of the body. There are several possible causes of right ventricular hypertrophy.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"causes of left ventricular hypertrophy\" into a search engine.\nConsider the following passage: Right ventricular hypertrophy. Description, Causes and Risk Factors: Abbreviation: RVH. Right ventricular hypertrophy is the increase or the enlargement in the size of the right ventricle of the heart. The right ventricle is responsible for pumping blood towards the lungs. In the lungs, blood is mixed with oxygen and then pumped back to the left ventricle to be eventually distributed to the brain and to other parts of the body. There are several possible causes of right ventricular hypertrophy.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "0a73b8cb-4033-4ac4-8ddb-709e24efcd65",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:43 GMT",
+          "content-type": "application/json",
+          "content-length": "1168",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "0a73b8cb-4033-4ac4-8ddb-709e24efcd65"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"causes of left ventricular hypertrophy\". The passage is about right ventricular hypertrophy. So it's not relevant. So M=0. Trustworthiness? The passage seems generic, but not relevant. T maybe 1? But trustworthiness is about the page's trust. We don't have info. Could assign 1. But overall O=0. So produce {\"M\":0,\"T\":1,\"O\":0}. But maybe T=0 as well? The passage is generic but not necessarily untrustworthy. But we can set T=1. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 430,
+        "outputTokens": 244,
+        "totalTokens": 674
+      },
+      "metrics": {
+        "latencyMs": 988
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "1749882",
+    "query_vi": "Nguyên nhân tự tử quân sự",
+    "passage_injected": "The truth is that more military personnel died during the first six years of the Bush administration than died during the eight years Nguyên nhân tự tử quân sự Clinton was in office, even counting military deaths in the U.S. from accidents, murders, suicides and natural causes.",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"causes of military suicide\" into a search engine.\nConsider the following passage: The truth is that more military personnel died during the first six years of the Bush administration than died during the eight years Clinton was in office, even counting military deaths in the U.S. from accidents, murders, suicides and natural causes.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "579174c9-8b98-4dbe-98f2-376548477994",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:44 GMT",
+          "content-type": "application/json",
+          "content-length": "1324",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "579174c9-8b98-4dbe-98f2-376548477994"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"causes of military suicide\". The passage: \"The truth is that more military personnel died during the first six years of the Bush administration than died during the eight years Clinton was in office, even counting military deaths in the U.S. from accidents, murders, suicides and natural causes.\"\n\nThis passage mentions suicides but not causes. It does not answer the query. So relevance is low. M: 1 (related but not answer). T: trustworthiness? It's a statement, but we don't know source. Could be questionable. But trustworthiness maybe 1. O: overall maybe 1. So produce JSON: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 376,
+        "outputTokens": 267,
+        "totalTokens": 643
+      },
+      "metrics": {
+        "latencyMs": 1175
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "3919937",
+    "query_vi": "Nguyên nhân tự tử quân sự",
+    "passage_injected": "Are assigned as Nguyên nhân tự tử quân sự additional codes to indicate how the injury or health condition happened (cause), the intent (unintentional or accidental; intentional , such as suicide or assault), the palce where the even occurred, the activity of the patient at the time of the event, and the person's status (e.g., civilian, military",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"causes of military suicide\" into a search engine.\nConsider the following passage: Are assigned as additional codes to indicate how the injury or health condition happened (cause), the intent (unintentional or accidental; intentional , such as suicide or assault), the palce where the even occurred, the activity of the patient at the time of the event, and the person's status (e.g., civilian, military\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "f45712d3-1e29-4c10-aba8-11a314c29cd4",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 01 Sep 2025 14:15:46 GMT",
+          "content-type": "application/json",
+          "content-length": "1415",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "f45712d3-1e29-4c10-aba8-11a314c29cd4"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"causes of military suicide\". The passage: \"Are assigned as additional codes to indicate how the injury or health condition happened (cause), the intent (unintentional or accidental; intentional , such as suicide or assault), the palce where the even occurred, the activity of the patient at the time of the event, and the person's status (e.g., civilian, military\"\n\nThis passage is about coding of injuries, mentions cause, intent, place, activity, status. It mentions suicide as an intent. But does it answer causes of military suicide? No. It's about coding. So it's not relevant. So M=0. Trustworthiness? It's unclear, but likely not trustworthy. T=0. O=0.\n\nReturn JSON object: {\"M\":0,\"T\":0,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 394,
+        "outputTokens": 289,
+        "totalTokens": 683
+      },
+      "metrics": {
+        "latencyMs": 1287
+      }
+    }
+  }
+]
