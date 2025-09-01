@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "D:\Work\Research_Project\anaconda_research_project\scripts\trec_dl_llm_label\trec_dl_label.py", line 79, in <module>
+    with INPUT_CSV.open("r", encoding="utf-8") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2800.0_x64__qbz5n2kfra8p0\Lib\pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'outputs\\trec_dl\\combined_results_top2.csv'
