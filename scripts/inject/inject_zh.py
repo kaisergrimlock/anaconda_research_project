@@ -7,12 +7,12 @@ import boto3
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "th"          # e.g., 'th' for Thai
+TARGET_LANG = "zh"          # e.g., 'vi' for Vietnamese
 SEED = 42                   # set None for non-deterministic
 INJECT_COUNT = 1            # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
 INPUT_FILE = Path("outputs/trec_dl/combined_irrelevant_results_20.csv")
-OUTPUT_FILE = Path("outputs/trec_dl/combined_result_translated_thai_20.csv")
+OUTPUT_FILE = Path("outputs/trec_dl/combined_result_translated_"+ TARGET_LANG +"_20.csv")
 # ==============================
 
 # AWS Translate client
@@ -62,9 +62,11 @@ with open(INPUT_FILE, newline="", encoding="utf-8") as fin, \
 
     reader = csv.DictReader(fin)
     fieldnames = list(reader.fieldnames or [])
+
     # Add our new columns
-    if "query_th" not in fieldnames:
-        fieldnames.append("query_th")
+    colName = "query_" + TARGET_LANG
+    if "query_translated" not in fieldnames:
+        fieldnames.append(colName)
     if "passage_injected" not in fieldnames:
         fieldnames.append("passage_injected")
 
@@ -78,14 +80,14 @@ with open(INPUT_FILE, newline="", encoding="utf-8") as fin, \
             SourceLanguageCode="auto",
             TargetLanguageCode=TARGET_LANG
         )
-        query_th = resp["TranslatedText"]
+        query_translated = resp["TranslatedText"]
 
         # 2) Inject translated query into random positions in the passage
         passage = row.get("passage", "")
-        passage_injected = inject_n(passage, query_th, INJECT_COUNT, INJECT_PROB)
+        passage_injected = inject_n(passage, query_translated, INJECT_COUNT, INJECT_PROB)
 
         # 3) Write results
-        row["query_th"] = query_th
+        row[colName] = query_translated
         row["passage_injected"] = passage_injected
         writer.writerow(row)
 

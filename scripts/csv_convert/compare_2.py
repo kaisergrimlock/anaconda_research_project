@@ -21,18 +21,18 @@ def as_int(s):
         return None
 
 def summarize_file(path: Path):
-    """Return (model, more_count, less_count) for one doc_rel_compare_*.csv."""
+    """Return (model, more_count, less_count, unchanged_count) for one doc_rel_compare_*.csv."""
     m = MODEL_RE.match(path.name)
     if not m:
         return None  # skip files that don't encode a model name
     model = m.group(1)
 
-    more = less = 0
+    more = less = unchanged = 0
 
     with path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
         if not reader.fieldnames:
-            return (model, more, less)
+            return (model, more, less, unchanged)
 
         # Find the right columns case-insensitively
         cols = {c.lower(): c for c in reader.fieldnames}
@@ -42,7 +42,7 @@ def summarize_file(path: Path):
 
         if not (rel_col and tr_col):
             # Not a comparison file; skip
-            return (model, more, less)
+            return (model, more, less, unchanged)
 
         for row in reader:
             r  = as_int(row.get(rel_col))
@@ -53,8 +53,10 @@ def summarize_file(path: Path):
                 more += 1
             elif rt < r:
                 less += 1
+            else:
+                unchanged += 1
 
-    return (model, more, less)
+    return (model, more, less, unchanged)
 
 def main():
     rows = []
@@ -70,9 +72,9 @@ def main():
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     with OUT_CSV.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["model", "more_relevant", "less_relevant"])
-        for model, more, less in rows:
-            writer.writerow([model, more, less])
+        writer.writerow(["model", "more_relevant", "less_relevant", "unchanged"])
+        for model, more, less, unchanged in rows:
+            writer.writerow([model, more, less, unchanged])
 
     print(f"Wrote {len(rows)} model summaries to {OUT_CSV}")
 

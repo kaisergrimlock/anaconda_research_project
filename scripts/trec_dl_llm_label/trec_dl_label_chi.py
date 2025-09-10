@@ -9,7 +9,7 @@ from datetime import datetime
 # Configurable Paths
 # ----------------------------
 PROMPT_FILE = Path("prompt.txt")
-INPUT_CSV   = Path("outputs/trec_dl/combined_result_translated_viet_20.csv")
+INPUT_CSV   = Path("outputs/trec_dl/combined_result_injected_eng_20.csv")
 
 OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/translated")   # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")                    # JSON logs
@@ -145,7 +145,7 @@ for model_id in MODELS:
     out_csv = OUTPUT_DIR / f"{run_id}_llm_labels_{safe_model}_top2.csv"
     with out_csv.open("w", encoding="utf-8", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["query","docid","passage","relevance","query_en","passage_injected"])
+        writer.writerow(["query","docid","passage","relevance","query_vi","passage_injected"])
         writer.writerows(results)
 
     # Logs

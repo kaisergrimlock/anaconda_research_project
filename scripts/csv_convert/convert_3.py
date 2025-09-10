@@ -3,9 +3,9 @@ from pathlib import Path
 
 # --- Paths based on your structure ---
 base_path = Path("outputs")
-haiku_path = base_path / "trec_dl_llm_label" / "scatter_haiku.csv"
+haiku_path = base_path / "trec_dl_llm_label" / "scatter_mixtral.csv"
 top2_path  = base_path / "trec_dl" / "combined_results_top2.csv"
-output_path = base_path / "trec_dl_llm_label" / "scatter_haiku_with_actual.csv"
+output_path = base_path / "trec_dl_llm_label" / "scatter_mixtral_with_actual.csv"
 
 # --- Load CSVs ---
 haiku = pd.read_csv(haiku_path)

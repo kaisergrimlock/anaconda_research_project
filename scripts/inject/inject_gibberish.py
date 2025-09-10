@@ -1,22 +1,25 @@
-#!/usr/bin/env python3
 import csv
 import random
 from pathlib import Path
+import boto3
 
 # ==============================
 # Config (edit as needed)
 # ==============================
 SEED = 42                   # set None for non-deterministic
-INJECT_COUNT = 1            # how many times to inject the query
+INJECT_COUNT = 1            # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
 INPUT_FILE = Path("outputs/trec_dl/combined_irrelevant_results_20.csv")
-OUTPUT_FILE = Path("outputs/trec_dl/combined_result_injected_eng_20.csv")  # keeping same name for compatibility
+OUTPUT_FILE = Path("outputs/trec_dl/combined_result_translated_gibberish_20.csv")
 # ==============================
 
 rng = random.Random(SEED)
 
 def find_between_word_positions(text: str):
-    """Return insertion indices that place content BETWEEN words (never slicing a token)."""
+    """
+    Return insertion indices such that inserting at that index places content
+    BETWEEN words (never slicing a token). Works on whitespace runs.
+    """
     positions = []
     i, n = 0, len(text)
     while i < n:
@@ -24,6 +27,7 @@ def find_between_word_positions(text: str):
             j = i
             while j < n and text[j].isspace():
                 j += 1
+            # whitespace run is [i, j); insert before next non-space if surrounded by non-spaces
             if i > 0 and j < n and not text[i-1].isspace() and not text[j].isspace():
                 positions.append(j)
             i = j
@@ -32,13 +36,16 @@ def find_between_word_positions(text: str):
     return positions
 
 def inject_once(text: str, snippet: str) -> str:
+    """Inject `snippet` at a random valid boundary; falls back to original text if none."""
     spots = find_between_word_positions(text)
     if not spots:
         return text
     idx = rng.choice(spots)
+    # add a trailing space so the next token isn't glued to snippet
     return text[:idx] + snippet + " " + text[idx:]
 
 def inject_n(text: str, snippet: str, n: int, prob: float) -> str:
+    """Inject up to n times with probability prob per attempt, rescanning boundaries each time."""
     out = text
     for _ in range(max(0, n)):
         if rng.random() <= prob:
@@ -51,7 +58,10 @@ with open(INPUT_FILE, newline="", encoding="utf-8") as fin, \
     reader = csv.DictReader(fin)
     fieldnames = list(reader.fieldnames or [])
 
-    # Ensure we add the injected column
+    # Add our new columns
+    colName = "query_gibberish"
+    if colName not in fieldnames:
+        fieldnames.append(colName)
     if "passage_injected" not in fieldnames:
         fieldnames.append("passage_injected")
 
@@ -59,12 +69,18 @@ with open(INPUT_FILE, newline="", encoding="utf-8") as fin, \
     writer.writeheader()
 
     for row in reader:
-        query = row.get("query", "")
+        # 1) Translate the QUERY (not the passage)
+        query_length = len(row["query"])
+        gibberish = ''.join(rng.choices('abcdefghijklmnopqrstuvwxyz ', k=query_length))
+        query_gibberish = gibberish
+
+        # 2) Inject translated query into random positions in the passage
         passage = row.get("passage", "")
+        passage_injected = inject_n(passage, query_gibberish, INJECT_COUNT, INJECT_PROB)
 
-        # Inject the ORIGINAL query (no translation) into the passage
-        row["passage_injected"] = inject_n(passage, query, INJECT_COUNT, INJECT_PROB)
-
+        # 3) Write results
+        row[colName] = query_gibberish
+        row["passage_injected"] = passage_injected
         writer.writerow(row)
 
 print(f"Done. Output saved to: {OUTPUT_FILE}")
