@@ -9,7 +9,7 @@ from collections import defaultdict
 # ----------------------------
 BASE_DIR = Path("outputs/trec_dl_llm_label")
 IRR_DIR  = BASE_DIR / "irrelevant"
-TRANS_DIR = BASE_DIR / "translated"
+TRANS_DIR = BASE_DIR / "translated/zh"
 OUT_DIR   = BASE_DIR
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

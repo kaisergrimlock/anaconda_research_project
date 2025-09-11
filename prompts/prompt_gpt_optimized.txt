@@ -1,0 +1,23 @@
+Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.
+Begin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.
+- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).
+- Adhere strictly to the scoring guidelines:
+- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.
+- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.
+- 1: Related. The passage is on-topic but does not answer the query.
+- 0: Irrelevant. The passage is not related to the query.
+- Evaluate every single passage; do not leave any items unscored or blank.
+- Always assume you are preparing a report based on the topic from the query.
+- Consider the user's intent as expressed by their search and methodically assess each passage.
+- Input Parameters:
+- `query`: A non-empty string representing the user's search query.
+- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.
+- Output:
+- A json object with the format: {{ "M": score, "T": score, "O": score }} where each score is an integer from 0 to 3.
+
+A person has typed "{query}" into a search engine.
+Consider the following passage: {passage}
+- If a passage or the query is empty or not a string, use null for each score in that object: {{ "M": null, "T": null, "O": null }}.
+- Output array length and order must match the input `passages` array.
+- Do not output any reasoning or commentary—only the JSON object.
+Example: {{"M": score, "T": score, "O": score}} Results {{}}

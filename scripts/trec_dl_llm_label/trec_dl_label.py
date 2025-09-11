@@ -1,4 +1,3 @@
-import math
 import boto3
 import json
 import csv
@@ -8,10 +7,10 @@ from datetime import datetime
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_FILE = Path("prompt.txt")
-INPUT_CSV   = Path("outputs/trec_dl/combined_results_top2.csv")
+PROMPT_FILE = Path("prompts/prompt.txt")
+INPUT_CSV   = Path("outputs/trec_dl/combined_irrelevant_results_20.csv")
 
-OUTPUT_DIR  = Path("outputs/trec_dl_llm_label")  # CSV outputs per run/model
+OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/irrelevant")  # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")        # JSON logs
 TOKENS_CSV  = Path("outputs/trec_dl_llm_label/token_usage.csv")  # cumulative token usage log
 
@@ -25,8 +24,9 @@ bedrock = boto3.client("bedrock-runtime", region_name="us-west-2")
 
 MODELS = [
     #"anthropic.claude-3-haiku-20240307-v1:0",
-    "mistral.mixtral-8x7b-instruct-v0:1",
+    #"mistral.mixtral-8x7b-instruct-v0:1",
     #"openai.gpt-oss-20b-1:0"
+    #"anthropic.claude-3-5-sonnet-20240620-v1:0"
 ]
 
 INFERENCE_CONFIG = {
@@ -38,12 +38,6 @@ INFERENCE_CONFIG = {
 # ----------------------------
 # Utility
 # ----------------------------
-def round_half_up(n):
-    try:
-        return math.floor(float(n) + 0.5)
-    except (TypeError, ValueError):
-        return ""
-
 def timestamp_id():
     """Return current timestamp as YYYYMMDD_HHMMSS"""
     return datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -1,0 +1,922 @@
+[
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "459676",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"cost of interior concrete flooring\" into a search engine.\nConsider the following passage: Day's Concrete Floors, Inc is the name of my company. We pour a lot of 3000 psi. concrete for interior concrete floors and 4000 psi concrete for exterior concrete. The concrete cost per yard of concrete is $92.00 for 3000 3/4 psi concrete and $100.00 for 4000 3/4 psi concrete.So 10 yards of concrete is approximately $1000.00 dollars U.S. here in Maine.ay's Concrete Floors, Inc is the name of my company. We pour a lot of 3000 psi. concrete for interior concrete floors and 4000 psi concrete for exterior concrete. The concrete cost per yard of concrete is $92.00 for 3000 3/4 psi concrete and $100.00 for 4000 3/4 psi concrete.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":2,\"O\":2}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c0ed7bb0-52b8-4c71-915b-6f05714b636a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:08 GMT",
+          "content-type": "application/json",
+          "content-length": "971",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c0ed7bb0-52b8-4c71-915b-6f05714b636a"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON array of objects, each with M, T, O scores. There's only one passage. The query: \"cost of interior concrete flooring\". Passage: contains cost per yard for interior concrete floors: $92 per yard for 3000 psi. Also mentions 4000 psi for exterior. So it's relevant. It gives cost. So M=3. Trustworthiness: It's a company website, presumably. But we don't know source. It's a business statement. Might be trustworthy but not verified. But it's a direct statement. I'd give T=2. Overall O maybe average? But guidelines: overall score likely similar to M and T. I'd give O=2 or 3? Since M=3, T=2, overall maybe 2.5 but must be integer. I'd choose 2. So output: {\"M\":3,\"T\":2,\"O\":2}."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":2,\"O\":2}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 645,
+        "outputTokens": 207,
+        "totalTokens": 852
+      },
+      "metrics": {
+        "latencyMs": 873
+      }
+    }
+  },
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "5703401",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"cost of interior concrete flooring\" into a search engine.\nConsider the following passage: Day's Concrete Floors, Inc is the name of my company. We pour a lot of 3000 psi. concrete for interior concrete floors and 4000 psi concrete for exterior concrete. The concrete cost per yard of concrete is $92.00 for 3000 3/4 psi concrete and $100.00 for 4000 3/4 psi concrete.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":2,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a8d68477-429b-4280-a249-b137c0a2db37",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:11 GMT",
+          "content-type": "application/json",
+          "content-length": "2246",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a8d68477-429b-4280-a249-b137c0a2db37"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON object for each passage. There's only one passage. We need to evaluate M, T, O. Query: \"cost of interior concrete flooring\". Passage: \"Day's Concrete Floors, Inc is the name of my company. We pour a lot of 3000 psi. concrete for interior concrete floors and 4000 psi concrete for exterior concrete. The concrete cost per yard of concrete is $92.00 for 3000 3/4 psi concrete and $100.00 for 4000 3/4 psi concrete.\"\n\nWe need to score:\n\nM: Intent match. The passage contains cost of interior concrete flooring: $92 per yard for 3000 psi. So it's relevant. It's not exactly the answer? The query: \"cost of interior concrete flooring\". The passage gives cost per yard. That is the answer. So M=3.\n\nT: Trustworthiness. It's a company statement. It's presumably trustworthy? It's a direct statement of cost. But we don't know if it's accurate. But it's a primary source. I'd give 2 maybe. But guidelines: 3 perfect, 2 highly relevant, 1 related, 0 irrelevant. For trustworthiness, we need to evaluate if the passage is trustworthy. It's a company statement. It's likely trustworthy. I'd give 2. But maybe 3? The passage is a direct statement of cost. It's not citing sources. But it's a primary source. I'd give 2.\n\nO: Overall score. Usually average or something. But we need to produce a single integer 0-3. We can compute average of M and T? But guidelines: \"overall score (O)\". We need to decide. Usually overall is maybe average of M and T. But we can decide. Let's compute average: (3+2)/2=2.5. Round? We need integer 0-3. We could round to nearest integer: 3? Or floor: 2? The guidelines don't specify. But we can choose 3? But maybe 2.5 rounds to 3. But we can also choose 2. I'd choose 3? But we need to be consistent. Let's think: The passage is highly relevant and fairly trustworthy. So overall maybe 3. But if we consider trustworthiness less than perfect, overall maybe 2.5 -> 3. I'd choose 3.\n\nThus output: {\"M\":3,\"T\":2,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":2,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 549,
+        "outputTokens": 526,
+        "totalTokens": 1075
+      },
+      "metrics": {
+        "latencyMs": 2160
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "1494936",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A declaratory judgment, sometimes called declaratory relief, is conclusive and legally binding as to the present and future rights of the parties involved. The parties involved in a declaratory judgment may not later seek another court resolution of the same legal issue unless they appeal the judgment.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":3,\"O\":3}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "5a15d881-8e0d-4daf-aa2e-090168ad7d52",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:12 GMT",
+          "content-type": "application/json",
+          "content-length": "1337",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "5a15d881-8e0d-4daf-aa2e-090168ad7d52"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON array of objects, one per passage. There's only one passage. We need to evaluate M, T, O. Query: \"definition declaratory judgment\". Passage: \"A declaratory judgment, sometimes called declaratory relief, is conclusive and legally binding as to the present and future rights of the parties involved. The parties involved in a declaratory judgment may not later seek another court resolution of the same legal issue unless they appeal the judgment.\"\n\nWe need to score intent match: Does it answer the query? The query is definition of declaratory judgment. The passage defines it: \"A declaratory judgment, sometimes called declaratory relief, is conclusive and legally binding as to the present and future rights of the parties involved.\" That is a definition. So M=3.\n\nTrustworthiness: The passage seems factual, but we don't know source. It's a straightforward definition. I'd give T=3 as well. Overall score O: combine? Usually O is overall relevance and trustworthiness. Since both high, O=3.\n\nThus output: [{\"M\":3,\"T\":3,\"O\":3}]."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":3,\"O\":3}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 252,
+        "totalTokens": 779
+      },
+      "metrics": {
+        "latencyMs": 1281
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7125239",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Common law. 1  Consent judgment: a consent judgment is available where the parties agree on the terms of the judgment or order that should be made. 2  Declaratory judgment: a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":3,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "27810dd1-c251-42d0-87c1-9f48a43f3b1d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:14 GMT",
+          "content-type": "application/json",
+          "content-length": "1191",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "27810dd1-c251-42d0-87c1-9f48a43f3b1d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON objects for each passage. There's only one passage. Query: \"definition declaratory judgment\". Passage: \"Common law. 1 Consent judgment: a consent judgment is available where the parties agree on the terms of the judgment or order that should be made. 2 Declaratory judgment: a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\"\n\nWe need to evaluate M, T, O. M: intent match. The passage contains definition of declaratory judgment. It's relevant. It's not perfect? It says \"a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\" That is a definition. So M=3. T: trustworthiness. It's a snippet from presumably a legal source. It's likely trustworthy. So T=3. O: overall score. Usually average? But guidelines: overall score maybe average of M and T? But we can assign 3. So output: {\"M\":3,\"T\":3,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":3,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 529,
+        "outputTokens": 232,
+        "totalTokens": 761
+      },
+      "metrics": {
+        "latencyMs": 1078
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "8305152",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"definition of a sigmet\" into a search engine.\nConsider the following passage: Definition of SIGMET. plural. SIGMETs. also. sigmets. : a notice of significant hazardous weather conditions (such as extreme turbulence, icing, or poor visibility) in a large area that is provided to the pilot of an aircraft before takeoff â compare airmet.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":3,\"O\":3}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a9054545-a11b-4ab3-809c-dc31bed4c540",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:15 GMT",
+          "content-type": "application/json",
+          "content-length": "1184",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a9054545-a11b-4ab3-809c-dc31bed4c540"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON array of objects, each with M, T, O scores. There's only one passage. Query: \"definition of a sigmet\". Passage: \"Definition of SIGMET. plural. SIGMETs. also. sigmets. : a notice of significant hazardous weather conditions (such as extreme turbulence, icing, or poor visibility) in a large area that is provided to the pilot of an aircraft before takeoff â compare airmet.\"\n\nWe need to evaluate relevance and trustworthiness. The passage is a definition of SIGMET. It matches query. So M=3. Trustworthiness: It's presumably from a source? The passage seems like a definition, but we don't know source. But it's likely trustworthy. We can give T=3. Overall O=3.\n\nReturn array with one object: {\"M\":3,\"T\":3,\"O\":3}.\n\nCheck format: Output array length and order must match input passages array. So output should be an array: [ {\"M\":3,\"T\":3,\"O\":3} ].\n\nNo extra commentary."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":3,\"O\":3}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 533,
+        "outputTokens": 246,
+        "totalTokens": 779
+      },
+      "metrics": {
+        "latencyMs": 1084
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "985994",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"definition of a sigmet\" into a search engine.\nConsider the following passage: sigmet SIGMET, or Significant Meteorological Information, is a weather advisory that contains meteorological information concerning the safety of all aircraft. There are two types of SIGMETs, convective and non-convective.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":3,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "fdc62e72-5268-480a-91c2-ac05b98e908c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:16 GMT",
+          "content-type": "application/json",
+          "content-length": "1056",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "fdc62e72-5268-480a-91c2-ac05b98e908c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate relevance and trustworthiness of the passage given the query \"definition of a sigmet\". The passage: \"sigmet SIGMET, or Significant Meteorological Information, is a weather advisory that contains meteorological information concerning the safety of all aircraft. There are two types of SIGMETs, convective and non-convective.\"\n\nWe need to produce JSON object with M, T, O scores. M: intent match. The passage defines SIGMET, matches query. So M=3. T: trustworthiness. The passage seems factual, but we don't know source. It's likely trustworthy. I'd give T=3. O: overall score, likely average of M and T? But guidelines: overall score maybe combined. Usually O = average or something. But we can decide. Since both M and T are 3, O=3. So output: {\"M\":3,\"T\":3,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":3,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 517,
+        "outputTokens": 211,
+        "totalTokens": 728
+      },
+      "metrics": {
+        "latencyMs": 887
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "8434623",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"difference between a mcdouble and a double cheeseburger\" into a search engine.\nConsider the following passage: There is a discernible difference between the two burgers, especially in the meat quality. The McDouble contains gristle and carry's a different flavor than the Double Cheeseburger. The double cheeseburger tastes more like beef. The McDouble tastes of whatever meat filler they use to fill the gap.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e3c0ef77-808f-44ef-b162-2c080d09ed93",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:18 GMT",
+          "content-type": "application/json",
+          "content-length": "1507",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e3c0ef77-808f-44ef-b162-2c080d09ed93"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage. Query: \"difference between a mcdouble and a double cheeseburger\". Passage: \"There is a discernible difference between the two burgers, especially in the meat quality. The McDouble contains gristle and carry's a different flavor than the Double Cheeseburger. The double cheeseburger tastes more like beef. The McDouble tastes of whatever meat filler they use to fill the gap.\"\n\nWe need to assign M, T, O. M: intent match. Passage addresses difference. It contains some answer but not precise. So M=2 (highly relevant). T: trustworthiness. The passage seems informal, possibly inaccurate. No citations. So T=1 (related but not trustworthy). O: overall score. Probably average of M and T? But guidelines: overall score is a combined measure. We can consider 2+1=3, average 1.5? But must be integer 0-3. Likely 1 or 2. Since M=2, T=1, overall maybe 1.5 => round? Probably 1. But maybe 2? Let's think: The passage is somewhat relevant but not trustworthy. So overall maybe 1.5 => round to 2? But guidelines: integer 0-3. I'd choose 1.5? But must be integer. I'd choose 1.5? No. I'd choose 1.5? Not allowed. So choose 1 or 2. I'd choose 1 because trustworthiness low. So O=1. So output: {\"M\":2,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 541,
+        "outputTokens": 356,
+        "totalTokens": 897
+      },
+      "metrics": {
+        "latencyMs": 1477
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "744165",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"difference between a mcdouble and a double cheeseburger\" into a search engine.\nConsider the following passage: Review: Triple Cheeseburger from McDonaldâs. When it comes to the various sizes of classic McDonaldâs cheeseburgers, the prices might have you scratching your head. The price differences between a McDonaldâs Cheeseburger, the beefier McDouble and the cheesier Double Cheeseburger now all fall within 50-cents of one another.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "034c7007-c4c6-48c1-9987-dfce28386b56",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:20 GMT",
+          "content-type": "application/json",
+          "content-length": "1979",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "034c7007-c4c6-48c1-9987-dfce28386b56"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage for relevance and trustworthiness. Query: \"difference between a mcdouble and a double cheeseburger\". Passage: \"Review: Triple Cheeseburger from McDonald’s. When it comes to the various sizes of classic McDonald’s cheeseburgers, the prices might have you scratching your head. The price differences between a McDonald’s Cheeseburger, the beefier McDouble and the cheesier Double Cheeseburger now all fall within 50-cents of one another.\"\n\nWe need to score M, T, O. M: relevance to query. The passage mentions McDouble and Double Cheeseburger, but it's about price differences, not the difference in composition. The query asks difference between a McDouble and a Double Cheeseburger. The passage does mention both, but only in context of price differences. It does not answer the difference in ingredients. So it's partially relevant but not fully. According to guidelines: 3 perfect, 2 highly relevant, 1 related, 0 irrelevant. This is somewhat related but not answering. So M=1.\n\nTrustworthiness: The passage is a review, presumably from a website. It's not a primary source but likely trustworthy. But we don't have evidence of reliability. It's a review, but it's about price differences. It's likely trustworthy. I'd give T=2? But guidelines: 3 perfect trustworthiness, 2 highly trustworthy, 1 related, 0 irrelevant. The passage is a review, presumably credible. I'd give T=2.\n\nOverall score O: combine? Probably average? But guidelines: overall score. I'd give O=1? But maybe 2? The passage is somewhat relevant but not fully. I'd give O=1.5? But must be integer 0-3. I'd choose O=1. Because it's related but not answering. So final JSON: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 563,
+        "outputTokens": 416,
+        "totalTokens": 979
+      },
+      "metrics": {
+        "latencyMs": 2033
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "7407803",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: Cancel. The difference between an RN and a BSN is that an RN is a title for a registered nurse, while a BSN stands for a Bachelor of Science in nursing. Learn about the differences between degrees and licenses with help from a licensed RN in this free video on nursing jobs and health care.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":3,\"O\":3}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7ad6d628-c125-48a3-b832-1829e4487e0c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:22 GMT",
+          "content-type": "application/json",
+          "content-length": "1571",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7ad6d628-c125-48a3-b832-1829e4487e0c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of objects for each passage. There's only one passage. We need to evaluate M, T, O. The passage: \"Cancel. The difference between an RN and a BSN is that an RN is a title for a registered nurse, while a BSN stands for a Bachelor of Science in nursing. Learn about the differences between degrees and licenses with help from a licensed RN in this free video on nursing jobs and health care.\"\n\nQuery: \"difference between rn and bsn\"\n\nWe need to score:\n\nIntent match M: The passage directly addresses the difference between RN and BSN. It says \"The difference between an RN and a BSN is that an RN is a title for a registered nurse, while a BSN stands for a Bachelor of Science in nursing.\" That is a direct answer. So M=3.\n\nTrustworthiness T: The passage seems to be from some source, but we don't know. It says \"Cancel.\" maybe a glitch. But it provides a clear explanation. There's no obvious misinformation. It's likely trustworthy. So T=3.\n\nOverall O: Should be high. Usually O = average or something? But guidelines: Provide overall score. We can set O=3.\n\nThus output: [{\"M\":3,\"T\":3,\"O\":3}]\n\nCheck format: JSON array of objects. Each object: {\"M\": score, \"T\": score, \"O\": score}. So output: [{\"M\":3,\"T\":3,\"O\":3}]\n\nNo extra commentary."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":3,\"O\":3}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 334,
+        "totalTokens": 869
+      },
+      "metrics": {
+        "latencyMs": 1884
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "4185812",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: An RN to BSN Completion program is now offered by many institutions to accommodate registered nurses who already have their associate's degree or a diploma level degree. Before deciding if an RN to BSN Completion program is the next step for you, it's important to understand the differences. Potential Differences in Salary Between an RN and a BSN Degree. Initially, an RN and a nurse with a BSN degree might both receive the same salary for the same nursing position.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":2,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "15f227de-29a9-4a2f-8141-c2c2cc314e9a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:23 GMT",
+          "content-type": "application/json",
+          "content-length": "842",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "15f227de-29a9-4a2f-8141-c2c2cc314e9a"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate relevance and trustworthiness of the passage given the query \"difference between rn and bsn\". The passage is about RN to BSN Completion program differences, salary differences, etc. The query is \"difference between rn and bsn\". The passage addresses differences between RN and BSN, so it's relevant. It contains some answer but not exact answer. So M=2. Trustworthiness: It's likely from an educational institution, but we don't know source. It's likely trustworthy. But we can't be sure. We can assign T=2. Overall O=2. So output: {\"M\":2,\"T\":2,\"O\":2}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":2,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 565,
+        "outputTokens": 154,
+        "totalTokens": 719
+      },
+      "metrics": {
+        "latencyMs": 882
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "3288600",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: A goldfish will grow to the depth of the water it is kept in. If the tank is not large enough to allow the goldfish to grow, it's growth will be stunted and this can cause the fish to become unhealthy and die. The fancy goldfish do not get as large as the common/comet/shubunkin/feeder goldfish.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":3,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e8b15ac0-ad9f-4d93-b65c-8e5a6a80fca9",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:25 GMT",
+          "content-type": "application/json",
+          "content-length": "1044",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e8b15ac0-ad9f-4d93-b65c-8e5a6a80fca9"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate relevance and trustworthiness of the passage given the query \"do goldfish grow\". The passage says: \"A goldfish will grow to the depth of the water it is kept in. If the tank is not large enough to allow the goldfish to grow, it's growth will be stunted and this can cause the fish to become unhealthy and die. The fancy goldfish do not get as large as the common/comet/shubunkin/feeder goldfish.\"\n\nWe need to assign M, T, O. M: intent match. The passage addresses the question \"do goldfish grow?\" It says they will grow to the depth of the water. So yes, it answers. So M=3. T: trustworthiness. The passage seems factual, but we don't know source. It's likely trustworthy. But we can give 3. O: overall score: maybe 3. So output: {\"M\":3,\"T\":3,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":3,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 545,
+        "outputTokens": 221,
+        "totalTokens": 766
+      },
+      "metrics": {
+        "latencyMs": 995
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "3288596",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: If the tank is not large enough to allow the goldfish to grow, it's growth will be stunted and this can cause the fish to become unhealthy and die. The fancy goldfish do not get as large as the common/comet/shubunkin/feeder goldfish. The more room you can give your goldfish, the faster it will grow.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":2,\"T\":2,\"O\":2}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e87a0f93-2648-4e99-bfc2-69719b79f65c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:26 GMT",
+          "content-type": "application/json",
+          "content-length": "1443",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e87a0f93-2648-4e99-bfc2-69719b79f65c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate relevance and trustworthiness of the passage given the query \"do goldfish grow\". The passage says: \"If the tank is not large enough to allow the goldfish to grow, it's growth will be stunted and this can cause the fish to become unhealthy and die. The fancy goldfish do not get as large as the common/comet/shubunkin/feeder goldfish. The more room you can give your goldfish, the faster it will grow.\"\n\nWe need to assign M, T, O. M: intent match. The passage addresses goldfish growth, yes. It says they grow, but growth depends on tank size. It answers the question \"do goldfish grow?\" Yes, they do, but growth is limited by tank size. So it's relevant. Score 2? It's highly relevant. It contains answer but also extra info. So M=2.\n\nT: trustworthiness. The passage seems factual but no source. It's general knowledge. Might be moderately trustworthy. Score 2? Could be 2. O: overall score: maybe average of M and T? But guidelines: overall score is a combined measure. Likely 2. So output: {\"M\":2,\"T\":2,\"O\":2}.\n\nWe need to output array of objects? The input had one passage. So output array length 1. So output: [{\"M\":2,\"T\":2,\"O\":2}]."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":2,\"T\":2,\"O\":2}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 545,
+        "outputTokens": 318,
+        "totalTokens": 863
+      },
+      "metrics": {
+        "latencyMs": 1281
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "8412684",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: Ecological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.cological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":1,\"T\":2,\"O\":1}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e06cf410-497e-42b2-8c29-1281a3adc7dc",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:28 GMT",
+          "content-type": "application/json",
+          "content-length": "2164",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e06cf410-497e-42b2-8c29-1281a3adc7dc"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON array of objects for each passage. There's only one passage. We need to evaluate M, T, O. Query: \"anthropological definition of environment\". Passage: \"Ecological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.cological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.\"\n\nWe need to check relevance: The passage is about ecological anthropology, which is a subfield of anthropology that studies environment's influence. The query is \"anthropological definition of environment\". The passage does not give a definition of environment, but it mentions environment in context. So it's somewhat relevant but not a direct definition. So M: 1 (related but does not answer). T: trustworthiness? The passage seems like a snippet from a text, but we don't know source. It's likely trustworthy? It's a generic statement. I'd give T: 2? But guidelines: trustworthiness: 3 perfect, 2 highly relevant, 1 related, 0 irrelevant. But trustworthiness is separate from relevance. We need to assess trustworthiness: Is the passage credible? It's a generic statement, but no source. I'd give 2? But maybe 1? The passage is not obviously from a reputable source. But it's a factual statement. I'd give 2. O: overall score: combine? Probably average? But guidelines: overall score is a single integer. We need to decide. Usually overall is maybe average of M and T? But we can decide. Let's think: M=1, T=2. Overall maybe 1? Or 2? The guidelines don't specify how to compute O. But we can interpret O as overall relevance and trustworthiness. I'd give 1.5? But must be integer 0-3. I'd choose 1. Because M is low. So O=1.\n\nThus output: [{\"M\":1,\"T\":2,\"O\":1}]."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":1,\"T\":2,\"O\":1}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 527,
+        "outputTokens": 442,
+        "totalTokens": 969
+      },
+      "metrics": {
+        "latencyMs": 1957
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "8635981",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: By K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment..\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "0cb88c70-f440-446f-9bc1-2fc8522acfda",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:30 GMT",
+          "content-type": "application/json",
+          "content-length": "1569",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "0cb88c70-f440-446f-9bc1-2fc8522acfda"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage for relevance and trustworthiness. Query: \"anthropological definition of environment\". Passage: \"By K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment.\"\n\nWe need to score M, T, O. M: intent match. The query is \"anthropological definition of environment\". The passage gives definition of cultural ecology, which is about how society adapts to environment. It does not give definition of environment itself. So it's somewhat related but not directly answering. So M=1 (related). T: trustworthiness. The passage cites K. Kris Hirst, mentions Julian Steward, 1955 book. It's likely credible. So T=2? But we need to consider trustworthiness: is it reliable? It's a passage from presumably a source. It's a definition. I'd give T=2 (highly trustworthy). O: overall score: maybe average? But guidelines: overall score likely reflect both. I'd give O=1? But maybe 2? Let's think: M=1, T=2. O maybe 1? The overall score should reflect both. The passage is somewhat relevant but not perfect. So O=1. So output: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 533,
+        "outputTokens": 322,
+        "totalTokens": 855
+      },
+      "metrics": {
+        "latencyMs": 1402
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "5032362",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"axon terminals or synaptic knob definition\" into a search engine.\nConsider the following passage: What is the term used to describe the rounded areas on the ends of the axon terminals? a) synaptic vesicles Incorrect. Synaptic vesicles are structures within the synaptic knobs. b) axons c) dendrites d) synaptic knobs Correct. Synaptic knobs are located at the tip of each axon terminal.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":3,\"O\":3}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4ad90970-704a-4712-a225-12f345204e6e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:31 GMT",
+          "content-type": "application/json",
+          "content-length": "1102",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4ad90970-704a-4712-a225-12f345204e6e"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce a JSON array of objects, one per passage. There's only one passage. We need to evaluate M, T, O. The passage: \"What is the term used to describe the rounded areas on the ends of the axon terminals? a) synaptic vesicles Incorrect. Synaptic vesicles are structures within the synaptic knobs. b) axons c) dendrites d) synaptic knobs Correct. Synaptic knobs are located at the tip of each axon terminal.\"\n\nQuery: \"axon terminals or synaptic knob definition\". The passage directly addresses the definition of synaptic knobs, which are the rounded areas on axon terminals. So intent match: 3. Trustworthiness: The passage seems like a quiz question with answer. It's factual. So trustworthiness: 3. Overall: 3. So output: {\"M\":3,\"T\":3,\"O\":3}. Since only one passage, output array with one object. Ensure JSON array."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":3,\"O\":3}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 543,
+        "outputTokens": 222,
+        "totalTokens": 765
+      },
+      "metrics": {
+        "latencyMs": 988
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "1681334",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"axon terminals or synaptic knob definition\" into a search engine.\nConsider the following passage: Psychology Definition of TERMINAL BUTTON: the terminal part of an axon from which a neural signal is rendered, via dispersion of a neurotransmitter, across a synapse to a nearby neuron TERMINAL BUTTON: The terminal button is commonly referred to as the synaptic button, end button, button terminal, terminal bulb, and synaptic knob. Related Psychology Terms axon terminal\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "[{\"M\":3,\"T\":3,\"O\":3}]",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "77e45a32-1195-471a-9b6d-75eb10ae7559",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:33 GMT",
+          "content-type": "application/json",
+          "content-length": "1266",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "77e45a32-1195-471a-9b6d-75eb10ae7559"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of objects for each passage. There's only one passage. We need to evaluate M, T, O. Query: \"axon terminals or synaptic knob definition\". Passage: \"Psychology Definition of TERMINAL BUTTON: the terminal part of an axon from which a neural signal is rendered, via dispersion of a neurotransmitter, across a synapse to a nearby neuron TERMINAL BUTTON: The terminal button is commonly referred to as the synaptic button, end button, button terminal, terminal bulb, and synaptic knob. Related Psychology Terms axon terminal\"\n\nWe need to score intent match M: The passage defines terminal button, synonyms, includes synaptic knob. Query is definition of axon terminals or synaptic knob. Passage provides definition. So M=3.\n\nTrustworthiness T: The passage seems from a psychology definition source, likely credible. No obvious issues. So T=3.\n\nOverall O: combine? Usually O is overall relevance and trustworthiness. Likely 3.\n\nThus output: [{\"M\":3,\"T\":3,\"O\":3}]."
+                }
+              }
+            },
+            {
+              "text": "[{\"M\":3,\"T\":3,\"O\":3}]"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 550,
+        "outputTokens": 243,
+        "totalTokens": 793
+      },
+      "metrics": {
+        "latencyMs": 968
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "7666831",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"causes of left ventricular hypertrophy\" into a search engine.\nConsider the following passage: Left ventricular hypertrophy: Related Topics. These medical condition or symptom topics may be relevant to medical information for Left ventricular hypertrophy: 1  Ventricular hypertrophy. 2  Left. 3  Ventricular. 4  Hypertrophy. 5  Enlargement. 6  Ventricle. 7  Heart. 8  Heart symptoms (2927 causes). 9  Heart disease (106 causes). 10  Heart disorder.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "0267a7a6-e123-436b-b7f3-a998ad426be1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:34 GMT",
+          "content-type": "application/json",
+          "content-length": "976",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "0267a7a6-e123-436b-b7f3-a998ad426be1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage. Query: \"causes of left ventricular hypertrophy\". Passage: \"Left ventricular hypertrophy: Related Topics. These medical condition or symptom topics may be relevant to medical information for Left ventricular hypertrophy: 1  Ventricular hypertrophy. 2  Left. 3  Ventricular. 4  Hypertrophy. 5  Enlargement. 6  Ventricle. 7  Heart. 8  Heart symptoms (2927 causes). 9  Heart disease (106 causes). 10  Heart disorder.\"\n\nThis passage lists related topics but does not provide actual causes. So intent match: related but not answer. Score 1. Trustworthiness: It's a list of topics, not a source. Likely not trustworthy. Score 1. Overall: maybe 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 571,
+        "outputTokens": 208,
+        "totalTokens": 779
+      },
+      "metrics": {
+        "latencyMs": 990
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "5197135",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"causes of left ventricular hypertrophy\" into a search engine.\nConsider the following passage: Ventricular hypertrophy. Ventricular hypertrophy (VH) is thickening of the walls of a ventricle (lower chamber) of the heart. Although left ventricular hypertrophy (LVH) is more common, right ventricular hypertrophy (RVH) can also occur, as can hypertrophy of both ventricles, that is, biventricular hypertrophy (BVH). Ventricular hypertrophy can be part of various syndromes caused by any of various underlying diseases.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":2,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7afaf410-0355-4426-a4a1-961c700b07ca",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:36 GMT",
+          "content-type": "application/json",
+          "content-length": "1493",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7afaf410-0355-4426-a4a1-961c700b07ca"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage for relevance and trustworthiness. The query: \"causes of left ventricular hypertrophy\". Passage: \"Ventricular hypertrophy. Ventricular hypertrophy (VH) is thickening of the walls of a ventricle (lower chamber) of the heart. Although left ventricular hypertrophy (LVH) is more common, right ventricular hypertrophy (RVH) can also occur, as can hypertrophy of both ventricles, that is, biventricular hypertrophy (BVH). Ventricular hypertrophy can be part of various syndromes caused by any of various underlying diseases.\"\n\nWe need to score M, T, O. M: Intent match. The passage mentions LVH and that it can be part of various syndromes caused by underlying diseases. It does not list specific causes. The query is \"causes of left ventricular hypertrophy\". The passage does mention that LVH can be part of various syndromes caused by underlying diseases, but does not list them. So it's somewhat relevant but not fully answering. So M=2? It's highly relevant but not fully answering. T: trustworthiness. The passage seems factual, but no source. It's a generic description. I'd give T=2? It's likely trustworthy but not verified. O: overall score: maybe 2. So output: {\"M\":2,\"T\":2,\"O\":2}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":2,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 575,
+        "outputTokens": 307,
+        "totalTokens": 882
+      },
+      "metrics": {
+        "latencyMs": 1485
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "8819111",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"causes of military suicide\" into a search engine.\nConsider the following passage: Suicide surpassed war as the military's leading cause of death. War was the leading cause of death in the military nearly every year between 2004 and 2011 until suicides became the top means dying for in 2012 and 2013, according to a bar chart published this week in a.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "25a89c24-3c0a-4a81-bd8e-b0140668c7f5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:37 GMT",
+          "content-type": "application/json",
+          "content-length": "1110",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "25a89c24-3c0a-4a81-bd8e-b0140668c7f5"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage. Query: \"causes of military suicide\". Passage: \"Suicide surpassed war as the military's leading cause of death. War was the leading cause of death in the military nearly every year between 2004 and 2011 until suicides became the top means dying for in 2012 and 2013, according to a bar chart published this week in a.\"\n\nWe need to score M (intent match), T (trustworthiness), O (overall). The passage mentions that suicide surpassed war as leading cause of death, but does not list causes of military suicide. It gives some context but not causes. So intent match: related but not answer. So score 1. Trustworthiness: unclear source, but mentions bar chart published this week in a. Not enough info. Could be somewhat trustworthy but uncertain. I'd give 1. Overall: maybe 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 535,
+        "outputTokens": 220,
+        "totalTokens": 755
+      },
+      "metrics": {
+        "latencyMs": 999
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "8333919",
+    "prompt": "Evaluate the relevance and trustworthiness of web passages given a user query, providing a structured score for each passage.\nBegin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.\n- For each given query and its associated passages, assign scores on an integer scale from 0 to 3 for measures of intent match (M), trustworthiness (T), and overall score (O).\n- Adhere strictly to the scoring guidelines:\n- 3: Perfectly relevant. The passage is dedicated to the query and contains the exact answer.\n- 2: Highly relevant. The passage contains some answer, but it may be unclear or mixed with extraneous information.\n- 1: Related. The passage is on-topic but does not answer the query.\n- 0: Irrelevant. The passage is not related to the query.\n- Evaluate every single passage; do not leave any items unscored or blank.\n- Always assume you are preparing a report based on the topic from the query.\n- Consider the user's intent as expressed by their search and methodically assess each passage.\n- Input Parameters:\n- `query`: A non-empty string representing the user's search query.\n- `passages`: An array of non-empty strings, with each string as a passage to be evaluated.\n- Output:\n- A json object with the format: { \"M\": score, \"T\": score, \"O\": score } where each score is an integer from 0 to 3.\n\nA person has typed \"causes of military suicide\" into a search engine.\nConsider the following passage: Suicide surpassed war as the military's leading cause of death. War was the leading cause of death in the military nearly every year between 2004 and 2011 until suicides became the top means dying for in 2012 and 2013, according to a bar chart published this week in a. Post to Facebook.\n- If a passage or the query is empty or not a string, use null for each score in that object: { \"M\": null, \"T\": null, \"O\": null }.\n- Output array length and order must match the input `passages` array.\n- Do not output any reasoning or commentary—only the JSON object.\nExample: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "58b5f40d-401b-472b-8bc6-663e1460e29d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Wed, 10 Sep 2025 08:23:38 GMT",
+          "content-type": "application/json",
+          "content-length": "1173",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "58b5f40d-401b-472b-8bc6-663e1460e29d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to evaluate the passage. Query: \"causes of military suicide\". Passage: \"Suicide surpassed war as the military's leading cause of death. War was the leading cause of death in the military nearly every year between 2004 and 2011 until suicides became the top means dying for in 2012 and 2013, according to a bar chart published this week in a. Post to Facebook.\"\n\nWe need to score M (intent match), T (trustworthiness), O (overall). The passage is about suicide being leading cause of death, but does not list causes of military suicide. It mentions that suicide surpassed war as leading cause. It doesn't answer causes. So it's related but not answering. So M=1. Trustworthiness: It's referencing a bar chart published this week in a. Post to Facebook. That seems not very trustworthy. It's a social media post. So T=1 maybe. Overall: combine M and T. Likely 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 539,
+        "outputTokens": 237,
+        "totalTokens": 776
+      },
+      "metrics": {
+        "latencyMs": 1087
+      }
+    }
+  }
+]

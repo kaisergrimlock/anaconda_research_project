@@ -8,10 +8,10 @@ from datetime import datetime
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_FILE = Path("prompt.txt")
-INPUT_CSV   = Path("outputs/trec_dl/combined_result_injected_eng_20.csv")
+PROMPT_FILE = Path("prompts/prompt.txt")
+INPUT_CSV   = Path("outputs/trec_dl/combined_result_translated_zh_20.csv")
 
-OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/translated")   # CSV outputs per run/model
+OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/translated/zh")   # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")                    # JSON logs
 TOKENS_CSV  = Path("outputs/trec_dl_llm_label/token_usage.csv")
 
