@@ -1,0 +1,762 @@
+[
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "8260035",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: cost of interior concrete flooring \nPassage: Stained Concrete chi phí sàn bê tông nội thất Pricing - Interior Ver. 4.3. Thank you for visiting our Concrete Staining Cost page, we will go over some of the options that are available for concrete staining for interior floors and the pricing for them. First, let's make sure you are using the right estimator for your project, here's a quick primer on concrete staining.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "bc2a28bf-4be8-4128-aff2-9b454935ac7b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:26 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "bc2a28bf-4be8-4128-aff2-9b454935ac7b"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 354,
+        "outputTokens": 21,
+        "totalTokens": 375
+      },
+      "metrics": {
+        "latencyMs": 807
+      }
+    }
+  },
+  {
+    "query": "cost of interior concrete flooring",
+    "docid": "8259116",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: cost of interior concrete flooring \nPassage: Browse hundreds of concrete floor photos in kitchens, living rooms, business lobbies and more. Find out average prices and what design features contribute to the cost of concrete flooring. Get answers to chi phí sàn bê tông nội thất common questions about the comfort and maintenance of concrete floors. Watch 68 videos with design ideas, and installation & maintenance tips for interior concrete floors. Get professional tips and design ideas for using stains to enhance concrete floors. Learn how polishing produces concrete floors with a high-gloss finish that never needs waxing.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "966214f3-a179-439c-b62c-93d1a846b2c2",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:27 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "966214f3-a179-439c-b62c-93d1a846b2c2"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 380,
+        "outputTokens": 21,
+        "totalTokens": 401
+      },
+      "metrics": {
+        "latencyMs": 412
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501557",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: definition declaratory judgment \nPassage: An action or proceeding is not open định nghĩa phán quyết tuyên bố to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "45f81a92-61d9-43e5-80b6-18901d2bbb36",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:28 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "45f81a92-61d9-43e5-80b6-18901d2bbb36"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 332,
+        "outputTokens": 21,
+        "totalTokens": 353
+      },
+      "metrics": {
+        "latencyMs": 915
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "2174992",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: definition declaratory judgment \nPassage: Breesâ Eighth Cause of Action, for âDeclaratory Judgment,â Fails to State a Claim Against Both Miller and. ISM định nghĩa phán quyết tuyên bố ...........................................................................................................................  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "084930d9-e30a-4898-a6f2-4a0ee86e7529",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:29 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "084930d9-e30a-4898-a6f2-4a0ee86e7529"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 312,
+        "outputTokens": 21,
+        "totalTokens": 333
+      },
+      "metrics": {
+        "latencyMs": 801
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "985988",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: definition of a sigmet \nPassage: ï· SIGMET 1 is the type of the message and the sequential number of the day; ï· VALID 150435/150835 is the period of validity of the message. It định nghĩa của một sigmet follows the same standard of the. date/time of the header.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "00799151-bc95-47fc-b951-ed4e1ebafe12",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:31 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "00799151-bc95-47fc-b951-ed4e1ebafe12"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 327,
+        "outputTokens": 21,
+        "totalTokens": 348
+      },
+      "metrics": {
+        "latencyMs": 976
+      }
+    }
+  },
+  {
+    "query": "definition of a sigmet",
+    "docid": "2683747",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: definition of a sigmet \nPassage: Related to convective: Convective precipitation, convective định nghĩa của một sigmet SIGMET convection Air heated by a space heater rises and is replaced by cool air, creating a convection current that circulates hot air throughout a room. conÂ·vecÂ·tion (kÉn-vÄkâ²shÉn) n. 1. The act or process of conveying; transmission. 2. Physics a.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "92848f9c-4f9d-433a-a62b-35d398ce8d58",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:31 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "92848f9c-4f9d-433a-a62b-35d398ce8d58"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 365,
+        "outputTokens": 21,
+        "totalTokens": 386
+      },
+      "metrics": {
+        "latencyMs": 440
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "744167",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: difference between a mcdouble and a double cheeseburger \nPassage: The Double Cheeseburger is priced at $1.49 and my Triple Cheeseburger was priced at $2.19. I just donât understand the point of paying 70-cents for an extra burger patty when you can just Sự khác biệt giữa mcdouble và double cheeseburger get two McDoubles for $2.00. Obviously the value of the Triple Cheeseburger makes no sense when youâre comparing menu items.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "2c05486a-f26d-4e1f-9188-32db6c3e58bd",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:32 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "2c05486a-f26d-4e1f-9188-32db6c3e58bd"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 383,
+        "outputTokens": 21,
+        "totalTokens": 404
+      },
+      "metrics": {
+        "latencyMs": 449
+      }
+    }
+  },
+  {
+    "query": "difference between a mcdouble and a double cheeseburger",
+    "docid": "2226093",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: difference between a mcdouble and a double cheeseburger \nPassage: The difference is that the Mighty Kid's Meal provides more food than what is typically found in a Happy Meal, providing a McDouble (a cheeseburger consisting of two patties and one slice of cheese) instead of Sự khác biệt giữa mcdouble và double cheeseburger a cheeseburger or a hamburger, and more Chicken McNuggets (6 versus 4), plus a larger drink (16oz vs 12oz).  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "cbdb2297-5003-4356-b89f-8521e51a58cc",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:33 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "cbdb2297-5003-4356-b89f-8521e51a58cc"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 377,
+        "outputTokens": 21,
+        "totalTokens": 398
+      },
+      "metrics": {
+        "latencyMs": 793
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "5077707",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: difference between rn and bsn \nPassage: Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly Sự khác biệt giữa rn và bsn confused. Thanks.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "60f757e7-612a-42fd-9025-e47eefe7fb27",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:34 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "60f757e7-612a-42fd-9025-e47eefe7fb27"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 346,
+        "outputTokens": 21,
+        "totalTokens": 367
+      },
+      "metrics": {
+        "latencyMs": 824
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "8283527",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: difference between rn and bsn \nPassage: 0 Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the Sự khác biệt giữa rn và bsn BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "3782ce61-7adc-44b2-ab0f-03fde1d4dc4f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:35 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "3782ce61-7adc-44b2-ab0f-03fde1d4dc4f"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 347,
+        "outputTokens": 21,
+        "totalTokens": 368
+      },
+      "metrics": {
+        "latencyMs": 885
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "8273018",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: do goldfish grow \nPassage: Goldfish Hanging Plant â How To Grow Goldfish Houseplant. Goldfish plants (Columnea gloriosa) come to us from the Central and South American tropics and derive their common name from the unusual shape of their flowers, which with some cá vàng có phát triển không imagination, resemble fish. Under ideal conditions, the goldfish hanging plant blooms prolifically in a variety of reds, oranges and yellows.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a890c1dc-4ca5-485e-a72d-9d6026894f47",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:37 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a890c1dc-4ca5-485e-a72d-9d6026894f47"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 359,
+        "outputTokens": 21,
+        "totalTokens": 380
+      },
+      "metrics": {
+        "latencyMs": 841
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "8635981",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: anthropological definition of environment \nPassage: By định nghĩa nhân chủng học về môi trường K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment..  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "8c08d9cc-d102-4605-aef1-22fed4c33eb7",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:38 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "8c08d9cc-d102-4605-aef1-22fed4c33eb7"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 343,
+        "outputTokens": 21,
+        "totalTokens": 364
+      },
+      "metrics": {
+        "latencyMs": 791
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "1726",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: anthropological definition of environment \nPassage: Biological Anthropology. The graduate program in biological anthropology at CU Boulder định nghĩa nhân chủng học về môi trường offers training in several areas, including primatology, human biology, and paleoanthropology. We share an interest in human ecology, the broad integrative area of anthropology that focuses on the interactions of culture, biology and the environment.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "91872c4d-312e-497a-877e-390c0026dae3",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:39 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "91872c4d-312e-497a-877e-390c0026dae3"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 342,
+        "outputTokens": 21,
+        "totalTokens": 363
+      },
+      "metrics": {
+        "latencyMs": 798
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "8418683",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: axon terminals or synaptic knob definition \nPassage: Presynaptic Knob Definition of Presynaptic Knob :An area at the end thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp of an axon that contains neurotransmitters in synaptic vesicles. Presynaptic Knob is part of the Chemical Synapse Component group.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "5a60df3d-1068-4443-bcb3-c0e3f9668463",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:40 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "5a60df3d-1068-4443-bcb3-c0e3f9668463"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 356,
+        "outputTokens": 21,
+        "totalTokens": 377
+      },
+      "metrics": {
+        "latencyMs": 944
+      }
+    }
+  },
+  {
+    "query": "axon terminals or synaptic knob definition",
+    "docid": "2408264",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: axon terminals or synaptic knob definition \nPassage: Neurotransmitters are chemicals that transmit messages from one nerve cell (neuron) to another. The thiết bị đầu cuối sợi trục hoặc định nghĩa núm tiếp hợp nerve impulse travels from the first nerve cell through the axonâa single smooth body arising from the nerve cellâ to the axon terminal and the synaptic knobs.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 3, \"T\": 3, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "73661343-1806-4c40-8a6e-34268fb335f2",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:41 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "73661343-1806-4c40-8a6e-34268fb335f2"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 3, \"T\": 3, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 356,
+        "outputTokens": 21,
+        "totalTokens": 377
+      },
+      "metrics": {
+        "latencyMs": 484
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "47210",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: causes of left ventricular hypertrophy \nPassage: The last common cause of right ventricular hypertrophy is the ventricular septal defect. This is a disease affecting the ventricular septum. The nguyên nhân của phì đại thất trái ventricular septum, on the other hand, is the wall that divides the right and left ventricles of the heart. Symptoms of Right Ventricular Hypertrophy  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "fb84f524-7efc-4d8e-b414-b11572ed638f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:42 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "fb84f524-7efc-4d8e-b414-b11572ed638f"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 355,
+        "outputTokens": 21,
+        "totalTokens": 376
+      },
+      "metrics": {
+        "latencyMs": 848
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "5197130",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: causes of left ventricular hypertrophy \nPassage: Right ventricular hypertrophy. Description, Causes and Risk Factors: Abbreviation: RVH. Right ventricular hypertrophy is the increase or the enlargement in the size of the right ventricle of the heart. The right ventricle is responsible for pumping blood towards the lungs. In the lungs, blood is mixed with oxygen and nguyên nhân của phì đại thất trái then pumped back to the left ventricle to be eventually distributed to the brain and to other parts of the body. There are several possible causes of right ventricular hypertrophy.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 0, \"T\": 2, \"O\": 0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "148b09bd-59ab-4a99-af15-0dff8231296d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:43 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "148b09bd-59ab-4a99-af15-0dff8231296d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 0, \"T\": 2, \"O\": 0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 399,
+        "outputTokens": 21,
+        "totalTokens": 420
+      },
+      "metrics": {
+        "latencyMs": 343
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "1749882",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: causes of military suicide \nPassage: The truth is that more military personnel died during the first six years of the Bush administration than died during the eight years Nguyên nhân tự tử quân sự Clinton was in office, even counting military deaths in the U.S. from accidents, murders, suicides and natural causes.  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a4070b7f-7e60-4445-8304-fe8a8fce1358",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:44 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a4070b7f-7e60-4445-8304-fe8a8fce1358"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 321,
+        "outputTokens": 21,
+        "totalTokens": 342
+      },
+      "metrics": {
+        "latencyMs": 849
+      }
+    }
+  },
+  {
+    "query": "causes of military suicide",
+    "docid": "3919937",
+    "used_passage": "passage_injected",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  \nQuery: causes of military suicide \nPassage: Are assigned as Nguyên nhân tự tử quân sự additional codes to indicate how the injury or health condition happened (cause), the intent (unintentional or accidental; intentional , such as suicide or assault), the palce where the even occurred, the activity of the patient at the time of the event, and the person's status (e.g., civilian, military  \nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the passage is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Final score must be an integer value only. Do not provide any code in result. Provide each score in the format of: {\"M\": score, \"T\": score, \"O\": score} Results {} without reasoning.",
+    "response_text": "{\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c1710272-b368-4cd6-959a-8f5d74b1cbcf",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 00:52:45 GMT",
+          "content-type": "application/json",
+          "content-length": "213",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c1710272-b368-4cd6-959a-8f5d74b1cbcf"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "{\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 342,
+        "outputTokens": 21,
+        "totalTokens": 363
+      },
+      "metrics": {
+        "latencyMs": 871
+      }
+    }
+  }
+]

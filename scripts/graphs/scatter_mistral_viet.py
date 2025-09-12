@@ -5,8 +5,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-INPUT = Path("outputs/trec_dl_llm_label/scatter_mixtral.csv")
-OUT   = Path("outputs/trec_dl_llm_graphs/scatter_mixtral_by_docid_offset.pdf")
+INPUT = Path("outputs/trec_dl_llm_label/translated/viet/scatter_mixtral.csv")
+OUT   = Path("outputs/trec_dl_llm_graphs/scatter_mixtral_viet.pdf")
 
 df = pd.read_csv(INPUT)
 
