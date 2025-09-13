@@ -1,0 +1,899 @@
+[
+  {
+    "query": "anthropological definition of environment",
+    "docid": "8635981",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: By K. Kris Hirst. Definition: Cultural Ecology is an anthropological theory put forward by Julian Steward and used widely by archaeologists. Steward defined cultural ecology in his 1955 book The Theory of Culture Change as the study of the processes by which a society adapts to its environment..\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "cef142a2-2586-4602-ae43-7b74c276c9e6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:38 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "cef142a2-2586-4602-ae43-7b74c276c9e6"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 365,
+        "outputTokens": 19,
+        "totalTokens": 384
+      },
+      "metrics": {
+        "latencyMs": 351
+      }
+    }
+  },
+  {
+    "query": "anthropological definition of environment",
+    "docid": "1726",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"anthropological definition of environment\" into a search engine.\nConsider the following passage: Biological Anthropology. The graduate program in biological anthropology at CU Boulder offers training in several areas, including primatology, human biology, and paleoanthropology. We share an interest in human ecology, the broad integrative area of anthropology that focuses on the interactions of culture, biology and the environment.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": Not Applicable, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "9d31917f-c281-4b61-aba7-5bac309acdc3",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:39 GMT",
+          "content-type": "application/json",
+          "content-length": "227",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "9d31917f-c281-4b61-aba7-5bac309acdc3"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": Not Applicable, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 371,
+        "outputTokens": 21,
+        "totalTokens": 392
+      },
+      "metrics": {
+        "latencyMs": 295
+      }
+    }
+  },
+  {
+    "query": "causes of left ventricular hypertrophy",
+    "docid": "47210",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"causes of left ventricular hypertrophy\" into a search engine.\nConsider the following passage: The last common cause of right ventricular hypertrophy is the ventricular septal defect. This is a disease affecting the ventricular septum. The ventricular septum, on the other hand, is the wall that divides the right and left ventricles of the heart. Symptoms of Right Ventricular Hypertrophy\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 0, \"T\": 0, \"O\": 0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7ebbdd52-061f-4f93-a9ed-147b41a860a1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:39 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7ebbdd52-061f-4f93-a9ed-147b41a860a1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 0, \"T\": 0, \"O\": 0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 377,
+        "outputTokens": 19,
+        "totalTokens": 396
+      },
+      "metrics": {
+        "latencyMs": 314
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "5077707",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused. Thanks.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 3, \"T\": 2, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "23873920-a3b4-4dcf-a35f-78af6eba351d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:40 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "23873920-a3b4-4dcf-a35f-78af6eba351d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 3, \"T\": 2, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 369,
+        "outputTokens": 19,
+        "totalTokens": 388
+      },
+      "metrics": {
+        "latencyMs": 363
+      }
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "8283527",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: 0 Help me out here pls. What is the difference between a BSN and an RN. Don't you go through the four year program to get the BSN/RN. I've noticed that people put a stress on the BSN-route -RN -attained degree. I'm truly confused.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 3, \"T\": 2, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "552a36a1-cf70-4ba6-a5d7-1677a6122a93",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:40 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "552a36a1-cf70-4ba6-a5d7-1677a6122a93"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 3, \"T\": 2, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 369,
+        "outputTokens": 19,
+        "totalTokens": 388
+      },
+      "metrics": {
+        "latencyMs": 336
+      }
+    }
+  },
+  {
+    "query": "is cdg airport in main paris",
+    "docid": "6654655",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"is cdg airport in main paris\" into a search engine.\nConsider the following passage: CDG PARIS AIRPORT SHUTTLE. Do not lose your time on your arrival to CDG Paris. Airport-Shuttle offers automobiles with drivers specialized in the door-to-door transport of passengers between Paris airports (CDG, ORY and BVA) and Paris hotels.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "22027a1c-055c-400c-866a-5425d850d8ba",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:41 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "22027a1c-055c-400c-866a-5425d850d8ba"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 364,
+        "outputTokens": 19,
+        "totalTokens": 383
+      },
+      "metrics": {
+        "latencyMs": 347
+      }
+    }
+  },
+  {
+    "query": "is cdg airport in main paris",
+    "docid": "7447941",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"is cdg airport in main paris\" into a search engine.\nConsider the following passage: cdg, Paris Charles de Gaulle Airport, Paris, France weather text for Thu 20th April. The cdg, Paris Charles de Gaulle Airport, Paris, France weather is going to be sunny. cdg, Paris Charles de Gaulle Airport, Paris, France visibility is going to be around 20 km i.e. 12 miles and an atmospheric pressure of 1035 mb.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a33a129b-748b-48c5-b890-a0f231a95fc1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:41 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a33a129b-748b-48c5-b890-a0f231a95fc1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 393,
+        "outputTokens": 19,
+        "totalTokens": 412
+      },
+      "metrics": {
+        "latencyMs": 366
+      }
+    }
+  },
+  {
+    "query": "is cdg airport in main paris",
+    "docid": "2365660",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"is cdg airport in main paris\" into a search engine.\nConsider the following passage: From Aeroport Charles De Gaulle 2 Tgv train to Paris St-Michel/Notre Dame, train to Paris Champ de Mars/TourEiffel, then walk to Eiffel Tower. 1 h 17â¬. From Airport CDG T2 line 2 bus to Porte Maillot, walk to Andre Maurois, line 82 bus to Champ De Mars, then walk to Eiffel Tower. 1 h 8 min 19â¬. From Paris CDG Airport (CDG) taxi to Eiffel Tower. 30 min 62â¬. From Paris CDG Airport (CDG) drive to Eiffel Tower. 30 min 5â¬. From Paris CDG Airport (CDG) Uber to Eiffel Tower. 30 min 46â¬.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "ebf49c12-37b4-4fc5-906d-d1f2b3f8a4af",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:42 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "ebf49c12-37b4-4fc5-906d-d1f2b3f8a4af"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 495,
+        "outputTokens": 19,
+        "totalTokens": 514
+      },
+      "metrics": {
+        "latencyMs": 338
+      }
+    }
+  },
+  {
+    "query": "lps laws definition",
+    "docid": "456708",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"lps laws definition\" into a search engine.\nConsider the following passage: LPS requirements are covered in clause 2.5 of the standard. Interestingly, LPS is not defined in clause 1.2 of the standard, the definitions section, or in clause 2.5, the LPS requirements section. Iâll take a crack at writing a succinct definition for LPS:\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "f2a2ddf1-0e50-45aa-a3ad-50020f7d16f1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:43 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "f2a2ddf1-0e50-45aa-a3ad-50020f7d16f1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 364,
+        "outputTokens": 19,
+        "totalTokens": 383
+      },
+      "metrics": {
+        "latencyMs": 311
+      }
+    }
+  },
+  {
+    "query": "lps laws definition",
+    "docid": "1465664",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"lps laws definition\" into a search engine.\nConsider the following passage: one doing business in any other state. -lp must file an application for registration. -new state issues a certificate of registration, allowing the lp to utilize all assets of that state. -- law of the state in which the lp is formed is the law that governs the ops organization, internal affairs, and liability of its limited partners.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "9b42009f-5f1b-4892-93d3-021cf0f266c1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:43 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "9b42009f-5f1b-4892-93d3-021cf0f266c1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 363,
+        "outputTokens": 19,
+        "totalTokens": 382
+      },
+      "metrics": {
+        "latencyMs": 294
+      }
+    }
+  },
+  {
+    "query": "lps laws definition",
+    "docid": "8079046",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"lps laws definition\" into a search engine.\nConsider the following passage: We've got 73 definitions for LPS Â» What does LPS stand for? What does LPS mean? This page is about the various possible meanings of the acronym, abbreviation, shorthand or slang term: LPS.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "f87fce49-ff40-439b-8100-2d483d77658c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:44 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "f87fce49-ff40-439b-8100-2d483d77658c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 353,
+        "outputTokens": 19,
+        "totalTokens": 372
+      },
+      "metrics": {
+        "latencyMs": 339
+      }
+    }
+  },
+  {
+    "query": "lps laws definition",
+    "docid": "3526411",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"lps laws definition\" into a search engine.\nConsider the following passage: The Law and Ethyl Alcohol ..................................... Equistar Chemicals, LP and Industrial Ethyl Alcohol ..................... Services of Equistar Chemicals, LP ............................... What Is Ethyl Alcohol ........................................ The Sources of Industrial Ethyl Alcohol .............................\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 0, \"T\": 0, \"O\": 0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c5cdc271-9d83-4c20-974e-fc2103cd3c24",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:44 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c5cdc271-9d83-4c20-974e-fc2103cd3c24"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 0, \"T\": 0, \"O\": 0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 359,
+        "outputTokens": 19,
+        "totalTokens": 378
+      },
+      "metrics": {
+        "latencyMs": 313
+      }
+    }
+  },
+  {
+    "query": "medicare's definition of mechanical ventilation",
+    "docid": "2176453",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"medicare's definition of mechanical ventilation\" into a search engine.\nConsider the following passage: For 363 of the selected claims, Medicare payments to hospitals were incorrect. For example, for one beneficiary, the documentation (e.g., time log for the mechanical. ventilation) showed that the beneficiary had received 73 hours of mechanical. ventilation.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "b2d00e21-b23f-49cc-8eda-ed5408695cdc",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:45 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "b2d00e21-b23f-49cc-8eda-ed5408695cdc"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 362,
+        "outputTokens": 19,
+        "totalTokens": 381
+      },
+      "metrics": {
+        "latencyMs": 377
+      }
+    }
+  },
+  {
+    "query": "medicare's definition of mechanical ventilation",
+    "docid": "2176450",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"medicare's definition of mechanical ventilation\" into a search engine.\nConsider the following passage: For 14 of the 377 selected claims, Medicare payments to hospitals were correct; the beneficiaries. For example, for one beneficiary, the documentation (e.g., time log for the mechanical. ventilation) showed that the beneficiary had received 73 hours of mechanical. ventilation.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "9eadb32b-3d19-449d-acb4-9c30723aa058",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:45 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "9eadb32b-3d19-449d-acb4-9c30723aa058"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 370,
+        "outputTokens": 19,
+        "totalTokens": 389
+      },
+      "metrics": {
+        "latencyMs": 326
+      }
+    }
+  },
+  {
+    "query": "medicare's definition of mechanical ventilation",
+    "docid": "4345752",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"medicare's definition of mechanical ventilation\" into a search engine.\nConsider the following passage: There are other ways to estimate home ventilator prevalence in the United States. Medicare claims data from 2010 indicates approximately 3,172 patients on home mechanical ventilation using an invasive interface, and 899 patients on home mechanical ventilation with a noninvasive interface.n some countries, if the patient requires ventilator support more than X hours per day, he is placed on a life-support ventilator. There seems to be no consensus on the number of hours per day that constitutes âlife-support ventilation.â Some countries use 12 hours, some 14 hours, some more.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4b07334d-51e9-45b1-b8db-4df8707753ab",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:46 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4b07334d-51e9-45b1-b8db-4df8707753ab"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 443,
+        "outputTokens": 19,
+        "totalTokens": 462
+      },
+      "metrics": {
+        "latencyMs": 406
+      }
+    }
+  },
+  {
+    "query": "right pelvic pain causes",
+    "docid": "2163701",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"right pelvic pain causes\" into a search engine.\nConsider the following passage: Understanding the Cause and Treatment of Pelvic Fluid. It is not uncommon for women to complain of pain in the lower left or right side of the abdomen only to be told that the cause is free pelvic fluid.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c70d19c7-6f73-488a-92e0-35bc794f695c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:46 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c70d19c7-6f73-488a-92e0-35bc794f695c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 349,
+        "outputTokens": 19,
+        "totalTokens": 368
+      },
+      "metrics": {
+        "latencyMs": 249
+      }
+    }
+  },
+  {
+    "query": "right pelvic pain causes",
+    "docid": "1950269",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"right pelvic pain causes\" into a search engine.\nConsider the following passage: Chronic pelvic pain is pain in the area below your bellybutton and between your hips that lasts six months or longer. Chronic pelvic pain can have multiple causes. It can be a symptom of another disease, or it can be a condition in its own right. If your chronic pelvic pain appears to be caused by another medical problem, treating that problem may be enough to eliminate your pain.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 2, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7dc7dfa3-6427-46d2-a379-fa20819f155e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:47 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7dc7dfa3-6427-46d2-a379-fa20819f155e"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 2, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 383,
+        "outputTokens": 19,
+        "totalTokens": 402
+      },
+      "metrics": {
+        "latencyMs": 282
+      }
+    }
+  },
+  {
+    "query": "rsa definition key",
+    "docid": "7839904",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"rsa definition key\" into a search engine.\nConsider the following passage: Use this command to generate RSA key pairs for your Cisco device (such as a router). RSA keys are generated in pairs--one public RSA key and one private RSA key. If your router already has RSA keys when you issue this command, you will be warned and prompted to replace the existing keys with new keys.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 3, \"T\": 2, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "99ba4f33-4fea-4dde-8163-96694f96b727",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:47 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "99ba4f33-4fea-4dde-8163-96694f96b727"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 3, \"T\": 2, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 365,
+        "outputTokens": 19,
+        "totalTokens": 384
+      },
+      "metrics": {
+        "latencyMs": 279
+      }
+    }
+  },
+  {
+    "query": "rsa definition key",
+    "docid": "3572695",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"rsa definition key\" into a search engine.\nConsider the following passage: Use this command to generate RSA key pairs for your Cisco device (such as a router). RSA keys are generated in pairs--one public RSA key and one private RSA key. If your router already has RSA keys when you issue this command, you will be warned and prompted to replace the existing keys with new keys.amed Key Pairs. If you generate a named key pair using the key-label argument, you must also specify the usage-keys keyword or the general-keys keyword. Named key pairs allow you to have multiple RSA key pairs, enabling the Cisco IOS software to maintain a different key pair for each identity certificate.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 3, \"T\": 2, \"O\": 3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "036a681f-9130-4423-afe9-9c4e1a64af04",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:48 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "036a681f-9130-4423-afe9-9c4e1a64af04"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 3, \"T\": 2, \"O\": 3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 432,
+        "outputTokens": 19,
+        "totalTokens": 451
+      },
+      "metrics": {
+        "latencyMs": 324
+      }
+    }
+  },
+  {
+    "query": "what are the social determinants of health",
+    "docid": "2417985",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"what are the social determinants of health\" into a search engine.\nConsider the following passage: Social determinants. 1  Commission on Social Determinants of Health. 2  Socioeconomic Determinants of Health. 3  Social Determinants of Health.  Public Health Agency of 1  Canada. Childcare resource and research unit.  Inclusive Cities Canada.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 2, \"T\": 3, \"O\": 2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "0850608e-56b8-4b87-92a2-9505f22e2e42",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:49 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "0850608e-56b8-4b87-92a2-9505f22e2e42"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 2, \"T\": 3, \"O\": 2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 365,
+        "outputTokens": 19,
+        "totalTokens": 384
+      },
+      "metrics": {
+        "latencyMs": 280
+      }
+    }
+  },
+  {
+    "query": "what is the most popular food in switzerland",
+    "docid": "1524406",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"what is the most popular food in switzerland\" into a search engine.\nConsider the following passage: Swiss Girls Names: Most Popular Names for Girls in Switzerland (German) These are the most popular girls' names in Switzerland (German) for 2014.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 0, \"T\": 0, \"O\": 0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "dd1d9784-1c73-43f4-9cc9-40c6cace037d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:49 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "dd1d9784-1c73-43f4-9cc9-40c6cace037d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 0, \"T\": 0, \"O\": 0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 336,
+        "outputTokens": 19,
+        "totalTokens": 355
+      },
+      "metrics": {
+        "latencyMs": 281
+      }
+    }
+  },
+  {
+    "query": "what is the most popular food in switzerland",
+    "docid": "8683095",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"what is the most popular food in switzerland\" into a search engine.\nConsider the following passage: Name Lists Featuring Lionel. 1  Swiss Boys Names: Most Popular Names for Boys in Switzerland (German) 2  Swiss Boys Names: Most Popular Names for Boys in Switzerland (German), 2010. 3  Swiss Boys Names: Most Popular Names for Boys in Switzerland.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 1, \"T\": 3, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "d5d5f2a9-c24a-448b-a66d-6cedbbf7e74b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:50 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "d5d5f2a9-c24a-448b-a66d-6cedbbf7e74b"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 1, \"T\": 3, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 366,
+        "outputTokens": 19,
+        "totalTokens": 385
+      },
+      "metrics": {
+        "latencyMs": 350
+      }
+    }
+  },
+  {
+    "query": "what is theraderm used for",
+    "docid": "8651776",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"what is theraderm used for\" into a search engine.\nConsider the following passage: In the case of Theraderm, this is taken even further, as the brand was founded by a plastic surgeon, Dr. James Beckman. However, even though this brand was created by a doctor, it doesnât mean that the products are the right choice for everyone.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": " {\"M\": 1, \"T\": 2, \"O\": 1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "031205c8-2442-4c73-8cee-0a18ac3756fd",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Fri, 12 Sep 2025 08:06:50 GMT",
+          "content-type": "application/json",
+          "content-length": "214",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "031205c8-2442-4c73-8cee-0a18ac3756fd"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": " {\"M\": 1, \"T\": 2, \"O\": 1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 358,
+        "outputTokens": 19,
+        "totalTokens": 377
+      },
+      "metrics": {
+        "latencyMs": 320
+      }
+    }
+  }
+]

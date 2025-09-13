@@ -17,7 +17,7 @@ FORCE_QID   = None        # set to an int/str to force that qid; otherwise auto-
 
 K_START     = 50 #initial retrieval depth
 MIN_JUDGED  = 10 #minimum judged docs to retrieve
-K_CAP       = 2000 #maximum retrieval depth
+K_CAP       = 10000 #maximum retrieval depth
 
 # ---- Output locations (edit here) ----
 OUT_DIR = Path("outputs/trec_dl")  # make sure this exists or can be created

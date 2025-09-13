@@ -11,8 +11,8 @@ TARGET_LANG = "vi"          # e.g., 'vi' for Vietnamese
 SEED = 42                   # set None for non-deterministic
 INJECT_COUNT = 1            # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-INPUT_FILE = Path("outputs/trec_dl/combined_irrelevant_results_20.csv")
-OUTPUT_FILE = Path("outputs/trec_dl/combined_result_translated_"+ TARGET_LANG +"_20.csv")
+INPUT_FILE = Path("outputs/trec_dl/combined_irrelevant_results_100.csv")
+OUTPUT_FILE = Path("outputs/trec_dl/translated_data/combined_result_translated_"+ TARGET_LANG +"_100.csv")
 # ==============================
 
 # AWS Translate client
