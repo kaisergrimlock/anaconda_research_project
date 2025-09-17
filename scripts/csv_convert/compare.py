@@ -8,10 +8,10 @@ from collections import defaultdict
 # Config
 # ----------------------------
 BASE_DIR = Path("outputs/trec_dl_llm_label")
-IRR_DIR  = BASE_DIR / "irrelevant"
-TRANS_DIR = BASE_DIR / "judged"
+IRR_DIR  = BASE_DIR / "relevant"
+TRANS_DIR = BASE_DIR / "relevant/utility"
 OUT_DIR   = BASE_DIR
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+(OUT_DIR / "processed").mkdir(parents=True, exist_ok=True)
 
 # Regex to extract model name from filename
 MODEL_RE = re.compile(r"llm_labels_([^_]+)")

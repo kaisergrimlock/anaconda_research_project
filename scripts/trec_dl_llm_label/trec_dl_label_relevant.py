@@ -11,7 +11,7 @@ from datetime import datetime
 PROMPT_FILE = Path("prompts/prompt.txt")
 INPUT_CSV   = Path("outputs/trec_dl/trecdl_passage_2019_combined.csv")
 
-OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/irrelevant/utility")  # CSV outputs per run/model
+OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/utility")  # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")        # JSON logs
 TOKENS_CSV  = Path("outputs/trec_dl_llm_label/token_usage.csv")  # cumulative token usage log
 
