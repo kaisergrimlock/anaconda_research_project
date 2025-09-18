@@ -1,0 +1,11 @@
+Begin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.
+Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meaning: 0 = represent that the passage has nothing to do with the query, 1 = represents that the passage seems related to the query but does not contain any part of an answer to it, 2 = represents that the passage contains a partial or complete answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information and 3 = represents that the passage is dedicated to the query and contains a partial or complete answer to it.  
+Assume that you are writing a report on the subject of the topic. 
+A person has typed "{query}" into a search engine.
+Consider the following passage: {passage}
+Process this task in the following steps:
+1. Determine the underlying purpose of the query.
+2. Assess how well the passage aligns with the likely intent of the query (M).
+3. Evaluate the trustworthiness of the passage (T).
+4. Weigh both alignment and trustworthiness, then decide on an overall relevance score (O).
+After assigning each score, validate your choice for that category in 1-2 lines and proceed, correcting if inconsistent. Final score must be an integer value only. Do not provide any code in result. Do not add any text before or after the JSON array. If either the query or passage is missing or empty, assign a score of 0 for M, T, and O. Example: {{"M": score, "T": score, "O": score}} Results {{}}

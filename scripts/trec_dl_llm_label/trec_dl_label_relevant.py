@@ -8,10 +8,10 @@ from datetime import datetime
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_FILE = Path("prompts/prompt.txt")
-INPUT_CSV   = Path("outputs/trec_dl/trecdl_passage_2019_combined.csv")
+PROMPT_FILE = Path("prompts/new_prompt_3.txt")
+INPUT_CSV   = Path("outputs/trec_dl/retrieved/trecdl_passage_2019_combined.csv")
 
-OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/utility")  # CSV outputs per run/model
+OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/custom_3")  # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")        # JSON logs
 TOKENS_CSV  = Path("outputs/trec_dl_llm_label/token_usage.csv")  # cumulative token usage log
 
@@ -24,8 +24,8 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 bedrock = boto3.client("bedrock-runtime", region_name="us-west-2")
 
 MODELS = [
-    "anthropic.claude-3-haiku-20240307-v1:0",
-    "mistral.mixtral-8x7b-instruct-v0:1",
+    #"anthropic.claude-3-haiku-20240307-v1:0",
+    #"mistral.mixtral-8x7b-instruct-v0:1",
     "openai.gpt-oss-20b-1:0"
 ]
 

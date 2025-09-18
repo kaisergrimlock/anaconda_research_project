@@ -22,9 +22,9 @@ with columns: docid, nist_rel, llm_rel
 # ----------------------------
 BASE_DIR  = Path("outputs/trec_dl_llm_label")
 nist_FILE  = BASE_DIR / "relevant" / "trecdl_passage_2019_combined.csv"   # <-- the nisterence
-MODEL_DIR = BASE_DIR / "relevant" / "utility/20250917_201937"                    # <-- the LLM label files
+MODEL_DIR = BASE_DIR / "relevant" / "custom_2"                    # <-- the LLM label files
 
-OUT_DIR   = BASE_DIR / "processed" / "utility/" / datetime.now().strftime("%Y%m%d_%H%M%S")
+OUT_DIR   = BASE_DIR / "processed" / "custom_2/" / datetime.now().strftime("%Y%m%d_%H%M%S")
 
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 

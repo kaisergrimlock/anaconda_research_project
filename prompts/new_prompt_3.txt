@@ -1,0 +1,40 @@
+Judge only from the provided passage (don’t use outside knowledge).
+Consider common query intents (informational, navigational, transactional). If ambiguous, pick the most probable informational intent.
+If the query contains quotes, treat it as a request for those exact terms.
+Ignore images/links unless described in the passage text.
+If the passage is metadata-only (e.g., boilerplate, cookie banners), treat as non-answering.
+
+Do not stray from the given parameters at any point. 
+Label every single document, do not leave anything blank.
+Assume that you are writing a report on the subject of the topic. 
+A person has typed "{query}" into a search engine.
+Consider the following passage: {passage}
+Split this problem into steps: Consider the underlying intent of the search. 
+
+For match (M):
+3 (perfectly relevant): Direct, focused answer or uniquely on-topic content; answers the query clearly and fully (for the likely intent).
+2 (highly relevant): Contains a correct/usable answer but surrounded by noise, partially complete, or requires minor inference.
+1 (related): On the same topic/entity but does not answer the query (definitions/background/listings without the asked-for detail).
+0 (irrelevant): Off-topic, contradictory to the query, or purely boilerplate.
+
+For trustworthiness (T):
+Consider sourcing signals visible in the passage (citations, author/affiliation, specificity, internal consistency, datedness if stated).
+3: Strong sourcing/authority, specific details, internally consistent.
+2: Generally credible text without clear sourcing issues.
+1: Vague claims, marketing fluff, noticeable hedging, or minor inconsistencies.
+0: Evident misinformation, contradictions, or spammy/templated content.
+
+For overall (O):
+Start with O = M.
+If T = 0 and the passage makes factual claims central to answering, reduce O by 1 (floor at 0).
+If M = 2 and T = 3 (highly credible) and the answer is only slightly obscured, you may increase O to 3.
+Otherwise, keep O = M.
+Clamp to 0–3.
+
+Also consider these edge cases:
+Multiple intents: If the passage satisfies one plausible high-frequency intent for the query, score against that; don’t average intents.
+Negations/opposites: If the passage addresses the opposite of what’s asked (e.g., “how not to …” vs “how to …”), likely M=1 unless it still directly answers.
+Lists/tables: If the exact requested item/data point is present, consider M≥2; if the category is right but the item is missing, M=1.
+Comparisons: If the query asks “best X” and the passage ranks/compares X with rationale including the requested X, M≥2; generic sales copy without comparison is M=1.
+
+Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {{"M": score, "T": score, "O": score}} Results {{}}
