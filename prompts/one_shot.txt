@@ -1,0 +1,8 @@
+Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query
+Do not stray from the given parameters at any point. 
+Label every single document, do not leave anything blank.
+Assume that you are writing a report on the subject of the topic. 
+A person has typed "{query}" into a search engine.
+Consider the following passage: {passage}
+Split this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {{"M": score, "T": score, "O": score}} Results {{}}
+For example, if a person has types the query "anthropological definition of environment", and the passage to consider is: "Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.cological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.", then the score should be {{"M": 3, "T": 3, "O": 3}}

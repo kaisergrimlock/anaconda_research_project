@@ -8,4 +8,14 @@ Process this task in the following steps:
 2. Assess how well the passage aligns with the likely intent of the query (M).
 3. Evaluate the trustworthiness of the passage (T).
 4. Weigh both alignment and trustworthiness, then decide on an overall relevance score (O).
-After assigning each score, validate your choice for that category in 1-2 lines and proceed, correcting if inconsistent. Final score must be an integer value only. Do not provide any code in result. Do not add any text before or after the JSON array. If either the query or passage is missing or empty, assign a score of 0 for M, T, and O. Example: {{"M": score, "T": score, "O": score}} Results {{}}
+After assigning each score, validate your choice for that category in 1-2 lines and proceed, correcting if inconsistent. Final score must be an integer value only. Do not provide any code in result. Do not add any text before or after the JSON array. If either the query or passage is missing or empty, assign a score of 0 for M, T, and O. 
+Example: {{"M": score, "T": score, "O": score}} Results {{}}
+
+Example:
+For this passage:
+"Athropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies.cological Anthropology. Ecological anthropology attempts to understand the relative influence of environment on human societies and how it is used by different societies"
+
+And this query:
+anthropological definition of environment
+
+The overall score is: {{"M": 3, "T": 3, "O": 3}}

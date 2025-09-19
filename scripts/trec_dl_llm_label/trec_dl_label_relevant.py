@@ -8,10 +8,11 @@ from datetime import datetime
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_FILE = Path("prompts/new_prompt_3.txt")
+PROMPT_NAME = "few_shot" + ".txt"  # prompt template file
+PROMPT_FILE = Path("prompts/" + PROMPT_NAME)
 INPUT_CSV   = Path("outputs/trec_dl/retrieved/trecdl_passage_2019_combined.csv")
 
-OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/custom_3")  # CSV outputs per run/model
+OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/" + PROMPT_NAME)  # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")        # JSON logs
 TOKENS_CSV  = Path("outputs/trec_dl_llm_label/token_usage.csv")  # cumulative token usage log
 
