@@ -1,0 +1,204 @@
+[
+  {
+    "query": "difference between rn and bsn",
+    "docid": "985493",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: Share it with your friends/family. 1  Difference Between LPN and RN. 2  Difference Between RN and RPN. 3  Difference Between Nurse and Nurse Practitioner. 4  Difference Between NP and MD. 5  Difference Between ADN and BSN. 6  Differences between a Licensed practical nurse and a Patient care technician. 7  Difference Between CNA and MA.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "",
+    "full_response": {
+      "error": "Read timeout on endpoint URL: \"https://bedrock-runtime.us-west-2.amazonaws.com/model/openai.gpt-oss-20b-1%3A0/converse\""
+    }
+  },
+  {
+    "query": "difference between rn and bsn",
+    "docid": "985494",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: The BSN trains nurses for a professional role, along with the coursework in nursing science, leadership, research and nursing informatics. Summary: RN is a Registered Nurse, while BSN is a graduate program in nursing.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "",
+    "full_response": {
+      "error": "Read timeout on endpoint URL: \"https://bedrock-runtime.us-west-2.amazonaws.com/model/openai.gpt-oss-20b-1%3A0/converse\""
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "1034435",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: All Koi have the same body type, but very greatly in color. They can also grow up to two to three feet in length. Most goldfish are are orange in color, with a few types that also have black, white and calico colors. They come in a wide variety of body shapes, but stay relatively small in size.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "3c78de27-45e6-4a1d-968f-20219570de4e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:59:23 GMT",
+          "content-type": "application/json",
+          "content-length": "1370",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "3c78de27-45e6-4a1d-968f-20219570de4e"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"do goldfish grow\". The passage: \"All Koi have the same body type, but very greatly in color. They can also grow up to two to three feet in length. Most goldfish are are orange in color, with a few types that also have black, white and calico colors. They come in a wide variety of body shapes, but stay relatively small in size.\"\n\nThe passage mentions goldfish, but not directly answering \"do goldfish grow\". It says they stay relatively small in size. It doesn't answer the question directly. So M (match to intent) maybe 1 (related). T (trustworthiness) unknown; maybe 1. O final maybe 1. So produce {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 410,
+        "outputTokens": 276,
+        "totalTokens": 686
+      },
+      "metrics": {
+        "latencyMs": 48638
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "1101607",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: Goldfish can live for many years if properly cared for, a bowl is not large enough. My goldfish lived 10 years in a 27 gallon tank but may have lived longer in a pond. 1 liter won't be enough - goldfish can grow to 10 inches long or even larger than that. Thanks guys I was so worried but not anymore.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":1,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "2925c1b3-dbde-4bee-8226-a9a3c14b8a98",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:59:24 GMT",
+          "content-type": "application/json",
+          "content-length": "1515",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "2925c1b3-dbde-4bee-8226-a9a3c14b8a98"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"do goldfish grow\". The passage: \"Goldfish can live for many years if properly cared for, a bowl is not large enough. My goldfish lived 10 years in a 27 gallon tank but may have lived longer in a pond. 1 liter won't be enough - goldfish can grow to 10 inches long or even larger than that. Thanks guys I was so worried but not anymore.\"\n\nThe query: \"do goldfish grow\" - user wants to know if goldfish grow. The passage says goldfish can grow to 10 inches long or even larger. So it answers the query. So M (match) = 3. T (trustworthiness) - it's a user comment? It's not a reputable source. It's a personal anecdote. So trustworthiness maybe 1 or 2. I'd say 1. O final: combine M and T. Since M high, T low, overall maybe 2. So output: {\"M\":3,\"T\":1,\"O\":2}. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":1,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 414,
+        "outputTokens": 330,
+        "totalTokens": 744
+      },
+      "metrics": {
+        "latencyMs": 1612
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "1113693",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: Iguanas are ~6 inches long at the time they hatch. In the wild, iguanas grow 2-3 inches a month. They can (and should) grow at that rate in captivity (but often do not). Temperature is the most important factor affecting their growth rate.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4dca9d5a-ce0a-4413-ab26-abcd964d484b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:59:25 GMT",
+          "content-type": "application/json",
+          "content-length": "870",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4dca9d5a-ce0a-4413-ab26-abcd964d484b"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. For the passage about iguanas, query \"do goldfish grow\". The passage is irrelevant. So M=0, T maybe 0? Trustworthiness? It's about iguanas, not goldfish. So T=0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 399,
+        "outputTokens": 167,
+        "totalTokens": 566
+      },
+      "metrics": {
+        "latencyMs": 833
+      }
+    }
+  },
+  {
+    "query": "do goldfish grow",
+    "docid": "1171591",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"do goldfish grow\" into a search engine.\nConsider the following passage: Rating Newest Oldest. Best Answer: They can, but do not have to. Goldfish in a home aquarium are perfectly fine not hibernating. The vast majority of pond fish (goldfish, koi, comets, shubunkins and orfe) are related to the carp and have been overwintering in our climate very successfully for hundreds of years.Fish are cold blooded, which means that they take their body temperature from that of the surrounding environment.es they can and will if the conditions are right. Usually outside pond goldfish once the water reaches 50 degrees will begin their hibernation stage. If they are in a pond they should not be fed once the temps reach 55.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7b3d71f3-7ce1-499d-b558-9975c7b934be",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:59:27 GMT",
+          "content-type": "application/json",
+          "content-length": "1286",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7b3d71f3-7ce1-499d-b558-9975c7b934be"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"Label every single document, do not leave anything blank.\" There's only one passage. So we produce JSON array? Actually example shows a JSON object, not array. But earlier: \"Strictly produce a JSON array of scores\" maybe they mean array of objects? But example shows object. Might be confusion. We should output a JSON object with keys M, T, O. Provide scores 0-3.\n\nWe need to evaluate: Query: \"do goldfish grow\". The passage: about goldfish hibernation, not growth. So does not answer. It's related? It's about goldfish but not growth. So score 1 (related). Trustworthiness? The passage seems like a forum answer, not authoritative. So T maybe 1. M: relevance to query: 1. O: final maybe 1.\n\nThus output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 486,
+        "outputTokens": 259,
+        "totalTokens": 745
+      },
+      "metrics": {
+        "latencyMs": 1225
+      }
+    }
+  }
+]

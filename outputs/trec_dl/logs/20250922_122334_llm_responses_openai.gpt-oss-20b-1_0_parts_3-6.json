@@ -1,0 +1,1943 @@
+[
+  {
+    "query": "definition declaratory judgment",
+    "docid": "5930013",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: The Declaratory Act was a measure issued by British Parliament asserting its authority to make laws binding the colonists âin all cases whatsoeverâ including the right to tax.he Declaratory Act was a reaction of British Parliament to the failure of the Stamp Act as they did not want to give up on the principle of imperial taxation asserting its legal right to tax colonies.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "165279ec-b2ab-4f61-ae45-86874fcf4ebd",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:23:38 GMT",
+          "content-type": "application/json",
+          "content-length": "1132",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "165279ec-b2ab-4f61-ae45-86874fcf4ebd"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about Declaratory Act, not declaratory judgment. So it's irrelevant. So M=0, T? Trustworthiness: The passage seems like a historical description, but not relevant. Trustworthiness maybe 1? But we can assign 0? The passage is not about declaratory judgment. So overall O=0. So produce {\"M\":0,\"T\":0,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 418,
+        "outputTokens": 214,
+        "totalTokens": 632
+      },
+      "metrics": {
+        "latencyMs": 1084
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "5981957",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: You can also: 1  If you have proof that you paid the judgment, fill out and file a Declaration of Judgment Debtor Regarding Satisfaction of Judgment. 2  This is usually a local form you can get from your clerk's office or from your court's website.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "eb890d90-7d1d-42ef-aa7d-ba3562841547",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:23:40 GMT",
+          "content-type": "application/json",
+          "content-length": "1500",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "eb890d90-7d1d-42ef-aa7d-ba3562841547"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So produce {\"M\":score,\"T\":score,\"O\":score}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"You can also: 1 If you have proof that you paid the judgment, fill out and file a Declaration of Judgment Debtor Regarding Satisfaction of Judgment. 2 This is usually a local form you can get from your clerk's office or from your court's website.\"\n\nThis passage is about filing a Declaration of Judgment Debtor Regarding Satisfaction of Judgment. It does not define declaratory judgment. So it's not relevant. So M=0. Trustworthiness? It's a generic statement, but not relevant. T maybe 1? But trustworthiness of the page? Hard to gauge. But we can assign T=1 maybe. O final? Since M=0, overall irrelevant. So O=0. So output: {\"M\":0,\"T\":1,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 397,
+        "outputTokens": 301,
+        "totalTokens": 698
+      },
+      "metrics": {
+        "latencyMs": 1513
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "5984054",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: (a) Entry. A judgment is entered when it is noted on the docket. The clerk must prepare, sign, and enter the judgment: (1) after receiving the court's opinionâbut if settlement of the judgment's form is required, after final settlement; or. (2) if a judgment is rendered without an opinion, as the court instructs. (b) Notice.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c96bb8a9-3e97-45ce-8b05-11b159f15465",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:23:41 GMT",
+          "content-type": "application/json",
+          "content-length": "1172",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c96bb8a9-3e97-45ce-8b05-11b159f15465"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate passage relative to query \"definition declaratory judgment\". The passage is about entry of judgment, not definition. So it's not relevant. So M=0. Trustworthiness? The passage seems like a snippet from a legal text, but not necessarily trustworthy. But we can assign T maybe 1? But trustworthiness is about source reliability. We don't know. Could be 1. O final maybe 0. So output: {\"M\":0,\"T\":1,\"O\":0}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 422,
+        "outputTokens": 224,
+        "totalTokens": 646
+      },
+      "metrics": {
+        "latencyMs": 1187
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6055693",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A fourth concurs in the absolute necessity of a bill of rights, but contends that it ought to be declaratory, not of the personal rights of individuals, but of the rights reserved to the States in their political capacity.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":1,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "2de8f0d2-e6ae-44e0-bbea-1caf9176d693",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:23:43 GMT",
+          "content-type": "application/json",
+          "content-length": "1512",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "2de8f0d2-e6ae-44e0-bbea-1caf9176d693"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says produce a JSON array of scores? Actually example shows an object with keys M, T, O. They say \"JSON array of scores\" but example shows object. Might be confusion. We should output something like {\"M\": 1, \"T\": 2, \"O\": 1} maybe. Let's analyze.\n\nQuery: \"definition declaratory judgment\". The passage: \"A fourth concurs in the absolute necessity of a bill of rights, but contends that it ought to be declaratory, not of the personal rights of individuals, but of the rights reserved to the States in their political capacity.\"\n\nWe need to evaluate M: match to query. The passage mentions \"declaratory\" but not \"declaratory judgment\". It mentions \"declaratory\" in context of bill of rights. So it's somewhat related but not directly definition. So M maybe 1 (related). T: trustworthiness of web page. We don't have info. Assume moderate? Maybe 2? But we don't know. Could be 1. Let's assume 1. O: overall. Likely 1. So output: {\"M\":1,\"T\":1,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":1,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 386,
+        "outputTokens": 314,
+        "totalTokens": 700
+      },
+      "metrics": {
+        "latencyMs": 1543
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "617865",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: 1 In court a judgment becomes final when the case is over and a judge has signed a piece of paper. 2  The judgment is then effective until it is satisfied (by payment, or by doing whatever the judgment says) or until the judge has a legal reason to set the judgment aside.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":2,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e0dff358-ab3a-43f6-be7e-8ba96573144c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:47 GMT",
+          "content-type": "application/json",
+          "content-length": "1668",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e0dff358-ab3a-43f6-be7e-8ba96573144c"
+        },
+        "RetryAttempts": 1
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"In court a judgment becomes final when the case is over and a judge has signed a piece of paper. The judgment is then effective until it is satisfied (by payment, or by doing whatever the judgment says) or until the judge has a legal reason to set the judgment aside.\"\n\nThis passage does not define declaratory judgment. It's about general judgment. So it's irrelevant. So M=0, T maybe 2? Trustworthiness? It's generic info, but not relevant. T maybe 2? But trustworthiness of the page? We don't know. But we can assume moderate trustworthiness. But the instruction: \"Measure how trustworthy the web page is (T).\" We don't have info. Could assign 2. But maybe 1? The passage is generic, but not about declaratory judgment. So M=0. T maybe 2? But we can choose 2. O final: combine M and T. Since M=0, O likely 0. So output: {\"M\":0,\"T\":2,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":2,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 402,
+        "outputTokens": 347,
+        "totalTokens": 749
+      },
+      "metrics": {
+        "latencyMs": 2095
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6183638",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: (b) For Defending Party. A party against whom a claim, counterclaim, or cross-claim is asserted or a declaratory judgment is sought may, at any time, move with or without supporting affidavits for a summary judgment in his favor as to all or any part thereof. (c) Motion and Proceedings Thereon.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "b2820494-a592-4760-b9bf-1c66ba542bfd",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:49 GMT",
+          "content-type": "application/json",
+          "content-length": "1506",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "b2820494-a592-4760-b9bf-1c66ba542bfd"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"(b) For Defending Party. A party against whom a claim, counterclaim, or cross-claim is asserted or a declaratory judgment is sought may, at any time, move with or without supporting affidavits for a summary judgment in his favor as to all or any part thereof. (c) Motion and Proceedings Thereon.\"\n\nThis passage mentions declaratory judgment but does not give definition. So it's somewhat related but not answering. So M (match to intent) maybe 1. T (trustworthiness) unknown but likely moderate? The passage seems from a legal text, maybe trustworthy. But we don't have source. I'd give T=2? But trustworthiness maybe 2. O final maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 410,
+        "outputTokens": 300,
+        "totalTokens": 710
+      },
+      "metrics": {
+        "latencyMs": 1726
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6229732",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A declaratory statute is one which is passed in order to put an end to a doubt as to what the common law is, and which declares what it is, and has ever been. 2. Remedial statutes are those which are made to supply such defects, and abridge such superfluities in the common law as may have been discovered.ase law has the same legally binding effect as statutory law, but there are important distinctions between statutes and case law. Case law is written by judges, not by elected lawmakers, and it is written in response to a specific case before the court.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "953703da-a103-4b5f-b562-a893cab1bf69",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:50 GMT",
+          "content-type": "application/json",
+          "content-length": "1118",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "953703da-a103-4b5f-b562-a893cab1bf69"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about declaratory statute, remedial statutes, case law. It does not define declaratory judgment. So it's not relevant. Score M: 0. T: trustworthiness? The passage seems generic, but not authoritative. Could be 1? But trustworthiness maybe 1. O: overall relevance: 0. So output: {\"M\":0,\"T\":1,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 462,
+        "outputTokens": 215,
+        "totalTokens": 677
+      },
+      "metrics": {
+        "latencyMs": 1085
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6229733",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: 1. A declaratory statute is one which is passed in order to put an end to a doubt as to what the common law is, and which declares what it is, and has ever been. 2. Remedial statutes are those which are made to supply such defects, and abridge such superfluities in the common law as may have been discovered.. A declaratory statute is one which is passed in order to put an end to a doubt as to what the common law is, and which declares what it is, and has ever been. 2. Remedial statutes are those which are made to supply such defects, and abridge such superfluities in the common law as may have been discovered.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c3f77e9b-26a7-4ec1-a049-20af4158d4d8",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:51 GMT",
+          "content-type": "application/json",
+          "content-length": "1032",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c3f77e9b-26a7-4ec1-a049-20af4158d4d8"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. Evaluate passage relative to query \"definition declaratory judgment\". The passage is about declaratory statute, not declaratory judgment. So it's not relevant. So M=0. Trustworthiness? The passage seems generic legal text, but not necessarily trustworthy. But we can assign T=1 maybe. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 488,
+        "outputTokens": 183,
+        "totalTokens": 671
+      },
+      "metrics": {
+        "latencyMs": 1034
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6323613",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: You can pay the judgment to the court: You can pay the court instead of the other person by filing the form called Request to Pay Judgment to the Courtâ (SC - 145) . You have to pay the judgment, costs, interest and a $20 court fee. This lets you solve the problem right away without having to see the judgment creditor.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "b646614f-0ece-4ac6-9069-80dd4b90b0a5",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:53 GMT",
+          "content-type": "application/json",
+          "content-length": "1322",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "b646614f-0ece-4ac6-9069-80dd4b90b0a5"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says produce a JSON array of scores? But example shows JSON object. The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt seems they want a JSON object with keys M, T, O. The \"Results {}\" maybe placeholder. So we output something like {\"M\": 0, \"T\": 0, \"O\": 0}. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about paying a judgment to the court, not about definition of declaratory judgment. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? The passage seems generic, but we can assign 0. O=0. So output: {\"M\":0,\"T\":0,\"O\":0}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 416,
+        "outputTokens": 271,
+        "totalTokens": 687
+      },
+      "metrics": {
+        "latencyMs": 1279
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6391770",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: If the injury affect a legal right, then the remedy is in general by action in a court of law; but if an equitable right, or if it can be better investigated in a court of equity,' then the remedy is by bill.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "d6ce9544-5de9-4e95-8b84-c98aacd45057",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:55 GMT",
+          "content-type": "application/json",
+          "content-length": "1170",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "d6ce9544-5de9-4e95-8b84-c98aacd45057"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"If the injury affect a legal right, then the remedy is in general by action in a court of law; but if an equitable right, or if it can be better investigated in a court of equity,' then the remedy is by bill.\" This is about remedies, not declaratory judgment. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? It's not obviously trustworthy. But we can assign 0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 389,
+        "outputTokens": 223,
+        "totalTokens": 612
+      },
+      "metrics": {
+        "latencyMs": 1210
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6418949",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: The Declaration of Independence does not create individual rights, as the Constitution does. Indeed, it technically has no legal effect.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "eac11f75-a04b-4865-92ab-4f2a9ae8c21e",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:56 GMT",
+          "content-type": "application/json",
+          "content-length": "1162",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "eac11f75-a04b-4865-92ab-4f2a9ae8c21e"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"The Declaration of Independence does not create individual rights, as the Constitution does. Indeed, it technically has no legal effect.\" This is about Declaration of Independence, not declaratory judgment. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? The passage is likely from a website but we don't know. But it's not relevant. So T maybe 0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 365,
+        "outputTokens": 213,
+        "totalTokens": 578
+      },
+      "metrics": {
+        "latencyMs": 1097
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6486232",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A party against whom a claim, counterclaim, crossclaim, or third-party claim is asserted or a declaratory judgment is sought may move for a summary judgment in that party's favor as to all or any part thereof at any time with or without supporting affidavits. (c) Motion and Proceedings Thereon.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "ba09789a-5636-4d85-99f7-97b3ae0a6b5c",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:57 GMT",
+          "content-type": "application/json",
+          "content-length": "1464",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "ba09789a-5636-4d85-99f7-97b3ae0a6b5c"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"A party against whom a claim, counterclaim, crossclaim, or third-party claim is asserted or a declaratory judgment is sought may move for a summary judgment in that party's favor as to all or any part thereof at any time with or without supporting affidavits. (c) Motion and Proceedings Thereon.\"\n\nThis passage mentions declaratory judgment but does not give definition. So it's somewhat related but not answering. So M: 1 (related). T: trustworthiness? It's a snippet from presumably a legal text. Might be trustworthy. But we don't have source. I'd give T: 2 maybe. O: combine: maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 405,
+        "outputTokens": 287,
+        "totalTokens": 692
+      },
+      "metrics": {
+        "latencyMs": 1238
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6621100",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: On June 30, 1971* Potomac Sand and Gravel Company (Potomac Company) filed a bill for declaratory judgment in the Circuit Court for Anne Arundel County in which it requested that the Laws of Maryland (1971), Chapter 792; Code of Public Local Laws of Charles County (1969 Ed.), Article 9, section 337A (Chapter 792) be declared to be unconstitutional.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "b88199aa-43d8-4213-a2d4-3269f79790c6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:24:59 GMT",
+          "content-type": "application/json",
+          "content-length": "1267",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "b88199aa-43d8-4213-a2d4-3269f79790c6"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about a specific case where a company filed a bill for declaratory judgment. It does not provide a definition. So it's not answering the query. It's somewhat related (declaratory judgment concept). So likely score 1. M: 1. T: trustworthiness? The passage seems from a legal case, likely trustworthy. But we don't have source. But it's a specific case, likely reliable. So T maybe 2. O: overall relevance: 1. So output: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 427,
+        "outputTokens": 246,
+        "totalTokens": 673
+      },
+      "metrics": {
+        "latencyMs": 1142
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6763277",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: [Cite as N. Canton v. Canton, 2005-Ohio-6953.] Gwin, P.J. {Â¶1} Plaintiff the City of North Canton, Ohio appeals a judgment of the Court of. Common Pleas of Stark County, Ohio, which dismissed its complaint for declaratory. judgment and injunction. North Canton sought to prevent the defendant City of Canton.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":3,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "8305a060-db54-49f3-ba74-52bdad74fc88",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:01 GMT",
+          "content-type": "application/json",
+          "content-length": "1758",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "8305a060-db54-49f3-ba74-52bdad74fc88"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is a snippet from a case: \"Canton v. Canton, 2005-Ohio-6953. Gwin, P.J. {¶1} Plaintiff the City of North Canton, Ohio appeals a judgment of the Court of Common Pleas of Stark County, Ohio, which dismissed its complaint for declaratory judgment and injunction. North Canton sought to prevent the defendant City of Canton.\"\n\nThis passage mentions declaratory judgment but does not define it. So it's somewhat related but not answering definition. So M (match to intent) maybe 1 (related). T (trustworthiness) the source is a case citation, presumably trustworthy. So T maybe 3. O final maybe 1? But we need to weigh. The passage is not a definition, so not highly relevant. So M=1. T=3. O maybe 1? The instruction: \"Consider the aspects above and the relative importance of each, and decide on a final score (O).\" So O likely similar to M if trustworthiness high but content not answer. So O=1. Provide JSON object: {\"M\":1,\"T\":3,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":3,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 420,
+        "outputTokens": 366,
+        "totalTokens": 786
+      },
+      "metrics": {
+        "latencyMs": 1712
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6766748",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: (December 2007) A plaintiff (Ï in legal shorthand) is the party who initiates a lawsuit (also known as an action) before a court. By doing so, the plaintiff seeks a legal remedy, and if successful, the court will issue judgment in favor of the plaintiff and make the appropriate court order (e.g., an order for damages).\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "2f0ddcef-c2f7-4c07-8a04-15d5f4818333",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:02 GMT",
+          "content-type": "application/json",
+          "content-length": "1098",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "2f0ddcef-c2f7-4c07-8a04-15d5f4818333"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about plaintiff. Not relevant. So M=0, T? Trustworthiness of web page? The passage seems generic, but we don't know source. Probably moderate trust? But irrelevant. So T maybe 1? But trustworthiness maybe 2? But we can assign 1. O final score: 0. So output: {\"M\":0,\"T\":1,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 415,
+        "outputTokens": 214,
+        "totalTokens": 629
+      },
+      "metrics": {
+        "latencyMs": 1041
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6815300",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Pursuant to G.L. 1956 Â§ 9-30-1, Rhode Islandâs enactment of the Uniform Declaratory. Judgment Act, the Superior Court has the âpower to declare rights, status, and other legal. relationsâ upon petition. Town of Barrington v. Williams, 972 A.2d 603, 608 (R.I. 2009).\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":2,\"T\":3,\"O\":2}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c3ab5c2d-b86f-4e3e-9cfe-fcb11a63ec0a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:04 GMT",
+          "content-type": "application/json",
+          "content-length": "1515",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c3ab5c2d-b86f-4e3e-9cfe-fcb11a63ec0a"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. Evaluate passage relative to query \"definition declaratory judgment\". Passage: \"Pursuant to G.L. 1956 § 9-30-1, Rhode Island’s enactment of the Uniform Declaratory Judgment Act, the Superior Court has the 'power to declare rights, status, and other legal relations' upon petition. Town of Barrington v. Williams, 972 A.2d 603, 608 (R.I. 2009).\"\n\nThis passage contains definition of declaratory judgment: \"power to declare rights, status, and other legal relations\". It's somewhat definition. So M: highly relevant? The passage does provide definition but not full. So M=2. T: trustworthiness? It's a legal citation, likely trustworthy. So T=3. O: final score maybe weighted average? They said consider aspects and relative importance. Likely O=2. So output: {\"M\":2,\"T\":3,\"O\":2}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":2,\"T\":3,\"O\":2}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 431,
+        "outputTokens": 313,
+        "totalTokens": 744
+      },
+      "metrics": {
+        "latencyMs": 1456
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6862766",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Privity. A legal relationship between two parties based on contract, estate, or other lawful status, that confers certain rights or remedies. For example, parties that are in privity of contract can enforce the contract or obtain remedies based on it.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e4cea01e-de2c-4a2f-aa83-13009023b468",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:05 GMT",
+          "content-type": "application/json",
+          "content-length": "1003",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e4cea01e-de2c-4a2f-aa83-13009023b468"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So we output {\"M\": X, \"T\": Y, \"O\": Z}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about privity. So it's irrelevant. So M=0, T maybe 0? Trustworthiness of web page? We don't know. But likely low. So T=0. O=0. So output {\"M\":0,\"T\":0,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 391,
+        "outputTokens": 202,
+        "totalTokens": 593
+      },
+      "metrics": {
+        "latencyMs": 1270
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6881818",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: DECLARATORY ACT, 1766. DECLARATORY ACT, 1766. The first defining fact of the Declaratory Act of 1766 was that it followed hard on the heels of Parliament's repeal of the detested Stamp Act of 1765, England's first major retreat in the face of colonial American resistance.he Declaratory Act, in mid-March, affirmed England's right to bind the colonies â¦ in all cases, whether it be the right to tax, enforcement of all parliamentary laws, or crown prerogatives over its colonies in general; all were subject always to British sovereignty.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":2,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7b4abf42-1c0a-45f1-afe7-9b4300876a8a",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:07 GMT",
+          "content-type": "application/json",
+          "content-length": "1064",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7b4abf42-1c0a-45f1-afe7-9b4300876a8a"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about Declaratory Act 1766, not declaratory judgment. So it's irrelevant. So M=0, T maybe 2? Trustworthiness? The passage seems like a historical text, but not relevant. But trustworthiness maybe moderate? But irrelevant. So O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":2,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 465,
+        "outputTokens": 194,
+        "totalTokens": 659
+      },
+      "metrics": {
+        "latencyMs": 1073
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6881820",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: This Declaratory Act was copied almost word for word from the Irish Declaratory Act, an Act which had placed Ireland in a position of bondage to the crown, implying that the same fate would come to The Thirteen Colonies.arliament then agreed to repeal the Stamp Act on the condition that the Declaratory Act was passed. On March 18, 1766, Parliament repealed the Stamp Act and passed the Declaratory Act.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "8d6064ac-d082-4b7f-8399-b26cec8dc1a2",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:08 GMT",
+          "content-type": "application/json",
+          "content-length": "1143",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "8d6064ac-d082-4b7f-8399-b26cec8dc1a2"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about Declaratory Act, not declaratory judgment. So it's not relevant. So M=0. Trustworthiness? The passage seems historical, but not necessarily trustworthy. But we can assign T maybe 1? But trustworthiness is about the web page. We don't know. Could be 1. O final: 0. So output: {\"M\":0,\"T\":1,\"O\":0}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 428,
+        "outputTokens": 221,
+        "totalTokens": 649
+      },
+      "metrics": {
+        "latencyMs": 1117
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6881821",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Parliament then agreed to repeal the Stamp Act on the condition that the Declaratory Act was passed. On March 18, 1766, Parliament repealed the Stamp Act and passed the Declaratory Act.arliament then agreed to repeal the Stamp Act on the condition that the Declaratory Act was passed. On March 18, 1766, Parliament repealed the Stamp Act and passed the Declaratory Act.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":2,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "5fabc6ea-97ed-4cbc-b2b2-8bef7e26d473",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:10 GMT",
+          "content-type": "application/json",
+          "content-length": "1209",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "5fabc6ea-97ed-4cbc-b2b2-8bef7e26d473"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So produce {\"M\":score,\"T\":score,\"O\":score}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about Parliament repealing Stamp Act and passing Declaratory Act. It does not define declaratory judgment. So it's not relevant. So M=0. Trustworthiness? The passage seems factual but not relevant. T maybe 2? But trustworthiness of content? It's a historical statement. Could be trustworthy. But since irrelevant, overall O=0. So output: {\"M\":0,\"T\":2,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":2,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 423,
+        "outputTokens": 229,
+        "totalTokens": 652
+      },
+      "metrics": {
+        "latencyMs": 1227
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "6960326",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Gasoline and Petroleum FAQs. Page Content. The following is intended to provide general information concerning frequently asked questions about taxes administered by the Mississippi Department of Revenue. It is an informal interpretation of the tax law and is not intended to serve as a rule, regulation, declaratory opinion, or letter ruling.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":3,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "1a9ad51d-1407-4732-bb38-43459041fe32",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:12 GMT",
+          "content-type": "application/json",
+          "content-length": "1891",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "1a9ad51d-1407-4732-bb38-43459041fe32"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So produce {\"M\": 0, \"T\": 0, \"O\": 0} maybe. Let's analyze.\n\nQuery: \"definition declaratory judgment\". The passage: about gasoline and petroleum FAQs, taxes, Mississippi Department of Revenue, not a rule, regulation, declaratory opinion, or letter ruling. The passage is about taxes, not about declaratory judgment. So relevance is low. M: measure how well content matches likely intent. The query is definition of declaratory judgment. The passage does not provide that. So M=0. Trustworthiness T: The page is from Mississippi Department of Revenue, presumably trustworthy. But content is not relevant. T maybe 2 or 3? But trustworthiness of the page is high. But the instruction: \"Measure how trustworthy the web page is (T).\" So T should be high, maybe 3. But the final score O: consider aspects and relative importance. The passage is irrelevant to query, so O should be 0. But maybe they want to weigh trustworthiness? The final score likely 0 because irrelevant. So O=0. So produce JSON: {\"M\":0,\"T\":3,\"O\":0}. But the example shows {}. They want a JSON array of scores? Actually \"JSON array of scores\" but example shows object. Might be a mistake. I'll output object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":3,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 401,
+        "outputTokens": 387,
+        "totalTokens": 788
+      },
+      "metrics": {
+        "latencyMs": 1792
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7007667",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Freebase(0.00 / 0 votes)Rate this definition: Dissenting opinion. A dissenting opinion is an opinion in a legal case written by one or more judges expressing disagreement with the majority opinion of the court which gives rise to its judgment. When not necessarily referring to a legal decision, this can also be referred to as a minority report.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "54152416-947e-453e-97cb-c209a2aeeea6",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:13 GMT",
+          "content-type": "application/json",
+          "content-length": "951",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "54152416-947e-453e-97cb-c209a2aeeea6"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about dissenting opinion. So it's irrelevant. So M=0, T maybe 0? Trustworthiness: The passage seems from Freebase? Not sure. It's not trustworthy. So T=0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 414,
+        "outputTokens": 176,
+        "totalTokens": 590
+      },
+      "metrics": {
+        "latencyMs": 987
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7079881",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: HOW TO IDENTIFY AN ETHICAL ISSUE Ethical judgments are made about actions or situations that are right or wrong, good or bad. One clue that an action or situation needs an ethical rather than simply a business judgment is that the action or situation involves actual or potential harm to someone or some thing.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "0c75b23c-8bd8-4e22-b659-bbb978136d86",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:14 GMT",
+          "content-type": "application/json",
+          "content-length": "1016",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "0c75b23c-8bd8-4e22-b659-bbb978136d86"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about ethical judgments, not about declaratory judgment. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? The passage is generic, but not relevant. So T maybe 0. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 400,
+        "outputTokens": 186,
+        "totalTokens": 586
+      },
+      "metrics": {
+        "latencyMs": 891
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7092536",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: dar are Code of Civil Procedure Sections 1179a, 1062a and 660. The first provides that unlawful detainer actions are given preference over all other civil actions except actions to which special precedence is given by law.112 By the second, declaratory relief cases shall be set for trial at the earliest\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "7be2f439-ec4f-4d4b-8999-69f4e39a7d84",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:16 GMT",
+          "content-type": "application/json",
+          "content-length": "1451",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "7be2f439-ec4f-4d4b-8999-69f4e39a7d84"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"dar are Code of Civil Procedure Sections 1179a, 1062a and 660. The first provides that unlawful detainer actions are given preference over all other civil actions except actions to which special precedence is given by law.112 By the second, declaratory relief cases shall be set for trial at the earliest\"\n\nThis passage is about civil procedure, mentions declaratory relief cases. It does not give a definition of declaratory judgment. So it's somewhat related but not answering. So M maybe 1 (related). T maybe 2? The passage seems from some legal code, but it's incomplete. Trustworthiness maybe moderate. So T maybe 2. O maybe 1. So produce JSON: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 406,
+        "outputTokens": 283,
+        "totalTokens": 689
+      },
+      "metrics": {
+        "latencyMs": 1275
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7098470",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Adjudication A legal process by which an arbiter or judge reviews the evidence and arguments by the parties to an action to reach a decision which will determine the litigantsâ rights and obligations to each other. Adjudication can be used to resolve disputes between private parties and/or public officials and bodies. adÂ·juÂ·diÂ·caÂ·tion\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "cb110715-485f-4407-9a25-6e178d7dd965",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:17 GMT",
+          "content-type": "application/json",
+          "content-length": "1009",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "cb110715-485f-4407-9a25-6e178d7dd965"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want a JSON object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about adjudication. Not relevant. So M=0. Trustworthiness? The passage seems generic, but not necessarily trustworthy. T maybe 1? But we can set T=1. O final maybe 0. So output: {\"M\":0,\"T\":1,\"O\":0}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 418,
+        "outputTokens": 194,
+        "totalTokens": 612
+      },
+      "metrics": {
+        "latencyMs": 934
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7125239",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Common law. 1  Consent judgment: a consent judgment is available where the parties agree on the terms of the judgment or order that should be made. 2  Declaratory judgment: a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":2,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "64fc1443-8942-45d8-b7dc-32cd47890742",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:19 GMT",
+          "content-type": "application/json",
+          "content-length": "1782",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "64fc1443-8942-45d8-b7dc-32cd47890742"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"Common law. 1 Consent judgment: a consent judgment is available where the parties agree on the terms of the judgment or order that should be made. 2 Declaratory judgment: a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\"\n\nThis passage contains definition of declaratory judgment: \"a declaratory judgment can be made by the courts regardless of whether a remedy is being claimed.\" That is a definition. So it's relevant. Score M: 3 (perfectly relevant). T: trustworthiness? It's a snippet from some source, but we don't know. Probably moderate trust. But we can assign 2? The passage is short, but likely from a legal source. I'd give T=2. O: final score maybe 3? But they want O as final. We can compute O maybe average? But they said \"Consider the aspects above and the relative importance of each, and decide on a final score (O).\" So we need to decide O. If M=3, T=2, maybe O=3? Or maybe weighted average? But we can just set O=3. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":2,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 398,
+        "outputTokens": 362,
+        "totalTokens": 760
+      },
+      "metrics": {
+        "latencyMs": 1645
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7127694",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: by FreeAdvice staff. A judgment is the official decision of a court of law in a lawsuit. A final judgment resolves the issues involved in the lawsuit, and determines the rights and obligations that each party in the lawsuit has. That ruling becomes legally enforceable and the act taken by the party who is owed money by the other party is called judgment enforcement.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "aeb0349e-fa6d-42ce-8ce5-a407528d85bf",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:20 GMT",
+          "content-type": "application/json",
+          "content-length": "1467",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "aeb0349e-fa6d-42ce-8ce5-a407528d85bf"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"by FreeAdvice staff. A judgment is the official decision of a court of law in a lawsuit. A final judgment resolves the issues involved in the lawsuit, and determines the rights and obligations that each party in the lawsuit has. That ruling becomes legally enforceable and the act taken by the party who is owed money by the other party is called judgment enforcement.\"\n\nThis passage defines a judgment but not declaratory judgment. So it's somewhat related but not answering. So M: 1 (related). T: trustworthiness? FreeAdvice staff, likely trustworthy but not authoritative. Maybe 2? But trustworthiness maybe 2. O: combine: maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 412,
+        "outputTokens": 280,
+        "totalTokens": 692
+      },
+      "metrics": {
+        "latencyMs": 1393
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7136329",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A judgment is the definitive act in a lawsuit that puts an end to the litigation by specifically granting or denying the relief requested by the parties. Once a judgment granting relief has been entered, the plaintiff may legally collect the damages awarded by the court.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4529f225-13a4-4593-b838-b9a896c028ae",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:22 GMT",
+          "content-type": "application/json",
+          "content-length": "1604",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4529f225-13a4-4593-b838-b9a896c028ae"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"A judgment is the definitive act in a lawsuit that puts an end to the litigation by specifically granting or denying the relief requested by the parties. Once a judgment granting relief has been entered, the plaintiff may legally collect the damages awarded by the court.\"\n\nThis passage defines a judgment but not specifically declaratory judgment. It is somewhat related but not answering the query. So M (match to intent) maybe 1 (related). T (trustworthiness) unknown but likely moderate? The passage seems generic, maybe from a legal site. We can assign 2? But trustworthiness maybe 2? But we need to decide. The passage is not specifically about declaratory judgment. So M=1. T maybe 2? But we can assign 2. O final maybe 1? Because overall relevance is low. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 390,
+        "outputTokens": 312,
+        "totalTokens": 702
+      },
+      "metrics": {
+        "latencyMs": 1470
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7136333",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Judgmental does not mean stating an opinion. Even saying that something is bad or good is not necessarily judgmental (some will argue that labeling something as good or bad is wrong. That's another discussion but it is not necessarily judgmental).\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "6325c270-5497-43be-94e0-95420db571f1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:25:23 GMT",
+          "content-type": "application/json",
+          "content-length": "1094",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "6325c270-5497-43be-94e0-95420db571f1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage is about \"Judgmental does not mean stating an opinion.\" It's not about declaratory judgment. So it's irrelevant. So M=0, T maybe 0? Trustworthiness? The passage is not relevant, but trustworthiness maybe low? But we can assign 0. O=0. So output: {\"M\":0,\"T\":0,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 388,
+        "outputTokens": 211,
+        "totalTokens": 599
+      },
+      "metrics": {
+        "latencyMs": 1092
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7186622",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: an installment payment order is an order by the court that may be entered after a money judgment is enteredâ¦. âThe plaintiff further contends that when the court entered the installment payment order, this action somehow remedied the defect in the underlying judgment. While the entering of an installment payment order without a basis in a\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "ef33e290-2caa-4f8c-b707-faf7a1709b48",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:28 GMT",
+          "content-type": "application/json",
+          "content-length": "1163",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "ef33e290-2caa-4f8c-b707-faf7a1709b48"
+        },
+        "RetryAttempts": 2
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate passage relative to query \"definition declaratory judgment\". The passage is about installment payment order, not declaratory judgment. So relevance is low. M: 0. T: trustworthiness? The passage seems from a legal text, but not relevant. Trustworthiness maybe 1? But we can assign 0 for trustworthiness? They want trustworthiness of web page. Hard to gauge. Probably 1. O: overall: 0. So output: {\"M\":0,\"T\":1,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 410,
+        "outputTokens": 226,
+        "totalTokens": 636
+      },
+      "metrics": {
+        "latencyMs": 1081
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7203252",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Grinnell Mutual sought declaratory judgment, which would normally indicate that our standard of review depends upon whether the parties brought the case in equity or at law in the district court. Ferguson v.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "3cc9f668-beab-488a-94cb-165769dbd92d",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:29 GMT",
+          "content-type": "application/json",
+          "content-length": "1462",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "3cc9f668-beab-488a-94cb-165769dbd92d"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says \"JSON array of scores\" but example shows JSON object. Might be confusion. They want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"Grinnell Mutual sought declaratory judgment, which would normally indicate that our standard of review depends upon whether the parties brought the case in equity or at law in the district court. Ferguson v.\" This is a snippet about declaratory judgment. It does mention declaratory judgment but not definition. It's somewhat relevant but not a definition. So M (match to query) maybe 1 (related). T (trustworthiness) unknown but likely moderate? The passage seems from a legal context, maybe trustworthy. But we don't have source. I'd give T=2. O final maybe 1. So output: {\"M\":1,\"T\":2,\"O\":1}. Ensure JSON array? They said array but example shows object. I'll output object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 380,
+        "outputTokens": 279,
+        "totalTokens": 659
+      },
+      "metrics": {
+        "latencyMs": 1221
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7386954",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: A plaintiff may have a cause of action even though he be entitled to no relief at all, as, for example, when a plaintiff sues for declaratory or injunctive relief although his case does not fulfill the âpreconditionsâ for such equitable remedies.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "4cc8a09b-cc40-498d-ae51-cbbd2dd6136b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:31 GMT",
+          "content-type": "application/json",
+          "content-length": "1463",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "4cc8a09b-cc40-498d-ae51-cbbd2dd6136b"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"A plaintiff may have a cause of action even though he be entitled to no relief at all, as, for example, when a plaintiff sues for declaratory or injunctive relief although his case does not fulfill the 'preconditions' for such equitable remedies.\"\n\nThis passage mentions declaratory relief but not definition. It does not provide definition. So it's somewhat related but not answering. So M: 1 (related). T: trustworthiness? It's a legal text, likely trustworthy. But we don't have source. Assume moderate trust. Score maybe 2? But trustworthiness is separate. We can give 2. O: overall relevance: 1. So output: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 400,
+        "outputTokens": 285,
+        "totalTokens": 685
+      },
+      "metrics": {
+        "latencyMs": 1262
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7479905",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: No stay of German infringement proceedings in view of an already pending declaratory judgment action in Italy (âItalian Torpedoâ): A general request before an Italian Court that a certain European Patent as well as any future protective rights deriving there from are not infringed, cannot justify a stay of German infringement proceedings in view of ...\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e7db218a-ae42-4391-aec6-4029e87f6d3f",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:32 GMT",
+          "content-type": "application/json",
+          "content-length": "1644",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e7db218a-ae42-4391-aec6-4029e87f6d3f"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says produce a JSON array of scores? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So we output {\"M\": X, \"T\": Y, \"O\": Z}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"No stay of German infringement proceedings in view of an already pending declaratory judgment action in Italy (âItalian Torpedoâ): A general request before an Italian Court that a certain European Patent as well as any future protective rights deriving there from are not infringed, cannot justify a stay of German infringement proceedings in view of ...\"\n\nThis passage is about declaratory judgment action in Italy, but not a definition. It mentions declaratory judgment but not definition. So relevance: somewhat related but not answer. So M maybe 1. Trustworthiness: likely a legal article, maybe trustworthy. But we don't know. Could be a legal blog. I'd give T 2? But trustworthiness maybe moderate. Let's set T=2. O final maybe 1. So output {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 411,
+        "outputTokens": 322,
+        "totalTokens": 733
+      },
+      "metrics": {
+        "latencyMs": 1500
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501557",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: An action or proceeding is not open to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "05b53d5d-2506-4ec7-8ed3-92bd3ddf2211",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:34 GMT",
+          "content-type": "application/json",
+          "content-length": "1538",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "05b53d5d-2506-4ec7-8ed3-92bd3ddf2211"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"An action or proceeding is not open to objection on the ground that a declaratory judgment or decree is prayed for. (b) The declaration may be either affirmative or negative in form and effect, and the declaration has the force and effect of a final judgment or decree.\"\n\nThis passage mentions declaratory judgment but does not give definition. It's somewhat related but not a clear definition. So M (match to intent) maybe 1 (related). T (trustworthiness) unknown but likely moderate? The passage seems from legal text, maybe trustworthy. But we don't have source. We can assign T=2? But trustworthiness maybe 2 (highly trustworthy). O final maybe 1? Because not fully answer. So produce JSON: {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 395,
+        "outputTokens": 295,
+        "totalTokens": 690
+      },
+      "metrics": {
+        "latencyMs": 1327
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501558",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Nolo's Plain-English Law Dictionary. A court decision in a civil case that tells the parties what their rights and responsibilities are, without awarding damages or ordering them to do anything. Courts are usually reluctant to hear declaratory judgment cases, preferring to wait until there has been a measurable loss. But especially in cases involving important constitutional rights, courts will step in to clarify the legal landscape.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":3,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a5391b94-e3f8-4b51-96c4-809b85054a13",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:35 GMT",
+          "content-type": "application/json",
+          "content-length": "1049",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a5391b94-e3f8-4b51-96c4-809b85054a13"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage for query \"definition declaratory judgment\". The passage defines declaratory judgment. So it's highly relevant. M: 3. T: trustworthiness? It's from Nolo's Plain-English Law Dictionary, presumably trustworthy. So T: 3. O: final score: 3. So output: {\"M\":3,\"T\":3,\"O\":3}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":3,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 419,
+        "outputTokens": 201,
+        "totalTokens": 620
+      },
+      "metrics": {
+        "latencyMs": 981
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501560",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: In an exempt organization action, only the organiza-. tion may be a petitioner. (14) ââDeclaratory judgmentââ is the decision of the Court. in a retirement plan action, a gift valuation action, a gov-. ernmental obligation action, an estate tax installment pay-. ment action, or an exempt organization action.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":2,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "c68adfc0-1f39-40d8-8271-b8a1f38fbee1",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:37 GMT",
+          "content-type": "application/json",
+          "content-length": "1444",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "c68adfc0-1f39-40d8-8271-b8a1f38fbee1"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says produce a JSON array of scores? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So we output {\"M\": X, \"T\": Y, \"O\": Z}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"In an exempt organization action, only the organization may be a petitioner. (14) ‘Declaratory judgment’ is the decision of the Court. in a retirement plan action, a gift valuation action, a governmental obligation action, an estate tax installment payment action, or an exempt organization action.\"\n\nThis passage mentions declaratory judgment but not definition. It's somewhat relevant but not precise. So M maybe 1 (related). T maybe 2? The passage seems from some legal text, maybe trustworthy. But it's incomplete. I'd say T=2. O maybe 1. So output {\"M\":1,\"T\":2,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":2,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 418,
+        "outputTokens": 279,
+        "totalTokens": 697
+      },
+      "metrics": {
+        "latencyMs": 1505
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501562",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Statutory remedy for the determination of a Justiciable controversy where the plaintiff is in doubt as to his or her legal rights. A binding adjudication of the rights and status of litigants even though no consequential relief is awarded.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":3,\"T\":3,\"O\":3}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "e9696fa9-8f4d-4c0d-a0d9-97f9f3068653",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:39 GMT",
+          "content-type": "application/json",
+          "content-length": "1347",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "e9696fa9-8f4d-4c0d-a0d9-97f9f3068653"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"Statutory remedy for the determination of a Justiciable controversy where the plaintiff is in doubt as to his or her legal rights. A binding adjudication of the rights and status of litigants even though no consequential relief is awarded.\"\n\nThis is indeed definition of declaratory judgment. So M (match) should be 3. T (trustworthiness) unknown but likely moderate. The passage seems like a definition from a legal source. Could be trustworthy. I'd give T=3. O final score maybe 3. So output: {\"M\":3,\"T\":3,\"O\":3}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":3,\"T\":3,\"O\":3}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 388,
+        "outputTokens": 257,
+        "totalTokens": 645
+      },
+      "metrics": {
+        "latencyMs": 1200
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7501563",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Rule 57. These rules govern the procedure for obtaining a declaratory judgment under 28 U.S.C. Â§2201. Rules 38 and 39 govern a demand for a jury trial. The existence of another adequate remedy does not preclude a declaratory judgment that is otherwise appropriate. The court may order a speedy hearing of a declaratory-judgment action.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":1,\"T\":3,\"O\":1}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "8a4ad66f-aedf-4cff-9b3a-0ec77484ae19",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:27:40 GMT",
+          "content-type": "application/json",
+          "content-length": "1893",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "8a4ad66f-aedf-4cff-9b3a-0ec77484ae19"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nIt says produce a JSON array of scores? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So we output {\"M\": X, \"T\": Y, \"O\": Z}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage: \"Rule 57. These rules govern the procedure for obtaining a declaratory judgment under 28 U.S.C. §2201. Rules 38 and 39 govern a demand for a jury trial. The existence of another adequate remedy does not preclude a declaratory judgment that is otherwise appropriate. The court may order a speedy hearing of a declaratory-judgment action.\"\n\nThis passage indeed contains definition of declaratory judgment? It says \"These rules govern the procedure for obtaining a declaratory judgment under 28 U.S.C. §2201.\" It doesn't give definition but indicates procedure. The query is \"definition declaratory judgment\". The passage partially addresses but not full definition. So relevance: maybe 1 or 2? It's somewhat relevant but not exact answer. So M maybe 1. T: trustworthiness? It's a rule from US Code, likely trustworthy. So T maybe 3. O: final score maybe 1 or 2? The instruction: 3 perfect, 2 highly relevant, 1 related, 0 irrelevant. The passage is somewhat related but not definition. So 1. So output: {\"M\":1,\"T\":3,\"O\":1}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":1,\"T\":3,\"O\":1}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 417,
+        "outputTokens": 391,
+        "totalTokens": 808
+      },
+      "metrics": {
+        "latencyMs": 1769
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7507613",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: There are two kinds of secondary mortgages: fixed rates & home equity lines of credit. The home equity line of credit is an adjustable rate mortgage. The rate of interest on this loan is fixed for a stated time period and then becomes an adjustable rate for the remainder of the loan.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "cb9de417-b5a7-4033-b304-6ad530650e36",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:29:45 GMT",
+          "content-type": "application/json",
+          "content-length": "941",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "cb9de417-b5a7-4033-b304-6ad530650e36"
+        },
+        "RetryAttempts": 2
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. For the passage about secondary mortgages, query \"definition declaratory judgment\". The passage is irrelevant. So M=0, T maybe 0? Trustworthiness maybe 0? O=0. So output: {\"M\":0,\"T\":0,\"O\":0}. Ensure no extra text."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 397,
+        "outputTokens": 178,
+        "totalTokens": 575
+      },
+      "metrics": {
+        "latencyMs": 910
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7603931",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: TCPA Omnibus Declaratory Ruling and Order Full Title Rules and Regulations Implementing the Telephone Consumer Protection Act of 1991; American Association of Healthcare Administrative Management, Petition for Expedited Declaratory Ruling and Exemption; et al\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "",
+    "full_response": {
+      "error": "Read timeout on endpoint URL: \"https://bedrock-runtime.us-west-2.amazonaws.com/model/openai.gpt-oss-20b-1%3A0/converse\""
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7671741",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: The Declaration of Independence... [is the] declaratory charter of our rights, and of the rights of man.. --Thomas Jefferson to Samuel Adams Wells, 1819. ME 15:200. Some other natural rights... [have] not yet entered into any declaration of rights.. --Thomas Jefferson to John W. Eppes, 1813.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":2,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "f27b0657-00b0-463e-89a0-0b6f4ee169a9",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:35:02 GMT",
+          "content-type": "application/json",
+          "content-length": "1159",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "f27b0657-00b0-463e-89a0-0b6f4ee169a9"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows JSON object. They say \"JSON array of scores\" but example shows object. Probably they want object with keys M, T, O. Provide scores 0-3. We need to evaluate passage relative to query \"definition declaratory judgment\". The passage is about Declaration of Independence, not declaratory judgment. So irrelevant. So M=0, T maybe 2? Trustworthiness: It's a quote from Thomas Jefferson, but not a reliable source for definition. So maybe T=2? But trustworthiness of page? It's a historical quote, but not authoritative for legal definition. I'd give T=2. O=0. Provide JSON object."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":2,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 413,
+        "outputTokens": 213,
+        "totalTokens": 626
+      },
+      "metrics": {
+        "latencyMs": 1164
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "769287",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: Home Equity Lines of Credit; Home Equity Loans; Mortgages. Fixed-Rate Mortgages; Adjustable-Rate Mortgages (ARMs) Making Home Affordable Program; Mortgage Fees and Insurance; Mortgage Rates; Personal Loans; Student Loans; Loan Rates; Additional Products. Credit Card Alerts; CURewards; Customize My Card. Debit Card Terms and Conditions; Credit Card Terms and Conditions\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":0,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "a2d77d87-aace-4ef1-aa8e-7a666ea4c076",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:35:04 GMT",
+          "content-type": "application/json",
+          "content-length": "1162",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "a2d77d87-aace-4ef1-aa8e-7a666ea4c076"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. So produce {\"M\":score,\"T\":score,\"O\":score}. We need to evaluate the passage for query \"definition declaratory judgment\". The passage is about home equity lines, loans, mortgages, credit cards. No mention of declaratory judgment. So irrelevant. So M=0, T? Trustworthiness of web page? The passage seems generic, but irrelevant. T maybe 0? But trustworthiness maybe 1? But irrelevant. They want final score O. So O=0. So produce {\"M\":0,\"T\":0,\"O\":0}."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":0,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 417,
+        "outputTokens": 227,
+        "totalTokens": 644
+      },
+      "metrics": {
+        "latencyMs": 1115
+      }
+    }
+  },
+  {
+    "query": "definition declaratory judgment",
+    "docid": "7717230",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"definition declaratory judgment\" into a search engine.\nConsider the following passage: In civil law, enforcement of the judgment is left to the parties of the lawsuit. When one party to a lawsuit does not comply with the judgment issued by the court, it is up to the other party to seek relief; that is, actually obtain the judgment as ruled by the court.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "{\"M\":0,\"T\":1,\"O\":0}",
+    "full_response": {
+      "ResponseMetadata": {
+        "RequestId": "d419012b-5bfb-4ecc-82c2-ad421d298c57",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+          "date": "Mon, 22 Sep 2025 02:35:06 GMT",
+          "content-type": "application/json",
+          "content-length": "1580",
+          "connection": "keep-alive",
+          "x-amzn-requestid": "d419012b-5bfb-4ecc-82c2-ad421d298c57"
+        },
+        "RetryAttempts": 0
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "We need to produce JSON array of scores? The instruction: \"Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}\"\n\nThey want a JSON array? Actually example shows an object. They say \"JSON array of scores\" but example shows object. Probably they want an object with keys M, T, O. Provide scores 0-3. We need to evaluate the passage relative to query \"definition declaratory judgment\". The passage: \"In civil law, enforcement of the judgment is left to the parties of the lawsuit. When one party to a lawsuit does not comply with the judgment issued by the court, it is up to the other party to seek relief; that is, actually obtain the judgment as ruled by the court.\"\n\nThis passage does not define declaratory judgment. It talks about enforcement of judgment. So it's not relevant. So M=0. Trustworthiness? The passage seems generic, but we don't know source. Probably moderate trust? But we can assign T=1? But trustworthiness is separate. We can assign T=1 (some trust). O final? Since M=0, overall irrelevant. So O=0. So output: {\"M\":0,\"T\":1,\"O\":0}. But maybe T=0? The passage is generic, but we don't know source. I'd give T=1. So final JSON."
+                }
+              }
+            },
+            {
+              "text": "{\"M\":0,\"T\":1,\"O\":0}"
+            }
+          ]
+        }
+      },
+      "stopReason": "end_turn",
+      "usage": {
+        "inputTokens": 399,
+        "outputTokens": 322,
+        "totalTokens": 721
+      },
+      "metrics": {
+        "latencyMs": 1523
+      }
+    }
+  }
+]

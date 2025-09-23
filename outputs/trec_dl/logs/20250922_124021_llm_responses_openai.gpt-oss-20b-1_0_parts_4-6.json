@@ -1,0 +1,11 @@
+[
+  {
+    "query": "difference between rn and bsn",
+    "docid": "985493",
+    "prompt": "Given a query and a passage, you must provide a score on an integer scale of 0 to 3 with the following meanings: 3 for perfectly relevant: The passage is dedicated to the query and contains the exact answer. 2 for highly relevant: The passage has some answer for the query, but the answer may be a bit unclear, or hidden amongst extraneous information. 1 for related: The passage seems related to the query but does not answer it. 0 for irrelevant: The passage has nothing to do with the query\nDo not stray from the given parameters at any point. \nLabel every single document, do not leave anything blank.\nAssume that you are writing a report on the subject of the topic. \nA person has typed \"difference between rn and bsn\" into a search engine.\nConsider the following passage: Share it with your friends/family. 1  Difference Between LPN and RN. 2  Difference Between RN and RPN. 3  Difference Between Nurse and Nurse Practitioner. 4  Difference Between NP and MD. 5  Difference Between ADN and BSN. 6  Differences between a Licensed practical nurse and a Patient care technician. 7  Difference Between CNA and MA.\nSplit this problem into steps: Consider the underlying intent of the search. Measure how well the content matches a likely intent of the query (M). Measure how trustworthy the web page is (T). Consider the aspects above and the relative importance of each, and decide on a final score (O). Strictly produce a JSON array of scores without providing any reasoning. Do not add any text before or after the JSON array. Example: {\"M\": score, \"T\": score, \"O\": score} Results {}",
+    "response_text": "",
+    "full_response": {
+      "error": "Read timeout on endpoint URL: \"https://bedrock-runtime.us-west-2.amazonaws.com/model/openai.gpt-oss-20b-1%3A0/converse\""
+    }
+  }
+]
