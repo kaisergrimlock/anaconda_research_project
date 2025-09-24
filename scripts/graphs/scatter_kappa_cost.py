@@ -55,7 +55,7 @@ for _, r in df.iterrows():
         edgecolor="black", linewidths=0.4
     )
 
-ax.set_xlabel("Cost per 1K tokens (USD)")
+ax.set_xlabel("Cost per 1K document (USD)")
 ax.set_ylabel("Quadratic Cohen’s κ")
 ax.set_xlim(xmin, xmax)
 ax.set_ylim(ymin, ymax)

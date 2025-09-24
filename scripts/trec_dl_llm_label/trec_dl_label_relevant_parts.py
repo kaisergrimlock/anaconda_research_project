@@ -21,8 +21,8 @@ PROMPT_NAME = "prompt"
 PROMPT_FILE = Path(f"prompts/{PROMPT_NAME}.txt")
 
 # >>> Choose which parts to process (inclusive) <<<
-START_PART = 7
-END_PART   = 9
+START_PART = 16
+END_PART   = 19
 
 # Where the part files live & their filename pattern
 PART_DIR     = Path("outputs/trec_dl/retrieved/all_topics")
