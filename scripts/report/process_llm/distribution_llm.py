@@ -7,7 +7,7 @@ from collections import Counter
 import csv
 
 # ==== Configure these ====
-INPUT_FILE   = Path("outputs/trec_dl_llm_label/processed/all_docs_label.cleaned.csv")
+INPUT_FILE   = Path("outputs/trec_dl_llm_label/processed/all_docs_label_cleaned.csv")
 OUTPUT_FILE  = Path("outputs/trec_dl_llm_label/processed/label_counts.csv")
 COLLECTION   = "llm"   # whatever label you want in the output
 LABEL_COLUMN = "relevance"
