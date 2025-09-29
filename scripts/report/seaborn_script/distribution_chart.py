@@ -1,101 +1,51 @@
 #!/usr/bin/env python3
-"""
-Count docs per (label, collection) and write CSV summary.
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.ticker import PercentFormatter
 
-Supports:
-- CSV/TSV (auto-detects delimiter). Expects columns: `label`, `collection`.
-- JSONL (one JSON object per line) with keys: `label`, `collection`.
+# ---- Data (from your CSV content) ----
+df = pd.DataFrame({
+    "label":   [0, 1, 2, 3],
+    "NIST":    [5158, 1601, 1804, 697],
+    "llm":     [3618, 2498, 1689, 1250],
+    "%_NIST":  [55.7, 17.29, 19.48, 7.53],
+    "%_llm":   [39.96, 27.59, 18.65, 13.8],
+})
 
-Usage:
-  python make_label_counts.py INPUT_FILE --outdir path/to/output [--outfile label_counts.csv]
-  # If your columns have different names, specify them:
-  python make_label_counts.py data.csv --outdir out --label-col rel --collection-col source
-"""
+# We only need the percentages for this plot
+pct = df[["label", "%_NIST", "%_llm"]].rename(columns={"%_NIST": "NIST", "%_llm": "LLM"})
 
-import argparse
-import csv
-import json
-from collections import Counter
-from pathlib import Path
+# Long format for seaborn
+pct_long = pct.melt(id_vars="label", var_name="Source", value_name="Percent")
 
-def iter_rows_from_csv(path, label_col, collection_col):
-    with open(path, "r", newline="", encoding="utf-8") as f:
-        sample = f.read(4096)
-        f.seek(0)
-        try:
-            dialect = csv.Sniffer().sniff(sample)
-        except csv.Error:
-            # Fallback: assume comma
-            dialect = csv.get_dialect("excel")
-        reader = csv.DictReader(f, dialect=dialect)
-        for i, row in enumerate(reader, 1):
-            if label_col not in row or collection_col not in row:
-                raise KeyError(
-                    f"Missing required columns in CSV (need '{label_col}' and '{collection_col}'). "
-                    f"Available: {list(row.keys())}"
-                )
-            yield str(row[label_col]).strip(), str(row[collection_col]).strip()
+# ---- Plot ----
+sns.set(style="whitegrid")
+plt.figure(figsize=(8, 4.5))
 
-def iter_rows_from_jsonl(path, label_col, collection_col):
-    with open(path, "r", encoding="utf-8") as f:
-        for i, line in enumerate(f, 1):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                obj = json.loads(line)
-            except json.JSONDecodeError as e:
-                raise ValueError(f"Line {i} is not valid JSON: {e}")
-            if label_col not in obj or collection_col not in obj:
-                raise KeyError(
-                    f"Missing keys at line {i} (need '{label_col}' and '{collection_col}'). "
-                    f"Available: {list(obj.keys())}"
-                )
-            yield str(obj[label_col]).strip(), str(obj[collection_col]).strip()
+ax = sns.barplot(data=pct_long, x="label", y="Percent", hue="Source")
 
-def main():
-    ap = argparse.ArgumentParser(description="Create CSV: label,no_of_docs,collection")
-    ap.add_argument("input_file", help="Path to input CSV/TSV or JSONL")
-    ap.add_argument("--outdir", required=True, help="Directory to write the output CSV")
-    ap.add_argument("--outfile", default="label_counts.csv", help="Output filename (default: label_counts.csv)")
-    ap.add_argument("--label-col", default="label", help="Column/key name for label (default: label)")
-    ap.add_argument("--collection-col", default="collection", help="Column/key name for collection (default: collection)")
-    args = ap.parse_args()
+# Make y-axis show percentages (0–100)
+ax.yaxis.set_major_formatter(PercentFormatter(100))
 
-    inp = Path(args.input_file)
-    if not inp.exists():
-        raise FileNotFoundError(f"Input file not found: {inp}")
+# Titles & labels
+ax.set_title("Label Distribution (%): NIST vs LLM", pad=12)
+ax.set_xlabel("Label")
+ax.set_ylabel("Percentage")
 
-    # Choose reader based on extension
-    ext = inp.suffix.lower()
-    if ext in {".csv", ".tsv"}:
-        row_iter = iter_rows_from_csv(inp, args.label_col, args.collection_col)
-    elif ext in {".jsonl", ".ndjson"}:
-        row_iter = iter_rows_from_jsonl(inp, args.label_col, args.collection_col)
-    else:
-        # Try CSV first; if it fails hard, suggest JSONL
-        try:
-            row_iter = iter_rows_from_csv(inp, args.label_col, args.collection_col)
-        except Exception:
-            row_iter = iter_rows_from_jsonl(inp, args.label_col, args.collection_col)
+# Add value labels on bars
+for p in ax.patches:
+    height = p.get_height()
+    if pd.notnull(height):
+        ax.annotate(f"{height:.2f}%",
+                    (p.get_x() + p.get_width() / 2, height),
+                    ha="center", va="bottom", fontsize=9, xytext=(0, 3), textcoords="offset points")
 
-    counts = Counter()
-    total = 0
-    for label, collection in row_iter:
-        counts[(label, collection)] += 1
-        total += 1
+# Legend and layout
+ax.legend(title="Source")
+plt.tight_layout()
 
-    outdir = Path(args.outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
-    outpath = outdir / args.outfile
+# Save (optional)
+# plt.savefig("nist_llm_label_percent.png", dpi=200)
 
-    with open(outpath, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["label", "no. of docs", "collection"])
-        for (label, collection), cnt in sorted(counts.items(), key=lambda x: (str(x[0][1]), str(x[0][0]))):
-            writer.writerow([label, cnt, collection])
-
-    print(f"Wrote {len(counts)} rows (from {total} docs) to: {outpath}")
-
-if __name__ == "__main__":
-    main()
+plt.show()
