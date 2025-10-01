@@ -1,0 +1,4 @@
+model,equal_count,less_relevant_count,more_relevant_count,total_rows,kappa_binary_threshold_1,alpha_ordinal
+anthropic.claude-3-5-haiku-20241022-v1_0_top2,26,2,46,74,0.24118129614438055,0.1780121618671795
+openai.gpt-oss-120b-1_0_top2,103,30,117,250,0.4384688389750079,0.5099547279879252
+__OVERALL__,129,32,163,324,0.4144357844798374,0.4781434756349062
