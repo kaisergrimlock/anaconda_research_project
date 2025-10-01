@@ -88,6 +88,8 @@ with INPUT_CSV.open("r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     data_rows = [row for row in reader]
 
+total_docs = len(data_rows)  # <-- for progress display
+
 for model_id in MODELS:
     print(f"\n--- Running inference for model: {model_id} ---")
 
@@ -98,7 +100,8 @@ for model_id in MODELS:
     total_output_tokens = 0
     run_id = timestamp_id()
 
-    for row in data_rows:
+    # enumerate with 1-based index for [i/total]
+    for i, row in enumerate(data_rows, 1):
         query = row["query"]
         docid = row["docid"]
         passage_text = row["passage"].strip()
@@ -145,6 +148,12 @@ for model_id in MODELS:
         usage = resp.get("usage", {})
         total_input_tokens  += int(usage.get("inputTokens", 0) or 0)
         total_output_tokens += int(usage.get("outputTokens", 0) or 0)
+
+        # ---- Progress indicator ----
+        print(f"[{i}/{total_docs} docs]", end="\r", flush=True)
+
+    # finish the progress line
+    print()
 
     # ----------------------------
     # Write combined CSV per model
