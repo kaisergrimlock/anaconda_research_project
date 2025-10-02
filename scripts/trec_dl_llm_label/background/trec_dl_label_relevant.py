@@ -12,7 +12,7 @@ from datetime import datetime
 now = str(datetime.now().strftime("_%Y%m%d_%H%M%S"))
 PROMPT_NAME = "prompt" # prompt template file
 PROMPT_FILE = Path("prompts/" + PROMPT_NAME + ".txt")
-INPUT_CSV   = Path("outputs/trec_dl_2019/retrieved/raw/trecdl_passage_2019_judged_only_25.csv")
+INPUT_CSV   = Path("outputs/trec_dl_llm_label/processed/relevance_missing_rows.csv")  # input with 'query', 'docid', 'passage' columns
 
 OUTPUT_DIR  = Path("outputs/trec_dl_llm_label/relevant/" + "utility" + "/" + now)  # CSV outputs per run/model
 LOG_DIR     = Path("outputs/trec_dl/logs")        # JSON logs

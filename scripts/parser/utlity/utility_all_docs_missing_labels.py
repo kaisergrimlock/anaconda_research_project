@@ -9,7 +9,7 @@ import csv
 PARTS_DIR    = Path("outputs/trec_dl_2019/retrieved/all_topics_in_parts")
 PARTS_GLOB   = "*.csv"
 
-ALL_DOCS_FILE = Path("outputs/trec_dl_llm_label/processed/all_docs_label_cleaned.csv")
+ALL_DOCS_FILE = Path("outputs/trec_dl_llm_label/processed/all_llm_labels.csv")
 
 OUTPUT_FILE  = Path("outputs/trec_dl_llm_label/processed/missing_labels.csv")
 
