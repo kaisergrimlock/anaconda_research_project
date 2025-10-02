@@ -4,6 +4,7 @@ import json
 import csv
 from pathlib import Path
 from datetime import datetime
+import shutil
 
 import boto3
 from botocore.config import Config
@@ -22,7 +23,7 @@ cfg = Config(
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_NAME = "prompt"
+PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_NAME}.txt")
 
 # >>> Choose which parts to process (inclusive) <<<
@@ -144,7 +145,8 @@ async def label_single_part_file(
       - 'log_json' (path)
     """
     rows = await asyncio.to_thread(read_rows, part_csv)
-    print(f"[{part_csv.name}] Loaded {len(rows)} rows")
+    total_rows = len(rows)
+    print(f"[{part_csv.name}] Loaded {total_rows} rows")
 
     # Each file writes its own labels CSV and log
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
@@ -206,9 +208,21 @@ async def label_single_part_file(
         logs.append({"query": query, "docid": docid, "prompt": prompt,
                      "response_text": text, "full_response": resp})
 
+        # After the loop, print a newline so subsequent logs don’t overwrite
+        print()  # move to next line
+
+        # Save per-file JSON log
+        with log_path.open("w", encoding="utf-8") as logf:
+            json.dump(logs, logf, indent=2, ensure_ascii=False)
+
+        print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | Log: {log_path.name} | tokens in/out={total_in}/{total_out}")
+
+
         in_tok, out_tok = usage_from_resp(resp)
         total_in  += in_tok
         total_out += out_tok
+        print(f"[{part_csv.name}] [{idx}/{total_rows}] docs", end="\r", flush=True)
+
 
     # Save per-file JSON log
     with log_path.open("w", encoding="utf-8") as logf:
@@ -314,6 +328,15 @@ async def run_for_model(model_id: str):
 
     print(f"[DONE] Model: {model_id} | Appended to: {OUTPUT_FILE}")
     print(f"[DONE] Token usage appended to: {TOKENS_CSV}")
+
+    # --- Clean up temp per-file labels directory ---
+    try:
+        shutil.rmtree(per_file_out_dir, ignore_errors=False)
+        print(f"[CLEANUP] Removed temp folder: {per_file_out_dir}")
+    except Exception as e:
+        # Non-fatal: we’ve already merged; just warn.
+        print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
+
 
 async def main():
     # Run models one-by-one; within each, files run in parallel
