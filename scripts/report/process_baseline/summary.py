@@ -25,9 +25,10 @@ from sklearn.metrics import cohen_kappa_score   # pip install scikit-learn
 import krippendorff as kd                       # pip install krippendorff
 
 # --------- Paths ---------
-NIST_DIR  = Path("retrieved/trec_dl_2019/judged")
-NIST_GLOB = "all_topics_trecdl_2019_part*.csv"
-LLM_CSV   = Path("outputs/llm_label/gpt_oss_20b_trec_dl_2019_raw.csv")
+TREC_DL_YEAR = "2023"  # '2019', '2020', or '2023'
+NIST_DIR  = Path("retrieved/trec_dl_" + TREC_DL_YEAR + "/judged")
+NIST_GLOB = "all_topics_trecdl_" + TREC_DL_YEAR + "_part*.csv"
+LLM_CSV   = Path("outputs/llm_label/trec_dl_2023_raw.csv")
 
 # preferred output dir (use 'output/llm_label' if it exists, else 'outputs/llm_label')
 PREF_OUT_DIR = Path("output/llm_label")

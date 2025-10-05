@@ -16,13 +16,14 @@ Path(r'D:\PyseriniCache').mkdir(parents=True, exist_ok=True)
 TRECDL_YEAR = '2023'      # '2019', '2020', or '2023'
 LEVEL       = 'passage'   # 'passage' or 'document'
 FETCH_TEXT  = True
+CHUNK_SIZE  = 500         # rows per output CSV chunk
 
 # Optional: force a subset of qids; otherwise we take the first N judged
 FORCE_QIDS: Iterable[Any] | None = None
 N_QUERIES   = 25
 
 # ---- Output location ----
-OUT_DIR = Path("outputs/trec_dl")
+OUT_DIR = Path("retrieved/trec_dl_" + TRECDL_YEAR + "/judged")
 COMBINED_CSV = OUT_DIR / f"trecdl_{LEVEL}_{TRECDL_YEAR}_judged_only.csv"
 
 # ----------------------------
@@ -105,28 +106,73 @@ def as_int_grade(g: Any) -> int:
         return 1 if str(g).strip().isdigit() and int(str(g).strip()) > 0 else 0
 
 def extract_text_from_doc(doc) -> str:
-    """Best-effort extraction of passage/document text."""
+    """Return plain passage/doc text (not the whole JSON)."""
     if not doc:
         return ""
     raw = doc.raw() or ""
-    # Try JSON payload (common in msmarco prebuilt indexes)
+    # Try JSON payload first
     try:
         obj = json.loads(raw)
         if isinstance(obj, dict):
-            if "contents" in obj and isinstance(obj["contents"], str):
-                return obj["contents"]
-            for k in ("raw", "text", "body"):
-                if k in obj and isinstance(obj[k], str):
-                    return obj[k]
+            # Prefer typical fields seen across msmarco v1/v2 variants
+            for k in ("contents", "passage", "passage_text", "text", "body", "raw"):
+                v = obj.get(k)
+                if isinstance(v, str) and v.strip():
+                    return v
     except Exception:
         pass
+    # Fallback to contents() if available
     try:
         c = doc.contents()
         if isinstance(c, str) and c.strip():
             return c
     except Exception:
         pass
+    # Last resort: raw string
     return raw
+
+def normalize_csv_cell(s: str) -> str:
+    """Collapse CR/LF/TAB to spaces so each CSV row is single-line."""
+    return " ".join((s or "").replace("\r", " ").replace("\n", " ").replace("\t", " ").split())
+
+class RollingCsvWriter:
+    """
+    Writes rows into multiple CSV files, rotating every `chunk_size` rows.
+    Files are named: {prefix}{part:03}.csv, each with a header.
+    """
+    def __init__(self, out_dir: Path, prefix: str, header: List[str], chunk_size: int = 500):
+        self.out_dir = out_dir
+        self.prefix = prefix
+        self.header = header
+        self.chunk_size = max(1, int(chunk_size))
+        self.part = 0
+        self.rows_in_part = 0
+        self.fh = None
+        self.writer = None
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+
+    def _open_next(self):
+        if self.fh:
+            self.fh.close()
+        self.part += 1
+        self.rows_in_part = 0
+        filename = f"{self.prefix}{self.part}.csv"   # <-- no zero padding, still .csv
+        self.fh = (self.out_dir / filename).open("w", encoding="utf-8", newline="")
+        self.writer = csv.writer(self.fh)
+        self.writer.writerow(self.header)
+
+
+    def write(self, row: List[Any]):
+        if self.writer is None or self.rows_in_part >= self.chunk_size:
+            self._open_next()
+        self.writer.writerow(row)
+        self.rows_in_part += 1
+
+    def close(self):
+        if self.fh:
+            self.fh.close()
+            self.fh = None
+            self.writer = None
 
 def fetch_doc_by_any_form(searcher: LuceneSearcher, docid: str, level: str) -> Tuple[Optional[str], Optional[Any]]:
     """Try both bare and prefixed forms; return (resolved_id, doc) or (None, None)."""
@@ -164,17 +210,17 @@ def pick_qids_to_run(all_topics: Dict[Any, Any],
 # ----------------------------
 if __name__ == "__main__":
     tkey       = topic_key_for(TRECDL_YEAR, LEVEL)
-    qrels_key  = qrels_key_for(TRECDL_YEAR, LEVEL)              # <-- NEW
-    index_name = index_name_for(TRECDL_YEAR, LEVEL)             # <-- pass year + level
+    qrels_key  = qrels_key_for(TRECDL_YEAR, LEVEL)          # make sure you added this helper earlier
+    index_name = index_name_for(TRECDL_YEAR, LEVEL)
 
-    # Robust sanity check (v2.1 doc index doesn't end with 'doc')
+    # Light sanity check
     if LEVEL == 'passage' and 'passage' not in index_name:
         raise RuntimeError(f"LEVEL={LEVEL} must match index={index_name}")
     if LEVEL == 'document' and 'doc' not in index_name:
         raise RuntimeError(f"LEVEL={LEVEL} must match index={index_name}")
 
     topics = get_topics(tkey)
-    qrels  = get_qrels(qrels_key)                               # <-- use qrels_key
+    qrels  = get_qrels(qrels_key)
 
     qids_to_run = pick_qids_to_run(
         all_topics=topics,
@@ -183,21 +229,25 @@ if __name__ == "__main__":
         n_queries=N_QUERIES
     )
 
+    print(f"Run name   : {"all_topics_trec_dl" + TRECDL_YEAR}")
+    print(f"Output dir : {OUT_DIR}")
     print(f"Topics key : {tkey}")
-    print(f"Qrels key  : {qrels_key}")                           # <-- helpful print
+    print(f"Qrels key  : {qrels_key}")
     print(f"Index      : {index_name}")
     print(f"Running {len(qids_to_run)} queries: {sorted(map(str, qids_to_run), key=qid_sort_key)}")
 
     searcher = LuceneSearcher.from_prebuilt_index(index_name)
     searcher.set_bm25(k1=0.82, b=0.68)
+    rolling = RollingCsvWriter(
+        out_dir=OUT_DIR,
+        prefix=f"all_topics_trecdl_{TRECDL_YEAR}_part",  # e.g., all_topics_trecdl_2023_part
+        header=["query", "docid", "passage", "relevance"],
+        chunk_size=CHUNK_SIZE
+    )
 
+    total_rows = 0
 
-    OUT_DIR.mkdir(exist_ok=True)
-
-    with COMBINED_CSV.open("w", encoding="utf-8", newline="") as fcsv:
-        writer = csv.writer(fcsv)
-        writer.writerow(["query", "docid", "passage", "relevance"])
-
+    try:
         for qid_key in qids_to_run:
             raw_qrels_for_qid = qrels_for(qrels, qid_key)  # dict[docid] -> grade
             query_text = topic_text(topics[qid_key])
@@ -217,18 +267,23 @@ if __name__ == "__main__":
                     if doc is not None:
                         found += 1
                         text = extract_text_from_doc(doc)
-                        writer.writerow([query_text, resolved_id, text, as_int_grade(grade)])
+                        rolling.write([query_text, resolved_id,
+                                       normalize_csv_cell(text),
+                                       as_int_grade(grade)])
+                        total_rows += 1
                     else:
                         missing += 1
-                        # Still write a row so you can see what's missing from the index
-                        writer.writerow([query_text, did, "", as_int_grade(grade)])
+                        rolling.write([query_text, did, "", as_int_grade(grade)])
+                        total_rows += 1
                 else:
-                    # Not fetching text; resolve id if possible (optional), else use did
                     resolved_id, _ = fetch_doc_by_any_form(searcher, did, LEVEL)
-                    writer.writerow([query_text, resolved_id or did, "", as_int_grade(grade)])
+                    rolling.write([query_text, resolved_id or did, "", as_int_grade(grade)])
                     found += 1 if resolved_id else 0
                     missing += 0 if resolved_id else 1
+                    total_rows += 1
 
             print(f"Found in index: {found} / {total_judged} | Missing: {missing}")
+    finally:
+        rolling.close()
 
-    print(f"\nWrote judged-only CSV: {COMBINED_CSV}")
+    print(f"\nWrote {total_rows} rows into chunked CSVs under: {OUT_DIR}")

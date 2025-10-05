@@ -1,10 +1,13 @@
-from time import strftime
+#!/usr/bin/env python3
+from __future__ import annotations
+
 import asyncio
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
 import shutil
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import boto3
 from botocore.config import Config
@@ -23,19 +26,21 @@ cfg = Config(
 # ----------------------------
 # Configurable Paths
 # ----------------------------
-PROMPT_NAME = "utility"
-PROMPT_FILE = Path(f"prompts/{PROMPT_NAME}.txt")
+PROMPT_NAME  = "utility"
+PROMPT_FILE  = Path(f"prompts/{PROMPT_NAME}.txt")
+LLM_COST_CSV = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 # >>> Choose which parts to process (inclusive) <<<
 START_PART = 1
 END_PART   = 19
+TREC_DL_YEAR = "2023"  # '2019', '2020', or '2023'
 
 # Where the part files live & their filename pattern
-PART_DIR     = Path("retrieved/trec_dl_2019/judged")
-PART_PATTERN = "all_topics_trecdl_2019_part{n}.csv"
+PART_DIR     = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged")
+PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Shared combined labels file
-OUTPUT_FILE = Path("outputs/llm_label/trec_dl_2019_raw.csv")
+OUTPUT_FILE = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}_raw.csv")
 
 LOG_DIR    = Path("logs")
 TOKENS_CSV = Path("token_usage.csv")
@@ -59,13 +64,16 @@ INFERENCE_CONFIG = {
 # ----------------------------
 # Utilities
 # ----------------------------
-def timestamp_id():
+def timestamp_id() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
-def timestamp_iso():
+def timestamp_iso() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 def append_token_row(tokens_csv: Path, row: dict):
+    """
+    Appends a run summary row. Adds an 'estimated_cost_usd' column.
+    """
     file_exists = tokens_csv.exists()
     with tokens_csv.open("a", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(
@@ -73,6 +81,7 @@ def append_token_row(tokens_csv: Path, row: dict):
             fieldnames=[
                 "run_id","timestamp","model","num_examples",
                 "input_tokens","output_tokens","total_tokens",
+                "estimated_cost_usd",
                 "labels_csv","log_json",
             ],
         )
@@ -111,9 +120,11 @@ def parse_llm_text_to_score(text: str) -> str:
     return ""
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
-    # Bedrock Converse response shape:
-    # resp["output"]["message"]["content"] is a list of blocks
-    # Your original code kept a model-specific index. Keep that for compatibility.
+    """
+    Bedrock Converse response shape:
+      resp["output"]["message"]["content"] -> list of blocks (with "text")
+    Your OpenAI-compat model had content at index 1; others at 0.
+    """
     try:
         if model_id.startswith("openai."):
             return resp["output"]["message"]["content"][1]["text"]
@@ -122,9 +133,35 @@ def extract_text_from_resp(model_id: str, resp: dict) -> str:
     except (KeyError, IndexError, TypeError):
         return ""
 
-def usage_from_resp(resp: dict):
+def usage_from_resp(resp: dict) -> tuple[int, int]:
     usage = resp.get("usage", {}) or {}
+    # Bedrock uses inputTokens/outputTokens
     return int(usage.get("inputTokens", 0) or 0), int(usage.get("outputTokens", 0) or 0)
+
+def load_model_prices(csv_path: Path) -> dict[str, tuple[float, float]]:
+    """
+    Read a CSV with header: llm,input,output
+    Prices are per 1K tokens. Returns {model: (input_price, output_price)}.
+    """
+    prices: dict[str, tuple[float, float]] = {}
+    with csv_path.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        for row in reader:
+            name = (row["llm"] or "").strip().strip('"').strip("'")
+            pin  = float((row["input"] or "0").strip())
+            pout = float((row["output"] or "0").strip())
+            prices[name] = (pin, pout)
+    return prices
+
+def estimate_run_cost(model: str, tin: int, tout: int, csv_path: Path) -> float:
+    """
+    Cost = (tin * input_price + tout * output_price) / 1000
+    """
+    prices = load_model_prices(csv_path)
+    if model not in prices:
+        raise KeyError(f"Model '{model}' not found in {csv_path}")
+    pin, pout = prices[model]
+    return (tin * pin + tout * pout) / 1000.0
 
 # ----------------------------
 # Per-file (part) worker
@@ -165,7 +202,7 @@ async def label_single_part_file(
 
     total_in = 0
     total_out = 0
-    logs = []
+    logs: list[dict[str, Any]] = []
 
     # Process serially within this file
     for idx, row in enumerate(rows, start=1):
@@ -205,29 +242,27 @@ async def label_single_part_file(
         with labels_path.open("a", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow([query, docid, passage_text, score])
 
-        logs.append({"query": query, "docid": docid, "prompt": prompt,
-                     "response_text": text, "full_response": resp})
-
-        # After the loop, print a newline so subsequent logs don’t overwrite
-        print()  # move to next line
-
-        # Save per-file JSON log
-        with log_path.open("w", encoding="utf-8") as logf:
-            json.dump(logs, logf, indent=2, ensure_ascii=False)
-
-        print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | Log: {log_path.name} | tokens in/out={total_in}/{total_out}")
-
-
         in_tok, out_tok = usage_from_resp(resp)
         total_in  += in_tok
         total_out += out_tok
-        print(f"[{part_csv.name}] [{idx}/{total_rows}] docs", end="\r", flush=True)
 
+        logs.append({
+            "query": query,
+            "docid": docid,
+            "prompt": prompt,
+            "response_text": text,
+            "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
+            "full_response": resp
+        })
+
+        # Progress line
+        print(f"[{part_csv.name}] [{idx}/{total_rows}]  tokens in/out += {in_tok}/{out_tok} (totals {total_in}/{total_out})", end="\r", flush=True)
 
     # Save per-file JSON log
     with log_path.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
+    print()  # newline after progress
     print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | Log: {log_path.name} | tokens in/out={total_in}/{total_out}")
 
     return {
@@ -279,11 +314,11 @@ async def run_for_model(model_id: str):
     per_file_out_dir = OUTPUT_FILE.parent / f"_tmp_{run_id}_{model_id.replace(':','_')}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Limit parallelism if desired (e.g., avoid throttling). Tune this:
-    max_concurrent_files = min(6, len(part_files))  # change as needed
+    # Limit parallelism across files to reduce throttling
+    max_concurrent_files = min(6, len(part_files))
     sem = asyncio.Semaphore(max_concurrent_files)
 
-    results = []
+    results: list[dict[str, Any]] = []
 
     async def sem_task(part_csv: Path):
         async with sem:
@@ -302,10 +337,17 @@ async def run_for_model(model_id: str):
     per_file_labels = [r["labels_csv"] for r in results]
     await asyncio.to_thread(merge_labels, per_file_labels, OUTPUT_FILE)
 
-    # Aggregate token usage and write a single row
+    # Aggregate token usage and compute cost
     total_in  = sum(r["input_tokens"]  for r in results)
     total_out = sum(r["output_tokens"] for r in results)
     num_rows  = sum(r["rows"] for r in results)
+
+    # Cost from CSV (per 1K tokens)
+    try:
+        cost_usd = estimate_run_cost(model_id, total_in, total_out, LLM_COST_CSV)
+    except Exception as e:
+        cost_usd = 0.0
+        print(f"[WARN] Could not compute cost from {LLM_COST_CSV}: {e}")
 
     # For reproducibility, also write a combined log index (list of per-file logs)
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
@@ -322,11 +364,14 @@ async def run_for_model(model_id: str):
         "input_tokens": total_in,
         "output_tokens": total_out,
         "total_tokens": total_in + total_out,
+        "estimated_cost_usd": f"{cost_usd:.6f}",
         "labels_csv": str(OUTPUT_FILE),
         "log_json": str(combined_log_index),
     })
 
-    print(f"[DONE] Model: {model_id} | Appended to: {OUTPUT_FILE}")
+    print(f"[DONE] Model: {model_id} | Labeled rows: {num_rows}")
+    print(f"[TOKENS] in={total_in:,}  out={total_out:,}  total={total_in + total_out:,}")
+    print(f"[COST]   from {LLM_COST_CSV.name} -> ${cost_usd:,.6f} USD")
     print(f"[DONE] Token usage appended to: {TOKENS_CSV}")
 
     # --- Clean up temp per-file labels directory ---
@@ -334,9 +379,7 @@ async def run_for_model(model_id: str):
         shutil.rmtree(per_file_out_dir, ignore_errors=False)
         print(f"[CLEANUP] Removed temp folder: {per_file_out_dir}")
     except Exception as e:
-        # Non-fatal: we’ve already merged; just warn.
         print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
-
 
 async def main():
     # Run models one-by-one; within each, files run in parallel
