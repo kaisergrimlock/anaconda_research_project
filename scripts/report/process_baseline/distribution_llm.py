@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # Aggregate label counts from ONE CSV file and APPEND to the summary CSV.
-# Input must have a 'relevance' column (fallback to 'label').
+# Only labels {0,1,2,3} are considered; anything else => 0 (un-relevant).
 
 from pathlib import Path
 from collections import Counter
 import csv
 
 # ==== Configure these ====
-INPUT_FILE  = Path("outputs/trec_dl_llm_label/processed/all_llm_labels.csv")  # the file in your screenshot
-OUTPUT_FILE = Path("outputs/trec_dl_llm_label/processed/label_counts.csv")     # shared summary file
-JUDGE       = "llm"                                  # what to put in 'judge' column
-LABEL_COLUMN = "relevance"                           # fallback to 'label' if missing
+INPUT_FILE   = Path("outputs/llm_label/trec_dl_2023_raw.csv")
+OUTPUT_FILE  = Path("outputs/baseline/label_counts.csv")
+JUDGE        = "llm"
+LABEL_COLUMN = "relevance"   # fallback to 'label' if missing
 # =========================
 
 if not INPUT_FILE.exists():
@@ -29,8 +29,9 @@ def detect_reader(path: Path):
         dialect = csv.get_dialect("excel")
     return f, csv.DictReader(f, dialect=dialect)
 
-# --- count labels ---
-counts = Counter()
+# --- count labels (normalize to 0..3) ---
+ALLOWED = {"0", "1", "2", "3"}
+counts = Counter({k: 0 for k in ALLOWED})
 rows_read = 0
 
 fh, reader = detect_reader(INPUT_FILE)
@@ -49,26 +50,19 @@ with fh:
     for row in reader:
         if not row:
             continue
-        label = str(row[lbl_col]).strip()
-        counts[label] += 1
+        raw = str(row.get(lbl_col, "")).strip()
+        norm = raw if raw in ALLOWED else "0"  # map anything else to 0
+        counts[norm] += 1
         rows_read += 1
 
-# --- append summary ---
-# If the output file doesn't exist, write the header first.
+# --- append summary (always 0..3) ---
 need_header = not OUTPUT_FILE.exists()
 
 with open(OUTPUT_FILE, "a", newline="", encoding="utf-8") as out:
     w = csv.writer(out)
     if need_header:
         w.writerow(["label", "no. of docs", "judge"])
-
-    def sort_key(k):
-        try:
-            return (0, int(k))
-        except ValueError:
-            return (1, k)
-
-    for label in sorted(counts, key=sort_key):
+    for label in ("0", "1", "2", "3"):
         w.writerow([label, counts[label], JUDGE])
 
 print(f"Processed {rows_read} rows from: {INPUT_FILE}")
