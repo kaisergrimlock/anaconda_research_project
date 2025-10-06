@@ -6,9 +6,10 @@ import csv
 import json
 import shutil
 import sys
+import threading
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import boto3
 from botocore.config import Config
@@ -19,8 +20,8 @@ from botocore.config import Config
 
 cfg = Config(
     region_name="us-west-2",
-    connect_timeout=10,      # handshake/socket connect
-    read_timeout=300,        # wait up to 5 min for a response
+    connect_timeout=10,
+    read_timeout=300,
     retries={"max_attempts": 8, "mode": "standard"},
 )
 
@@ -44,9 +45,9 @@ PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 # >>> Choose which parts to process (inclusive) <<<
-START_PART    = 1
-END_PART      = 19
-TREC_DL_YEAR  = "2023"  # '2019', '2020', or '2023'
+START_PART    = 20
+END_PART      = 45
+TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
 PART_DIR      = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
@@ -75,9 +76,6 @@ def timestamp_iso() -> str:
     return datetime.now().isoformat(timespec="seconds")
 
 def append_token_row(tokens_csv: Path, row: dict):
-    """
-    Appends a run summary row. Adds an 'estimated_cost_usd' column.
-    """
     file_exists = tokens_csv.exists()
     with tokens_csv.open("a", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(
@@ -94,7 +92,6 @@ def append_token_row(tokens_csv: Path, row: dict):
         writer.writerow(row)
 
 def iter_part_files(start_part: int, end_part: int):
-    """Yield Path objects for the requested part range if they exist."""
     for n in range(start_part, end_part + 1):
         p = PART_DIR / PART_PATTERN.format(n=n)
         if p.exists():
@@ -129,15 +126,9 @@ def model_short_name(model_id: str) -> str:
         s = s.split(":", 1)[0]
     parts = s.split("-")
     s = "-".join(parts[:3])
-    # sanitize
     return "".join(ch if (ch.isalnum() or ch == "-") else "-" for ch in s).strip("-")
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
-    """
-    Bedrock Converse response shape:
-      resp["output"]["message"]["content"] -> list of blocks (with "text")
-    Your OpenAI-compat model had content at index 1; others at 0.
-    """
     try:
         if model_id.startswith("openai."):
             return resp["output"]["message"]["content"][1]["text"]
@@ -148,14 +139,9 @@ def extract_text_from_resp(model_id: str, resp: dict) -> str:
 
 def usage_from_resp(resp: dict) -> tuple[int, int]:
     usage = resp.get("usage", {}) or {}
-    # Bedrock uses inputTokens/outputTokens
     return int(usage.get("inputTokens", 0) or 0), int(usage.get("outputTokens", 0) or 0)
 
 def load_model_prices(csv_path: Path) -> Dict[str, tuple[float, float]]:
-    """
-    Read a CSV with header: llm,input,output
-    Prices are per 1K tokens. Returns {model: (input_price, output_price)}.
-    """
     prices: Dict[str, tuple[float, float]] = {}
     with csv_path.open("r", encoding="utf-8", newline="") as fh:
         reader = csv.DictReader(fh)
@@ -167,9 +153,6 @@ def load_model_prices(csv_path: Path) -> Dict[str, tuple[float, float]]:
     return prices
 
 def estimate_run_cost(model: str, tin: int, tout: int, csv_path: Path) -> float:
-    """
-    Cost = (tin * input_price + tout * output_price) / 1000
-    """
     prices = load_model_prices(csv_path)
     if model not in prices:
         raise KeyError(f"Model '{model}' not found in {csv_path}")
@@ -193,6 +176,42 @@ def read_rows_stream(path: Path):
         f.close()
 
 # ----------------------------
+# Stop key listener (press Q to stop)
+# ----------------------------
+def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
+    """
+    Starts a daemon thread that listens for a single-key press 'q'/'Q' and sets stop_event.
+    On Windows uses msvcrt; on other platforms falls back to blocking input().
+    """
+    def _listen():
+        try:
+            import msvcrt  # Windows
+            print("[STOP] Press 'Q' to stop gracefully.")
+            while not stop_event.is_set():
+                if msvcrt.kbhit():
+                    ch = msvcrt.getwch()
+                    if ch and ch.lower() == 'q':
+                        loop.call_soon_threadsafe(stop_event.set)
+                        break
+        except ImportError:
+            # Fallback: this will block stdin; still acceptable as a simple stop
+            print("[STOP] Type 'Q' + Enter to stop gracefully.")
+            while not stop_event.is_set():
+                try:
+                    line = sys.stdin.readline()
+                except Exception:
+                    break
+                if not line:
+                    break
+                if line.strip().lower() == 'q':
+                    loop.call_soon_threadsafe(stop_event.set)
+                    break
+
+    t = threading.Thread(target=_listen, name="stop-key-listener", daemon=True)
+    t.start()
+    return t
+
+# ----------------------------
 # Blocking per-file worker (runs in a thread)
 # ----------------------------
 def _label_single_part_file_blocking(
@@ -202,6 +221,7 @@ def _label_single_part_file_blocking(
     run_id: str,
     per_file_out_dir: Path,
     logs_dir: Path,
+    stop_event: Optional[asyncio.Event] = None,
 ) -> dict:
     """
     Process one part file (serial per row) in a blocking manner.
@@ -228,6 +248,11 @@ def _label_single_part_file_blocking(
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
 
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
+        # stop check
+        if stop_event is not None and stop_event.is_set():
+            print(f"\n[STOP] Requested. Halting file early: {part_csv.name}")
+            break
+
         query = row.get("query", "")
         docid = row.get("docid", f"<missing-docid-{idx}>")
         passage_text = (row.get("passage", "") or "").strip()
@@ -251,9 +276,14 @@ def _label_single_part_file_blocking(
             })
             continue
 
-        text = extract_text_from_resp(model_id, resp)
+        # parse response
+        try:
+            text = extract_text_from_resp(model_id, resp)
+        except Exception:
+            text = ""
         score = parse_llm_text_to_score(text)
 
+        # write labeled row
         with labels_path.open("a", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow([query, docid, passage_text, score])
 
@@ -297,21 +327,25 @@ async def label_single_part_file(
     run_id: str,
     per_file_out_dir: Path,
     logs_dir: Path,
+    stop_event: asyncio.Event,
 ) -> dict:
     return await asyncio.to_thread(
         _label_single_part_file_blocking,
-        part_csv, model_id, prompt_template, run_id, per_file_out_dir, logs_dir
+        part_csv, model_id, prompt_template, run_id, per_file_out_dir, logs_dir, stop_event
     )
 
 # ----------------------------
 # Combine per-file labels into the shared per-model OUTPUT_FILE
 # ----------------------------
-def merge_labels(per_file_labels: List[str], combined_out: Path):
+def merge_labels(per_file_labels: List[str], combined_out: Path, stop_event: Optional[asyncio.Event] = None):
     ensure_combined_header(combined_out)
     appended = 0
     with combined_out.open("a", encoding="utf-8", newline="") as out_f:
         out_writer = csv.writer(out_f)
         for path_str in per_file_labels:
+            if stop_event is not None and stop_event.is_set():
+                print("[STOP] Merge halted early by user.")
+                break
             p = Path(path_str)
             if not p.exists():
                 print(f"[WARN] Missing per-file labels for merge: {p}")
@@ -327,7 +361,7 @@ def merge_labels(per_file_labels: List[str], combined_out: Path):
 # ----------------------------
 # Orchestration
 # ----------------------------
-async def run_for_model(model_id: str):
+async def run_for_model(model_id: str, stop_event: asyncio.Event):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
 
     # --- Per-model directories / files ---
@@ -349,6 +383,7 @@ async def run_for_model(model_id: str):
 
     run_id = timestamp_id()
     print(f"\n--- Running inference for model: {model_id} (run_id={run_id}) ---")
+    print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
     # Temp per-file labels live under the model's output folder
     per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}"
@@ -362,20 +397,33 @@ async def run_for_model(model_id: str):
 
     async def sem_task(part_csv: Path):
         async with sem:
+            if stop_event.is_set():
+                return None
             return await label_single_part_file(
-                part_csv, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR
+                part_csv, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
             )
 
     # Create tasks: one per file
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
+
+    # Consume tasks, honoring stop_event (cancel remaining if requested)
     for task in asyncio.as_completed(tasks):
+        if stop_event.is_set():
+            # cancel remaining
+            for t in tasks:
+                if not t.done():
+                    t.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            print("[STOP] Cancelled remaining files.")
+            break
         res = await task
         if res:
             results.append(res)
 
-    # Merge per-file label CSVs into the per-model combined OUTPUT_FILE
-    per_file_labels = [r["labels_csv"] for r in results]
-    await asyncio.to_thread(merge_labels, per_file_labels, output_file)
+    if results and not stop_event.is_set():
+        # Merge per-file label CSVs into the per-model combined OUTPUT_FILE
+        per_file_labels = [r["labels_csv"] for r in results]
+        await asyncio.to_thread(merge_labels, per_file_labels, output_file, stop_event)
 
     # Aggregate token usage and compute cost
     total_in  = sum(r["input_tokens"]  for r in results)
@@ -412,7 +460,6 @@ async def run_for_model(model_id: str):
     print(f"[DONE] Model: {model_id} | Labeled rows: {num_rows}")
     print(f"[TOKENS] in={total_in:,}  out={total_out:,}  total={total_in + total_out:,}")
     print(f"[COST]   from {LLM_COST_CSV.name} -> ${cost_usd:,.6f} USD")
-    print(f"[DONE] Token usage appended to: {tokens_csv}")
 
     # --- Clean up temp per-file labels directory ---
     try:
@@ -422,12 +469,27 @@ async def run_for_model(model_id: str):
         print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
 
 async def main():
-    # Run models one-by-one; within each, files run in parallel
-    for model_id in MODELS:
-        await run_for_model(model_id)
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+    listener_thread = start_stop_key_listener(loop, stop_event)
+
+    try:
+        for model_id in MODELS:
+            if stop_event.is_set():
+                print("[STOP] Skipping remaining models.")
+                break
+            await run_for_model(model_id, stop_event)
+    finally:
+        # ensure we mark stop (so listener thread can exit if waiting)
+        stop_event.set()
+        # thread is daemon; no need to join, but try briefly:
+        try:
+            listener_thread.join(timeout=0.2)
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("[INTERRUPTED] Top-level stop.")
+        print("\n[INTERRUPTED] Top-level stop.")
