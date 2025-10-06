@@ -6,9 +6,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # ---------- Config ----------
-TREC_DL_YEAR = "2019"
-NIST_DIR   = Path("retrieved/trec_dl_" + TREC_DL_YEAR)
-LLM_FILE   = Path("outputs/llm_label/trec_dl_" + TREC_DL_YEAR + "_raw.csv")
+TREC_DL_YEAR = "2023"
+MODEL = "gpt-oss-20b"
+NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
+LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw_with_ids.csv")
 OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR)
 OUT_COUNTS = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT    = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
