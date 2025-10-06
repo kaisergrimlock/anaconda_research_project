@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-# Aggregate label counts from many CSV files in a folder.
-# Only labels {0,1,2,3} are considered; anything else => 0 (un-relevant).
-
 from pathlib import Path
 from collections import Counter
-import csv
+import pandas as pd
+import csv, sys
 
 # ==== Configure these ====
 TREC_DL_YEAR = "2023"
-INPUT_DIR    = Path("retrieved/trec_dl_" + TREC_DL_YEAR + "/judged")  # folder with many CSVs
-GLOB_PATTERN = "*.csv"                      # which files to include
+INPUT_DIR    = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged")
+GLOB_PATTERN = "*.csv"
 OUTPUT_FILE  = Path("outputs/baseline/label_counts.csv")
-JUDGE        = "NIST"                       # constant written to the output
-LABEL_COLUMN = "relevance"                  # will fall back to 'label' if missing
+JUDGE        = "NIST"
+LABEL_COLUMN = "relevance"   # fallback to 'label' if missing
 # =========================
 
 files = sorted(INPUT_DIR.glob(GLOB_PATTERN))
@@ -21,59 +19,66 @@ if not files:
 
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-# Pre-seed to guarantee keys exist and to enforce 0..3 only
 ALLOWED = {"0", "1", "2", "3"}
 counts = Counter({k: 0 for k in ALLOWED})
 total_rows = 0
 files_read = 0
 
-def detect_reader(path: Path):
-    """Return (file_handle, DictReader) with a sniffed dialect (fallback to comma)."""
-    f = open(path, "r", newline="", encoding="utf-8-sig")
-    sample = f.read(4096)
-    f.seek(0)
-    try:
-        dialect = csv.Sniffer().sniff(sample)
-    except csv.Error:
-        dialect = csv.get_dialect("excel")
-    return f, csv.DictReader(f, dialect=dialect)
+def _bump_field_limit():
+    limit = min(2_000_000_000, getattr(sys, "maxsize", 2_000_000_000))
+    while limit >= 131072:
+        try:
+            csv.field_size_limit(limit)
+            return
+        except OverflowError:
+            limit //= 2
+
+_bump_field_limit()
+
+def load_label_series(fp: Path) -> pd.Series:
+    """
+    Read just the label column from a CSV, robust to very long fields.
+    Tries 'relevance' then falls back to 'label'. Uses chunks to limit memory.
+    """
+    # First read the header only to detect the correct column name
+    hdr = pd.read_csv(fp, nrows=0, encoding="utf-8-sig", engine="python")
+    cols = [c.strip() for c in hdr.columns]
+    col = LABEL_COLUMN if LABEL_COLUMN in cols else ("label" if "label" in cols else None)
+    if col is None:
+        raise KeyError(f"Neither '{LABEL_COLUMN}' nor 'label' found in {fp}. Available: {cols}")
+
+    # Stream in chunks to avoid loading the huge 'passage' column
+    ser_parts = []
+    for chunk in pd.read_csv(
+        fp,
+        usecols=[col],                 # <- only read the label column
+        dtype=str,                    # keep labels as strings
+        encoding="utf-8-sig",
+        engine="python",              # more tolerant for messy rows/quotes
+        chunksize=200_000,            # tune if needed
+        on_bad_lines="skip"           # skip any malformed lines
+    ):
+        ser_parts.append(chunk[col].astype(str).str.strip())
+    if not ser_parts:
+        return pd.Series(dtype=str)
+    return pd.concat(ser_parts, ignore_index=True)
 
 for fp in files:
-    f, reader = detect_reader(fp)
-
-    # choose label column per-file (relevance preferred; fallback to label)
-    fieldnames = [h.strip() for h in (reader.fieldnames or [])]
-    if LABEL_COLUMN in fieldnames:
-        lbl_col = LABEL_COLUMN
-    elif "label" in fieldnames:
-        lbl_col = "label"
-    else:
-        f.close()
-        raise KeyError(
-            f"Neither '{LABEL_COLUMN}' nor 'label' found in {fp}. "
-            f"Available columns: {fieldnames}"
-        )
-
-    for row in reader:
-        if not row:
-            continue
-        raw = str(row.get(lbl_col, "")).strip()
-
-        # Normalize: only keep {0,1,2,3}; everything else -> "0"
-        norm = raw if raw in ALLOWED else "0"
-
-        counts[norm] += 1
-        total_rows += 1
-
-    f.close()
+    s = load_label_series(fp)
+    # normalize to {0,1,2,3}, everything else -> "0"
+    s_norm = s.where(s.isin(ALLOWED), other="0")
+    vc = s_norm.value_counts()
+    for k, v in vc.items():
+        if k in ALLOWED:
+            counts[k] += int(v)
+    total_rows += int(vc.sum())
     files_read += 1
 
 # write summary (fixed order 0..3)
 with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as out:
-    w = csv.writer(out)
-    w.writerow(["label", "no. of docs", "judge"])
+    out.write("label,no. of docs,judge\n")
     for label in ("0", "1", "2", "3"):
-        w.writerow([label, counts[label], JUDGE])
+        out.write(f"{label},{counts[label]},{JUDGE}\n")
 
 print(f"Processed {files_read} files, {total_rows} rows.")
 print(f"Wrote summary to: {OUTPUT_FILE}")

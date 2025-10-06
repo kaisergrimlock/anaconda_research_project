@@ -20,7 +20,7 @@ CHUNK_SIZE  = 500         # rows per output CSV chunk
 
 # Optional: force a subset of qids; otherwise we take the first N judged
 FORCE_QIDS: Iterable[Any] | None = None
-N_QUERIES   = 25
+N_QUERIES = 1000000000000000000 # effectively all
 
 # ---- Output location ----
 OUT_DIR = Path("retrieved/trec_dl_" + TRECDL_YEAR + "/judged")
@@ -240,10 +240,11 @@ if __name__ == "__main__":
     searcher.set_bm25(k1=0.82, b=0.68)
     rolling = RollingCsvWriter(
         out_dir=OUT_DIR,
-        prefix=f"all_topics_trecdl_{TRECDL_YEAR}_part",  # e.g., all_topics_trecdl_2023_part
-        header=["query", "docid", "passage", "relevance"],
+        prefix=f"all_topics_trecdl_{TRECDL_YEAR}_part",
+        header=["qid", "query", "pid_qrels", "pid_resolved", "passage", "relevance"],
         chunk_size=CHUNK_SIZE
     )
+
 
     total_rows = 0
 
@@ -261,28 +262,36 @@ if __name__ == "__main__":
             print(f"Total judged in qrels for qid: {total_judged}")
 
             for did, grade in raw_qrels_for_qid.items():
-                resolved_id, doc = (None, None)
+                pid_qrels = str(did).strip()
+                pid_resolved, doc = (None, None)
+
                 if FETCH_TEXT:
-                    resolved_id, doc = fetch_doc_by_any_form(searcher, did, LEVEL)
+                    pid_resolved, doc = fetch_doc_by_any_form(searcher, pid_qrels, LEVEL)
                     if doc is not None:
                         found += 1
                         text = extract_text_from_doc(doc)
-                        rolling.write([query_text, resolved_id,
-                                       normalize_csv_cell(text),
-                                       as_int_grade(grade)])
-                        total_rows += 1
                     else:
                         missing += 1
-                        rolling.write([query_text, did, "", as_int_grade(grade)])
-                        total_rows += 1
+                        text = ""
                 else:
-                    resolved_id, _ = fetch_doc_by_any_form(searcher, did, LEVEL)
-                    rolling.write([query_text, resolved_id or did, "", as_int_grade(grade)])
-                    found += 1 if resolved_id else 0
-                    missing += 0 if resolved_id else 1
-                    total_rows += 1
+                    pid_resolved, _ = fetch_doc_by_any_form(searcher, pid_qrels, LEVEL)
+                    found += 1 if pid_resolved else 0
+                    missing += 0 if pid_resolved else 1
+                    text = ""
+
+                # IMPORTANT: always write the original qrels pid to preserve near-dupes.
+                rolling.write([
+                    str(qid_key),
+                    query_text,
+                    pid_qrels,                  # <- original id from qrels (kept as-is)
+                    pid_resolved or "",         # <- whatever Lucene returned (for debugging only)
+                    normalize_csv_cell(text),
+                    as_int_grade(grade)
+                ])
+                total_rows += 1
 
             print(f"Found in index: {found} / {total_judged} | Missing: {missing}")
+
     finally:
         rolling.close()
 
