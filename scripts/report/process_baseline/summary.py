@@ -28,7 +28,7 @@ import krippendorff as kd                       # pip install krippendorff
 TREC_DL_YEAR = "2023"  # '2019', '2020', or '2023'
 NIST_DIR  = Path("retrieved/trec_dl_" + TREC_DL_YEAR + "/judged")
 NIST_GLOB = "all_topics_trecdl_" + TREC_DL_YEAR + "_part*.csv"
-LLM_CSV   = Path("outputs/llm_label/trec_dl_2023_raw.csv")
+LLM_CSV   = Path("outputs/llm_label/gpt-oss-20b/gpt-oss-20b_trec_dl_2023_raw_with_ids.csv")
 
 # preferred output dir (use 'output/llm_label' if it exists, else 'outputs/llm_label')
 PREF_OUT_DIR = Path("output/llm_label")

@@ -2,6 +2,10 @@ import csv
 import random
 from pathlib import Path
 import boto3
+import sys
+sys.path.append(str(Path(__file__).parent.parent))
+from helper import allow_huge_csv_fields
+
 
 # ==============================
 # Config (edit as needed)
@@ -11,13 +15,15 @@ TARGET_LANG = "vi"          # e.g., 'vi' for Vietnamese
 SEED = 42                   # set None for non-deterministic
 INJECT_COUNT = 1            # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-
+TRECDL_YEAR = "2023"    # for folder naming only
 # Process ALL CSV files in this folder:
-INPUT_DIR = Path("outputs/trec_dl_2019/retrieved/all_topics_in_parts")
+INPUT_DIR = Path("retrieved/trec_dl_" + TRECDL_YEAR + "/judged")
 
 # Output folder will mirror input filenames:
-OUTPUT_DIR = Path("outputs/trec_dl_2019/retrieved/injected_topics_in_parts" + f"parts_injected_{TARGET_LANG}")  
+OUTPUT_DIR = Path("retrieved/trec_dl_" + TRECDL_YEAR + "/" + TARGET_LANG + "/")  
 # ==============================
+
+allow_huge_csv_fields() # Raise CSV field size limit for giant cells
 
 # AWS Translate client
 translate = boto3.client("translate", region_name=REGION)
