@@ -4,7 +4,7 @@ from pathlib import Path
 import boto3
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
-from helper import allow_huge_csv_fields
+from scripts.report.process_baseline.helper import allow_huge_csv_fields
 
 
 # ==============================

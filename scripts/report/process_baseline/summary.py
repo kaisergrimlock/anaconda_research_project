@@ -23,6 +23,7 @@ from datetime import datetime
 import numpy as np
 from sklearn.metrics import cohen_kappa_score   # pip install scikit-learn
 import krippendorff as kd                       # pip install krippendorff
+from helper import allow_huge_csv_fields
 
 # --------- Paths ---------
 TREC_DL_YEAR = "2023"  # '2019', '2020', or '2023'
@@ -34,18 +35,90 @@ LLM_CSV   = Path("outputs/llm_label/gpt-oss-20b/gpt-oss-20b_trec_dl_2023_raw_wit
 PREF_OUT_DIR = Path("output/llm_label")
 OUT_DIR = PREF_OUT_DIR if PREF_OUT_DIR.exists() else Path("outputs/llm_label")
 OUT_CSV = OUT_DIR / "results_summary.csv"
+allow_huge_csv_fields()
+
 
 # --------- Helpers ---------
+# --- replace _norm_headers ---
 def _norm_headers(cols: List[str]) -> Dict[str, str]:
-    return {c.lower().strip(): c for c in (cols or [])}
+    """
+    Normalize headers (lower, strip, remove BOM) and return a map
+    normalized_name -> original_header_name, with useful aliases.
+    """
+    if not cols:
+        return {}
+    def kclean(s: str) -> str:
+        return (s or "").strip().lstrip("\ufeff").lower()
 
+    base = {kclean(c): c for c in cols}
+
+    # canonical -> alternatives (normalized)
+    aliases = {
+        # passage/document ids
+        "pid":   ("pid", "pid_resolved", "pid-qrels", "pid_qrels", "passage_id", "passageid", "passage-id"),
+        "docid": ("docid", "docno", "doc_id", "documentid", "document_id"),
+        # query ids / topic ids
+        "qid":   ("qid", "topic", "topicid", "topic_id", "query_id"),
+        "query": ("query", "query_text", "title"),
+        # labels
+        "relevance": ("relevance", "judgment", "judgement", "label", "grade"),
+    }
+
+    final_map = dict(base)
+    for canon, alts in aliases.items():
+        for alt in alts:
+            if alt in base:
+                final_map[canon] = base[alt]
+                break
+
+    return final_map
+
+
+
+# --- replace _pick_key ---
 def _pick_key(h: Dict[str, str]) -> Tuple[str, ...]:
-    for a,b in [("query","docid"),("topic","docid"),("qid","docid")]:
-        if a in h and b in h: return (h[a], h[b])
-    if "docid" in h: return (h["docid"],)
-    if "doc" in h:   return (h["doc"],)
-    if "id" in h:    return (h["id"],)
-    raise KeyError("No key columns found (need docid or (query/topic/qid, docid)).")
+    """
+    Identifier columns for joining.
+    For 2023, prefer (qid/query/topic, pid*) or just pid*.
+    For other years, prefer (qid/query/topic, docid*) or just docid*.
+    Accept pid* anywhere as a fallback too.
+    """
+    year = str(TREC_DL_YEAR)
+
+    # find any available pid-like and docid-like originals
+    pid_like   = [h[k] for k in ("pid", "pid_resolved", "pid_qrels") if k in h]
+    docid_like = [h[k] for k in ("docid",) if k in h]  # 'docid' may already be aliased
+
+    # helpers: first available column name
+    pid_col   = pid_like[0] if pid_like else None
+    docid_col = docid_like[0] if docid_like else None
+
+    # paired keys in priority order
+    if year == "2023":
+        for a in ("query", "qid", "topic"):
+            if a in h and pid_col:
+                return (h[a], pid_col)
+        if pid_col:
+            return (pid_col,)
+
+    # non-2023 preference
+    for a in ("query", "qid", "topic"):
+        if a in h and docid_col:
+            return (h[a], docid_col)
+
+    # broad fallbacks
+    if docid_col:
+        return (docid_col,)
+    if pid_col:
+        return (pid_col,)
+
+    # last-resort debug
+    raise KeyError(
+        f"No key columns found. Have headers: {sorted(h.keys())}. "
+        "Need pid/pid_resolved/pid_qrels or docid, or (query/qid/topic with one of those)."
+    )
+
+
 
 def _row_key(row: Dict[str, Any], keys: Tuple[str, ...]) -> Tuple[str, ...]:
     return tuple((row.get(k, "") or "").strip() for k in keys)
@@ -61,8 +134,9 @@ def _rel_val(row: Dict[str, Any], h: Dict[str,str]) -> int | None:
             return _as_int(row.get(h[name], ""))
     return None
 
+# --- replace your _load_csv open() line with this (utf-8-sig removes BOM) ---
 def _load_csv(path: Path) -> Tuple[Tuple[str,...], Dict[Tuple[str,...], int], Counter]:
-    with path.open("r", encoding="utf-8", newline="") as f:
+    with path.open("r", encoding="utf-8-sig", newline="") as f:
         rdr = csv.DictReader(f)
         if not rdr.fieldnames:
             return (), {}, Counter()
@@ -77,6 +151,7 @@ def _load_csv(path: Path) -> Tuple[Tuple[str,...], Dict[Tuple[str,...], int], Co
                 dups[key] += 1
             rows[key] = rel
         return kcols, rows, dups
+
 
 def _binarize_threshold(vals: List[int], thr: int = 1) -> List[int]:
     # <=thr -> 0,  >thr -> 1

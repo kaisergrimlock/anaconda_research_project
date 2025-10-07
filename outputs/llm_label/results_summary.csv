@@ -1,4 +1,4 @@
 timestamp,nist_parts_files,llm_file,total_docs,more_relevant_llm_gt_nist,less_relevant_llm_lt_nist,equal,krippendorff_alpha_ordinal,cohen_kappa_binary_thr1
 2025-10-02T15:09:11,19,gpt_oss_20b_trec_dl_2019_raw.csv,9133,3150,1145,4838,0.543688,0.510806
 2025-10-02T22:37:20,19,gpt_oss_20b_trec_dl_2019_raw.csv,9086,3179,1155,4752,0.536981,0.506702
-
+2025-10-07T23:49:16,45,gpt-oss-20b_trec_dl_2023_raw_with_ids.csv,18982,6014,2794,10174,0.483242,0.397324
