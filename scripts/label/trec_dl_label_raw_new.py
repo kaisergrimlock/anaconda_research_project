@@ -43,14 +43,14 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-
+LANG = "vi"  # "judged" for raw
 # >>> Choose which parts to process (inclusive) <<<
-START_PART    = 20
-END_PART      = 45
+START_PART    = 1
+END_PART      = 19
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
-PART_DIR      = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
+PART_DIR      = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN  = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # ----------------------------
@@ -102,7 +102,7 @@ def iter_part_files(start_part: int, end_part: int):
 def ensure_combined_header(path: Path):
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as csvfile:
-            csv.writer(csvfile).writerow(["query", "docid", "passage", "relevance"])
+            csv.writer(csvfile).writerow(["query", "pid_resolved", "passage", "relevance"])
 
 def parse_llm_text_to_score(text: str) -> str:
     """Expect model returns JSON like {"O": <label>}."""
@@ -236,7 +236,7 @@ def _label_single_part_file_blocking(
 
     if not labels_path.exists():
         with labels_path.open("w", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerow(["query", "docid", "passage", "relevance"])
+            csv.writer(f).writerow(["query", "pid_resolved", "passage", "relevance"])
 
     bedrock = boto3.client("bedrock-runtime", config=cfg)
 
@@ -254,7 +254,7 @@ def _label_single_part_file_blocking(
             break
 
         query = row.get("query", "")
-        docid = row.get("docid", f"<missing-docid-{idx}>")
+        pid_resolved = row.get("pid_resolved", f"<missing-pid_resolved-{idx}>")
         passage_text = (row.get("passage", "") or "").strip()
 
         prompt = prompt_template.format(query=query, passage=passage_text)
@@ -264,14 +264,14 @@ def _label_single_part_file_blocking(
         try:
             resp = bedrock.converse(**kwargs)
         except KeyboardInterrupt:
-            print(f"[INTERRUPTED] {part_csv.name}: Last doc {docid} (row {idx}) — stopping file early.")
+            print(f"[INTERRUPTED] {part_csv.name}: Last doc {pid_resolved} (row {idx}) — stopping file early.")
             break
         except Exception as api_err:
-            print(f"[ERROR] {part_csv.name}: API failed on docid={docid} (row {idx}) :: {api_err}")
+            print(f"[ERROR] {part_csv.name}: API failed on pid_resolved={pid_resolved} (row {idx}) :: {api_err}")
             with labels_path.open("a", encoding="utf-8", newline="") as f:
-                csv.writer(f).writerow([query, docid, passage_text, ""])
+                csv.writer(f).writerow([query, pid_resolved, passage_text, ""])
             logs.append({
-                "query": query, "docid": docid, "prompt": prompt,
+                "query": query, "pid_resolved": pid_resolved, "prompt": prompt,
                 "response_text": "", "full_response": {"error": str(api_err)}
             })
             continue
@@ -285,7 +285,7 @@ def _label_single_part_file_blocking(
 
         # write labeled row
         with labels_path.open("a", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerow([query, docid, passage_text, score])
+            csv.writer(f).writerow([query, pid_resolved, passage_text, score])
 
         in_tok, out_tok = usage_from_resp(resp)
         total_in  += in_tok
@@ -293,7 +293,7 @@ def _label_single_part_file_blocking(
 
         logs.append({
             "query": query,
-            "docid": docid,
+            "pid_resolved": pid_resolved,
             "prompt": prompt,
             "response_text": text,
             "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
@@ -372,7 +372,11 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
     MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Combined output CSV & token usage CSV for this model
-    output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_raw.csv"
+    if(LANG == "judged"):
+        output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_raw.csv"
+    else:
+        output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_{LANG}_raw.csv"
+
     tokens_csv  = MODEL_OUT_DIR / "token_usage.csv"
 
     # Build the list of part files to process

@@ -10,9 +10,16 @@ import matplotlib.pyplot as plt
 # ---------- Config ----------
 TREC_DL_YEAR = "2023"
 MODEL = "gpt-oss-20b"
+LANG = "vi"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
-LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw_with_ids.csv")
-OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR)
+if LANG != "eng":
+    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw.csv")
+    OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/" + LANG)
+else:
+    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw_with_ids.csv")
+    OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/eng")
+
+
 OUT_COUNTS = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT    = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
 OUT_PNG    = OUT_DIR / "confusion_matrix_llm_vs_nist.png"
@@ -112,15 +119,55 @@ nist = pd.concat(nist_parts, ignore_index=True)\
 print(f"[NIST] Total rows={len(nist):,} (after de-dup on qid,pid)")
 
 # 2) Load LLM (with ids)
+# 2) Load LLM (with or without qid)
 llm = read_csv_smart(LLM_FILE)
-qcol = pick_qid_col(llm)
+
+# choose pid + label cols first (always required)
 pcol = pick_pid_col(llm)
 lcol = pick_label_col(llm)
 
-llm = llm[[qcol, pcol, lcol]].rename(columns={qcol: "qid", pcol: "pid", lcol: "LLM_raw"})
-llm["qid"] = llm["qid"].astype(str).str.strip()
+# Try to find a qid-like column in the LLM file
+try:
+    qcol_llm = pick_qid_col(llm)  # may raise if not present
+    have_llm_qid = True
+except KeyError:
+    have_llm_qid = False
+
+# Parse/restrict to needed cols
+if have_llm_qid:
+    llm = llm[[qcol_llm, pcol, lcol]].rename(columns={qcol_llm: "qid", pcol: "pid", lcol: "LLM_raw"})
+else:
+    # No qid in LLM — keep pid + label for now
+    llm = llm[[pcol, lcol]].rename(columns={pcol: "pid", lcol: "LLM_raw"})
+
 llm["pid"] = llm["pid"].astype(str).str.strip()
 llm["LLM_parsed"] = llm["LLM_raw"].apply(parse_label)
+
+total_llm = len(llm)
+parsed_ok = llm["LLM_parsed"].notna().sum()
+parsed_bad = total_llm - parsed_ok
+print(f"[LLM ] rows={total_llm:,} | parsed={parsed_ok:,} | unparseable={parsed_bad:,}")
+
+# Drop invalid labels (or map to 0 if you set MAP_INVALID_TO_ZERO)
+if MAP_INVALID_TO_ZERO:
+    llm["LLM"] = llm["LLM_parsed"].fillna(0).astype(int)
+else:
+    llm = llm[llm["LLM_parsed"].notna()].copy()
+    llm["LLM"] = llm["LLM_parsed"].astype(int)
+
+# If LLM lacks qid, infer qids from NIST by pid (replicate across all qids for that pid)
+if not have_llm_qid:
+    # Build (pid -> qid) mapping from NIST
+    nist_pid_qids = nist[["pid", "qid"]].drop_duplicates()
+    before = len(llm)
+    llm = llm.merge(nist_pid_qids, on="pid", how="inner")
+    after = len(llm)
+    covered_pids = nist_pid_qids["pid"].nunique()
+    print(f"[LLM ] No qid column found; expanded by NIST pid→qid map: rows {before:,} -> {after:,} "
+          f"(unique NIST pids={covered_pids:,})")
+else:
+    # Normalize qid text if present
+    llm["qid"] = llm["qid"].astype(str).str.strip()
 
 total_llm = len(llm)
 parsed_ok = llm["LLM_parsed"].notna().sum()
