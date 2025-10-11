@@ -43,10 +43,10 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = REPO_ROOT / "prompts" / f"{PROMPT_NAME}.txt"
 
 # <<< choose ONE input file (NO leading slash) >>>
-INPUT_CSV   = REPO_ROOT / "outputs" / "llm_label" / "missing_or_unjudged_formatted.csv"
+INPUT_CSV   = REPO_ROOT / "outputs" / "queries" / "trec_dl_2023_expanded_queries.csv"
 
 # Output will be UPDATED in-place; matching (query,docid) rows replaced
-OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "trec_dl_2019_raw.csv"
+OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "trec_dl_2023_irrelevant.csv"
 
 LOG_DIR     = REPO_ROOT / "logs"
 TOKENS_CSV  = REPO_ROOT / "token_usage.csv"

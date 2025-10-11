@@ -12,9 +12,9 @@ PROMPT_FILE = Path("prompts/query_prompt.txt")   # prompt .txt with {query}
 
 # Fixed config (change if needed)
 MODEL_ID   = "openai.gpt-oss-20b-1:0"   # Bedrock modelId
-REGION     = "ap-southeast-2"           # AWS region
+REGION     = "us-west-2"           # AWS region
 QUERY_COL  = "query"                    # column to read
-MAX_TOKENS = 220
+MAX_TOKENS = 500
 TEMPERATURE= 0.3
 
 # Allow very large CSV cells
