@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # ---------- Config ----------
 TREC_DL_YEAR = "2023"
 MODEL = "gpt-oss-20b"
-LANG = "fr"
+LANG = "ru"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
 if LANG != "eng":
     LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw.csv")
@@ -22,7 +22,7 @@ else:
 
 OUT_COUNTS = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT    = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
-OUT_PNG    = OUT_DIR / "confusion_matrix_llm_vs_nist.png"
+OUT_PNG    = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"
 
 LABEL_COL_CHOICES = ["relevance", "label"]
 LABELS = [0, 1, 2, 3]
