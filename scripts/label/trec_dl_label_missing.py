@@ -19,7 +19,7 @@ from pathlib import Path
 from datetime import datetime
 from collections import OrderedDict
 from typing import Tuple, List
-
+import sys
 import boto3
 from botocore.config import Config
 
@@ -43,10 +43,10 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = REPO_ROOT / "prompts" / f"{PROMPT_NAME}.txt"
 
 # <<< choose ONE input file (NO leading slash) >>>
-INPUT_CSV   = REPO_ROOT / "outputs" / "queries" / "trec_dl_2023_expanded_queries.csv"
+INPUT_CSV   = REPO_ROOT / "outputs" / "queries" / "verbose_injected.csv"
 
 # Output will be UPDATED in-place; matching (query,docid) rows replaced
-OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "trec_dl_2023_irrelevant.csv"
+OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "trec_dl_2023_verbose_injected.csv"
 
 LOG_DIR     = REPO_ROOT / "logs"
 TOKENS_CSV  = REPO_ROOT / "token_usage.csv"
@@ -70,6 +70,18 @@ INFERENCE_CONFIG = {
 # ----------------------------
 # Utilities
 # ----------------------------
+def allow_huge_csv_fields():
+    """
+    Raise Python's CSV field size limit to the max supported by this platform.
+    """
+    max_int = sys.maxsize
+    while True:
+        try:
+            csv.field_size_limit(max_int)
+            break
+        except OverflowError:
+            max_int = max_int // 10
+
 def timestamp_id() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -264,6 +276,7 @@ def run_single_file(model_id: str):
     print(f"[DONE] Token usage appended to: {TOKENS_CSV}")
 
 def main():
+    allow_huge_csv_fields() # Allow huge CSV fields
     # Run models one-by-one on the SAME single input file
     for model_id in MODELS:
         run_single_file(model_id)

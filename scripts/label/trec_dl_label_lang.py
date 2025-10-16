@@ -43,10 +43,10 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-LANG = "fr"  # use 'eng' to point to judged/original folder per logic below
+LANG = "vi"  # use 'eng' to point to judged/original folder per logic below
 # >>> Choose which parts to process (inclusive) <<<
-START_PART    = 40
-END_PART      = 45
+START_PART    = 0
+END_PART      = 19
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern

@@ -7,8 +7,8 @@ from collections import Counter
 import csv
 
 # ==== Configure these ====
-INPUT_FILE   = Path("outputs/llm_label/trec_dl_2023_raw.csv")
-OUTPUT_FILE  = Path("outputs/baseline/label_counts.csv")
+INPUT_FILE   = Path("outputs/llm_label/trec_dl_2023_expanded_queries_injected.csv")
+OUTPUT_FILE  = Path("outputs/baseline/label_counts_expanded.csv")
 JUDGE        = "llm"
 LABEL_COLUMN = "relevance"   # fallback to 'label' if missing
 # =========================
