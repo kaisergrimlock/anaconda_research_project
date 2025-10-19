@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # ---------- Config ----------
 TREC_DL_YEAR = "2023"
 MODEL = "gpt-oss-20b"
-LANG = "ru"
+LANG = "eng"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
 if LANG != "eng":
     LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw.csv")
