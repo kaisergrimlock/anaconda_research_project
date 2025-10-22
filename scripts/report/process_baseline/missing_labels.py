@@ -14,22 +14,32 @@ Label normalization rule (for presence check only):
 """
 
 from pathlib import Path
+import sys
 import csv
 
+def allow_huge_csv_fields():
+    # Robustly raise the CSV field size limit (works on Windows where sys.maxsize may overflow)
+    max_int = sys.maxsize
+    while True:
+        try:
+            csv.field_size_limit(max_int)
+            break
+        except OverflowError:
+            max_int = int(max_int / 10)
+
+allow_huge_csv_fields()
+
 # ==== Configure these ====
-LABELS_FILE = Path("outputs/llm_label/trec_dl_2023_raw.csv")
-RETRIEVED_DIR = Path("retrieved/trec_dl_2023")     # searches **/*.csv
+LABELS_FILE   = Path("outputs/llm_label/gpt-oss-20b/gpt-oss-20b_trec_dl_2023_eng_raw.csv")
+RETRIEVED_DIR = Path("retrieved/trec_dl_2023")   # searches **/*.csv
 OUTPUT_MISSING = Path("outputs/llm_label/missing_or_unjudged_formatted.csv")
 
-# Candidate key-column pairs to try (first that exists in a file is used)
-# e.g., some files use 'topic' instead of 'query'.
-KEY_CHOICES = [
-    ("query", "docid"),
-    ("topic", "docid"),
-]
+# Column aliases
+DOCID_COL_CHOICES   = ("docid", "pid", "pid_resolved", "pid_qrels", "docno", "doc_id", "id")
+QUERY_COL_CHOICES   = ("query", "query_en", "topic", "question", "qid")
 PASSAGE_COL_CHOICES = ("passage", "text", "body")
 
-ALLOWED_LABELS = {"0", "1", "2", "3"}
+ALLOWED_LABELS = {"0", "1", "2", "3"}  # kept for normalization (not needed for presence)
 # =========================
 
 
@@ -45,27 +55,34 @@ def detect_reader(path: Path):
     return f, csv.DictReader(f, dialect=dialect)
 
 
-def pick_keys(fieldnames):
-    """Pick (key1,key2) present in fieldnames."""
-    fields = [h.strip() for h in (fieldnames or [])]
-    for a, b in KEY_CHOICES:
-        if a in fields and b in fields:
-            return a, b
-    raise KeyError(f"Could not find any usable key pair in columns: {fields}")
-
-
-def pick_passage_col(fieldnames):
-    fields = [h.strip() for h in (fieldnames or [])]
-    for c in PASSAGE_COL_CHOICES:
-        if c in fields:
+def pick_first(fields, choices):
+    fs = [h.strip() for h in (fields or [])]
+    for c in choices:
+        if c in fs:
             return c
-    # Passage isn't strictly required for keying; fallback to empty
     return None
 
 
-# ---- 1) Collect all retrieved keys (and keep a passage for output) ----
-retrieved_keys = set()
-key_to_passage = {}
+def pick_docid_col(fieldnames):
+    col = pick_first(fieldnames, DOCID_COL_CHOICES)
+    if not col:
+        raise KeyError(f"Could not find any doc-id column in: {fieldnames}")
+    return col
+
+
+def pick_query_col(fieldnames):
+    # optional
+    return pick_first(fieldnames, QUERY_COL_CHOICES)
+
+
+def pick_passage_col(fieldnames):
+    # optional
+    return pick_first(fieldnames, PASSAGE_COL_CHOICES)
+
+
+# ---- 1) Collect all retrieved DOCIDs (and keep query/passage for output) ----
+retrieved_docids = set()
+docid_to_details = {}  # docid -> (query_opt, passage_opt)
 
 csv_files = sorted(RETRIEVED_DIR.rglob("*.csv"))
 if not csv_files:
@@ -74,58 +91,57 @@ if not csv_files:
 for p in csv_files:
     fh, reader = detect_reader(p)
     with fh:
-        k1, k2 = pick_keys(reader.fieldnames)
+        dcol = pick_docid_col(reader.fieldnames)
+        qcol = pick_query_col(reader.fieldnames)
         pcol = pick_passage_col(reader.fieldnames)
         for row in reader:
             if not row:
                 continue
-            k = (row[k1].strip(), row[k2].strip())
-            retrieved_keys.add(k)
-            # Keep first seen passage
-            if k not in key_to_passage:
-                key_to_passage[k] = row.get(pcol, "").strip() if pcol else ""
+            did = str(row.get(dcol, "")).strip()
+            if not did:
+                continue
+            retrieved_docids.add(did)
+            if did not in docid_to_details:
+                qval = str(row.get(qcol, "")).strip() if qcol else ""
+                pval = str(row.get(pcol, "")).strip() if pcol else ""
+                docid_to_details[did] = (qval, pval)
 
-# ---- 2) Collect all labeled keys (coerce non-0..3 labels to '0', still present) ----
+# ---- 2) Collect all labeled DOCIDs (label value itself irrelevant for presence) ----
 if not LABELS_FILE.exists():
     raise FileNotFoundError(f"Labels file not found: {LABELS_FILE}")
 
-labeled_keys = set()
+labeled_docids = set()
 fh, reader = detect_reader(LABELS_FILE)
 with fh:
-    k1, k2 = pick_keys(reader.fieldnames)
-    # choose label column
+    dcol = pick_docid_col(reader.fieldnames)
     fields = [h.strip() for h in (reader.fieldnames or [])]
-    if "relevance" in fields:
-        lbl_col = "relevance"
-    elif "label" in fields:
-        lbl_col = "label"
-    else:
-        raise KeyError(
-            f"Neither 'relevance' nor 'label' found in {LABELS_FILE}. "
-            f"Available columns: {fields}"
-        )
+    lbl_col = "relevance" if "relevance" in fields else ("label" if "label" in fields else None)
 
     for row in reader:
         if not row:
             continue
-        raw = str(row.get(lbl_col, "")).strip()
-        _norm = raw if raw in ALLOWED_LABELS else "0"  # normalized (still present)
-        # Regard row as labeled regardless of original value (after normalization)
-        k = (row[k1].strip(), row[k2].strip())
-        labeled_keys.add(k)
+        did = str(row.get(dcol, "")).strip()
+        if not did:
+            continue
+        # keep normalization for completeness, though not used for presence
+        if lbl_col:
+            raw = str(row.get(lbl_col, "")).strip()
+            _norm = raw if raw in ALLOWED_LABELS else "0"
+        labeled_docids.add(did)
 
-# ---- 3) Compute missing keys ----
-missing = sorted(retrieved_keys - labeled_keys)
+# ---- 3) Compute missing docids ----
+missing_docids = sorted(retrieved_docids - labeled_docids)
 
 # ---- 4) Write output (formatted for later labeling) ----
 OUTPUT_MISSING.parent.mkdir(parents=True, exist_ok=True)
 with open(OUTPUT_MISSING, "w", newline="", encoding="utf-8") as out:
     w = csv.writer(out)
     w.writerow(["query", "docid", "passage", "relevance"])
-    for q, d in missing:
-        w.writerow([q, d, key_to_passage.get((q, d), ""), ""])
+    for did in missing_docids:
+        q, psg = docid_to_details.get(did, ("", ""))
+        w.writerow([q, did, psg, ""])
 
-print(f"Retrieved keys: {len(retrieved_keys)}")
-print(f"Labeled keys:   {len(labeled_keys)}")
-print(f"Missing keys:   {len(missing)}")
+print(f"Retrieved docids: {len(retrieved_docids)}")
+print(f"Labeled docids:   {len(labeled_docids)}")
+print(f"Missing docids:   {len(missing_docids)}")
 print(f"Wrote missing rows to: {OUTPUT_MISSING}")

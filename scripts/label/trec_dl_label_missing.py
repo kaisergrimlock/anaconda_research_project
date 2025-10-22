@@ -46,7 +46,7 @@ PROMPT_FILE = REPO_ROOT / "prompts" / f"{PROMPT_NAME}.txt"
 INPUT_CSV   = REPO_ROOT / "outputs" / "queries" / "verbose_injected.csv"
 
 # Output will be UPDATED in-place; matching (query,docid) rows replaced
-OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "trec_dl_2023_verbose_injected.csv"
+OUTPUT_FILE = REPO_ROOT / "outputs" / "llm_label" / "gpt-oss-20b/gpt-oss-20b_trec_dl_2023_eng_raw.csv"
 
 LOG_DIR     = REPO_ROOT / "logs"
 TOKENS_CSV  = REPO_ROOT / "token_usage.csv"

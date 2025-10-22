@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # ---------- Config ----------
-TREC_DL_YEAR = "2023"
+TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
 LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw_with_ids.csv")

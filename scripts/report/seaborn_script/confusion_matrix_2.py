@@ -12,12 +12,12 @@ TREC_DL_YEAR = "2023"
 MODEL = "gpt-oss-20b"
 LANG = "eng"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
-if LANG != "eng":
-    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw.csv")
+if LANG != "raw":
+    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw_with_qid.csv")
     OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/" + LANG)
 else:
-    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw_with_ids.csv")
-    OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/eng")
+    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw.csv")
+    OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/raw")
 
 
 OUT_COUNTS = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"

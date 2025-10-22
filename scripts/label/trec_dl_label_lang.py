@@ -43,14 +43,14 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-LANG = "vi"  # use 'eng' to point to judged/original folder per logic below
+LANG = "eng"  # use 'raw' to point to judged/original folder per logic below
 # >>> Choose which parts to process (inclusive) <<<
-START_PART    = 0
-END_PART      = 19
+START_PART    = 46
+END_PART      = 46
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
-if LANG != "eng":
+if LANG != "raw":
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 else:
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
@@ -270,7 +270,10 @@ def _label_single_part_file_blocking(
     lang_candidates = [f"passage_{LANG}", f"passage_{LANG}_injected", "passage_injected"]
 
     pid_key          = _require_any_key(part_csv, header, "pid", pid_candidates)
-    passage_lang_key = _require_any_key(part_csv, header, f"passage_{LANG}", lang_candidates)
+    if(LANG == "raw"):
+        passage_lang_key = "passage"
+    else:
+        passage_lang_key = _require_any_key(part_csv, header, f"passage_{LANG}", lang_candidates)
 
     # Output column name for the localized passage is standardized as "passage_<LANG>"
     lang_out_col = f"passage_{LANG}"
@@ -445,7 +448,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
     MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
     # Combined output CSV & token usage CSV for this model
-    if LANG == "eng":
+    if LANG == "raw":
         output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_raw.csv"
     else:
         output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_{LANG}_raw.csv"
