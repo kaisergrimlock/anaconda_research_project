@@ -13,7 +13,7 @@ MODEL = "gpt-oss-20b"
 LANG = "eng"
 NIST_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
 if LANG != "raw":
-    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw_with_qid.csv")
+    LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_" + LANG  + "_raw.csv")
     OUT_DIR    = Path("outputs/baseline/" + TREC_DL_YEAR + "/" + LANG)
 else:
     LLM_FILE   = Path("outputs/llm_label/" + MODEL + "/" + MODEL + "_trec_dl_" + TREC_DL_YEAR + "_raw.csv")

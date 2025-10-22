@@ -8,7 +8,7 @@ from pathlib import Path
 # =========================
 TREC_DL_YEAR = "2023"
 MODEL        = "gpt-oss-20b"
-LANG         = "eng"   # "eng", "vi", etc.
+LANG         = "vi"   # "eng", "vi", etc.
 
 # LLM file (the single CSV you labeled)
 LLM_FILE = Path("outputs/llm_label") / MODEL / f"{MODEL}_trec_dl_{TREC_DL_YEAR}_{LANG}_raw.csv"
@@ -51,7 +51,7 @@ def load_llm_pairs(fp: Path):
         r = csv.DictReader(f)
         hdr = [h.strip() for h in (r.fieldnames or [])]
         pid_col = _pick(hdr, ("pid",))
-        pen_col = _pick(hdr, ("passage_eng","passage_injected","passage_en"))
+        pen_col = _pick(hdr, ("passage_" + LANG,"passage_injected"))
         if not pid_col or not pen_col:
             raise RuntimeError("LLM file needs 'pid' and 'passage_eng' (or alias).")
 
