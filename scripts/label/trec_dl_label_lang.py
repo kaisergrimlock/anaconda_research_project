@@ -64,7 +64,7 @@ MODELS = [
 ]
 
 INFERENCE_CONFIG = {
-    "maxTokens": 1000,
+    "maxTokens": 2000,
     "temperature": 0.0,
     "topP": 1.0,
 }
@@ -113,11 +113,14 @@ def ensure_combined_header(path: Path, lang_out_name: str):
             csv.writer(csvfile).writerow(_header_cols(lang_out_name))
 
 def parse_llm_text_to_score(text: str) -> str:
-    """Expect model returns JSON like {"O": <label>}."""
     try:
         parsed = json.loads(text)
-        if isinstance(parsed, dict):
-            return str(parsed.get("O", ""))
+        if isinstance(parsed, dict) and "O" in parsed:
+            return str(parsed["O"])
+        if isinstance(parsed, list):
+            for item in parsed:
+                if isinstance(item, dict) and "O" in item:
+                    return str(item["O"])
     except Exception:
         pass
     return ""
