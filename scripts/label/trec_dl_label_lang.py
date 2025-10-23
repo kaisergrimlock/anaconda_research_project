@@ -7,9 +7,10 @@ import json
 import shutil
 import sys
 import threading
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
 from botocore.config import Config
@@ -43,10 +44,10 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-LANG = "eng"  # use 'raw' to point to judged/original folder per logic below
+LANG = "vi"  # use 'raw' to point to judged/original folder per logic below
 # >>> Choose which parts to process (inclusive) <<<
 START_PART    = 46
-END_PART      = 46
+END_PART      = 47
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
@@ -213,6 +214,61 @@ def _require_any_key(path: Path, header: List[str], label: str, candidates: List
     return key
 
 # ----------------------------
+# Upsert helpers (replace on same pid+docid+passage)
+# ----------------------------
+KEY_COLS = ("pid", "docid", "passage")
+
+def _row_key_from_list(row: List[str], header: List[str], key_cols: Tuple[str, str, str]) -> Tuple[str, str, str]:
+    idx = [header.index(c) for c in key_cols]
+    return tuple(row[i] for i in idx)  # type: ignore[return-value]
+
+def _read_csv_as_ordered_map(path: Path, header: List[str]) -> "OrderedDict[Tuple[str,str,str], List[str]]":
+    """
+    Load CSV (with known header) into an OrderedDict keyed by (pid, docid, passage).
+    Preserves insertion order.
+    """
+    od: "OrderedDict[Tuple[str,str,str], List[str]]" = OrderedDict()
+    if path.exists():
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.reader(f)
+            file_header = next(reader, None)
+            # tolerate header differences in whitespace/BOM
+            if file_header is None:
+                return od
+            for row in reader:
+                if not row:
+                    continue
+                k = _row_key_from_list(row, header, KEY_COLS)
+                od[k] = row
+    return od
+
+def _write_ordered_map_to_csv(path: Path, header: List[str], od: "OrderedDict[Tuple[str,str,str], List[str]]") -> None:
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(header)
+        for row in od.values():
+            w.writerow(row)
+    tmp.replace(path)
+
+def upsert_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
+    """
+    Insert/replace a row in CSV keyed by (pid, docid, passage).
+    Creates the file with header if it doesn't exist.
+    """
+    if not path.exists():
+        with path.open("w", encoding="utf-8", newline="") as f:
+            csv.writer(f).writerow(header)
+    od = _read_csv_as_ordered_map(path, header)
+    k = _row_key_from_list(new_row, header, KEY_COLS)
+    if k in od:
+        # Replace in place (retain order position)
+        od[k] = new_row
+    else:
+        od[k] = new_row
+    _write_ordered_map_to_csv(path, header, od)
+
+# ----------------------------
 # Stop key listener (press Q to stop)
 # ----------------------------
 def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
@@ -273,7 +329,7 @@ def _label_single_part_file_blocking(
     lang_candidates = [f"passage_{LANG}", f"passage_{LANG}_injected", "passage_injected"]
 
     pid_key          = _require_any_key(part_csv, header, "pid", pid_candidates)
-    if(LANG == "raw"):
+    if (LANG == "raw"):
         passage_lang_key = "passage"
     else:
         passage_lang_key = _require_any_key(part_csv, header, f"passage_{LANG}", lang_candidates)
@@ -284,9 +340,10 @@ def _label_single_part_file_blocking(
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     log_path    = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
 
+    labels_header = _header_cols(lang_out_col)
     if not labels_path.exists():
         with labels_path.open("w", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerow(_header_cols(lang_out_col))
+            csv.writer(f).writerow(labels_header)
 
     bedrock = boto3.client("bedrock-runtime", config=cfg)
 
@@ -338,8 +395,12 @@ def _label_single_part_file_blocking(
             break
         except Exception as api_err:
             print(f"[ERROR] {part_csv.name}: API failed on pid={pid}, docid={docid} (row {idx}) :: {api_err}")
-            with labels_path.open("a", encoding="utf-8", newline="") as f:
-                csv.writer(f).writerow([pid, docid, passage_orig, passage_lang, ""])
+            # UPSERT (blank relevance on failure)
+            upsert_row_csv(
+                labels_path,
+                labels_header,
+                [pid, docid, passage_orig, passage_lang, ""]
+            )
             logs.append({
                 "pid": pid, "docid": docid, "query": query,
                 "prompt": prompt,
@@ -357,9 +418,12 @@ def _label_single_part_file_blocking(
             text = ""
         score = parse_llm_text_to_score(text)
 
-        # write labeled row (pid-first, and both passages recorded)
-        with labels_path.open("a", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerow([pid, docid, passage_orig, passage_lang, score])
+        # UPSERT (pid, docid, passage) into per-file labels
+        upsert_row_csv(
+            labels_path,
+            labels_header,
+            [pid, docid, passage_orig, passage_lang, score]
+        )
 
         in_tok, out_tok = usage_from_resp(resp)
         total_in  += in_tok
@@ -418,24 +482,36 @@ async def label_single_part_file(
 # ----------------------------
 def merge_labels(per_file_labels: List[str], combined_out: Path, lang_out_name: str, stop_event: Optional[asyncio.Event] = None):
     ensure_combined_header(combined_out, lang_out_name)
-    appended = 0
-    with combined_out.open("a", encoding="utf-8", newline="") as out_f:
-        out_writer = csv.writer(out_f)
-        for path_str in per_file_labels:
-            if stop_event is not None and stop_event.is_set():
-                print("[STOP] Merge halted early by user.")
-                break
-            p = Path(path_str)
-            if not p.exists():
-                print(f"[WARN] Missing per-file labels for merge: {p}")
-                continue
-            with p.open("r", encoding="utf-8", newline="") as in_f:
-                reader = csv.reader(in_f)
-                _ = next(reader, None)  # skip header
-                for row in reader:
-                    out_writer.writerow(row)
-                    appended += 1
-    print(f"[MERGE] Appended {appended} labeled rows into: {combined_out}")
+    header = _header_cols(lang_out_name)
+
+    # Load existing combined into ordered map (preserve existing order)
+    od = _read_csv_as_ordered_map(combined_out, header)
+
+    appended_or_updated = 0
+    for path_str in per_file_labels:
+        if stop_event is not None and stop_event.is_set():
+            print("[STOP] Merge halted early by user.")
+            break
+        p = Path(path_str)
+        if not p.exists():
+            print(f"[WARN] Missing per-file labels for merge: {p}")
+            continue
+        with p.open("r", encoding="utf-8", newline="") as in_f:
+            reader = csv.reader(in_f)
+            _ = next(reader, None)  # skip header
+            for row in reader:
+                if not row:
+                    continue
+                k = _row_key_from_list(row, header, KEY_COLS)
+                if k in od:
+                    od[k] = row  # replace existing
+                else:
+                    od[k] = row  # append new at the end
+                appended_or_updated += 1
+
+    # Write back atomically
+    _write_ordered_map_to_csv(combined_out, header, od)
+    print(f"[MERGE] Upserted {appended_or_updated} rows into: {combined_out}")
 
 # ----------------------------
 # Orchestration

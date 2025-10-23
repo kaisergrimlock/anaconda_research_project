@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # =============== Config ===============
 TREC_DL_YEAR = "2023"
 MODEL        = "gpt-oss-20b"
-LANG         = "eng"            # "eng", "vi", "raw"
+LANG         = "fr"            # "eng", "vi", "raw"
 
 # Inputs/outputs
 NIST_DIR  = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
@@ -52,6 +52,29 @@ def read_csv_smart(path: Path) -> pd.DataFrame:
     # and cannot be written out here. This file will capture logical “unparseable label”
     # rows, not physically malformed lines.
     return pd.read_csv(path, engine="python", dtype=str, on_bad_lines="skip")
+
+def _write_chunked_csv(df: pd.DataFrame, out_dir: Path, base_name: str, chunk_size: int = 500) -> list[Path]:
+    """
+    Write df into multiple CSV files with at most `chunk_size` rows each,
+    stored under `out_dir`. Filenames: {base_name}_part_0001.csv, ...
+    Returns the list of written paths.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    n = len(df)
+    if n == 0:
+        return []
+    paths = []
+    num_parts = (n + chunk_size - 1) // chunk_size
+    pad = max(4, len(str(num_parts)))
+    for i in range(num_parts):
+        start = i * chunk_size
+        end   = min(start + chunk_size, n)
+        part  = df.iloc[start:end]
+        fp = out_dir / f"{base_name}_part_{(i+1):0{pad}d}.csv"
+        part.to_csv(fp, index=False, encoding="utf-8")
+        paths.append(fp)
+    return paths
+
 
 def pick_col(df: pd.DataFrame, candidates: list[str]) -> str | None:
     cols = {c.strip().lower(): c for c in df.columns}
@@ -164,13 +187,28 @@ unparsable = total_rows - parsed_ok
 print(f"[LLM ] rows={total_rows:,} | parsed={parsed_ok:,} | unparseable={unparsable:,}")
 
 # --- NEW: write out unparseable label rows (before we drop/map) ---
+# --- NEW: write out unparseable label rows (before we drop/map) ---
 if unparsable > 0:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     bad_mask = llm_work["LLM_parsed"].isna()
     # include the original columns for user inspection
     bad_rows = llm_raw.loc[bad_mask.index[bad_mask]].copy()
+
+    # 2a) Write the single combined CSV (kept for convenience/backward-compat)
     bad_rows.to_csv(OUT_UNPARSEABLE, index=False, encoding="utf-8")
     print(f"[LLM ] wrote unparseable labels to: {OUT_UNPARSEABLE}")
+
+    # 2b) Also write chunked copies into OUT_DIR / 'unparseable'  (500 rows per file)
+    UNPARSEABLE_DIR = OUT_DIR / "unparseable"
+    written_parts = _write_chunked_csv(
+        bad_rows,
+        out_dir=UNPARSEABLE_DIR,
+        base_name="unparseable",
+        chunk_size=500
+    )
+    if written_parts:
+        print(f"[LLM ] also split unparseable rows into {len(written_parts)} file(s) under: {UNPARSEABLE_DIR}")
+
 
 # Handle invalid labels
 if MAP_INVALID_TO_ZERO:
