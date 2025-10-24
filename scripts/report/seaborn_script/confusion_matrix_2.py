@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # =============== Config ===============
 TREC_DL_YEAR = "2023"
 MODEL        = "gpt-oss-20b"
-LANG         = "fr"            # "eng", "vi", "raw"
+LANG         = "ru"            # "eng", "vi", "raw"
 
 # Inputs/outputs
 NIST_DIR  = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"

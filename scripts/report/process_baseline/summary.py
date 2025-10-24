@@ -27,9 +27,10 @@ from helper import allow_huge_csv_fields
 
 # --------- Paths ---------
 TREC_DL_YEAR = "2023"  # '2019', '2020', or '2023'
+LANG = "enG"
 NIST_DIR  = Path("retrieved/trec_dl_" + TREC_DL_YEAR + "/judged")
 NIST_GLOB = "all_topics_trecdl_" + TREC_DL_YEAR + "_part*.csv"
-LLM_CSV   = Path("outputs/llm_label/gpt-oss-20b/gpt-oss-20b_trec_dl_2023_raw_with_ids.csv")
+LLM_CSV   = Path("outputs/llm_label/gpt-oss-20b/gpt-oss-20b_trec_dl_" + TREC_DL_YEAR + "_" + LANG + "_raw.csv")
 
 # preferred output dir (use 'output/llm_label' if it exists, else 'outputs/llm_label')
 PREF_OUT_DIR = Path("output/llm_label")

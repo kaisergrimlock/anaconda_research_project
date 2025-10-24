@@ -44,7 +44,7 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-LANG = "vi"  # use 'raw' to point to judged/original folder per logic below
+LANG = "ru"  # use 'raw' to point to judged/original folder per logic below
 # >>> Choose which parts to process (inclusive) <<<
 START_PART    = 46
 END_PART      = 47

@@ -17,8 +17,8 @@ import numpy as np
 from sklearn.metrics import cohen_kappa_score        # pip install scikit-learn
 import krippendorff as kd                            # pip install krippendorff
 
-BASE_DIR = Path("outputs/trec_dl_llm_label")
-IN_DIR   = BASE_DIR / "processed/utility/20250917_211535"
+BASE_DIR = Path("outputs")
+IN_DIR   = BASE_DIR / "llm_label/gpt-oss-20b/"
 OUT_CSV  = IN_DIR / "doc_rel_summary_2.csv"
 MODEL_RE = re.compile(r"doc_rel_compare_(.+)\.csv$", re.IGNORECASE)
 
