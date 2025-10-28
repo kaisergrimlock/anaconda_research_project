@@ -44,17 +44,17 @@ _bump_field_limit()
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
-LANG = "ru"  # use 'raw' to point to judged/original folder per logic below
-# >>> Choose which parts to process (inclusive) <<<
-START_PART    = 46
-END_PART      = 47
+
+LANG          = "raw"   # "raw", "vi", "fr", ...
+START_PART    = 40
+END_PART      = 45
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
-if LANG != "raw":
-    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
-else:
+if LANG == "raw":
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
+else:
+    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN  = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # ----------------------------
@@ -69,6 +69,32 @@ INFERENCE_CONFIG = {
     "temperature": 0.0,
     "topP": 1.0,
 }
+
+# ----------------------------
+# Output schema handling
+# ----------------------------
+def expected_extra_cols_for_lang(lang: str) -> List[str]:
+    if lang == "raw":
+        return []  # exactly the base six
+    # language-specific columns (query_<lang>, passage_injected)
+    return [f"query_{lang}", "passage_injected"]
+
+def expected_base_cols() -> List[str]:
+    return ["qid", "query", "pid_qrels", "pid_resolved", "passage", "relevance"]
+
+def output_header_from_input(input_header: List[str]) -> List[str]:
+    """
+    Preserve the exact input header order and append 'llm_relevance'.
+    """
+    return list(input_header) + ["llm_relevance"]
+
+# Upsert/Merge identity
+KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
+
+def ensure_csv_with_header(path: Path, header: List[str]):
+    if not path.exists():
+        with path.open("w", encoding="utf-8", newline="") as f:
+            csv.writer(f).writerow(header)
 
 # ----------------------------
 # Utilities
@@ -103,17 +129,11 @@ def iter_part_files(start_part: int, end_part: int):
         else:
             print(f"[WARN] Missing file: {p}")
 
-def _header_cols(lang_out_name: str):
-    # Output header uses pid and includes both passages
-    # lang_out_name will be "passage_<LANG>"
-    return ["pid", "docid", "passage", lang_out_name, "relevance"]
-
-def ensure_combined_header(path: Path, lang_out_name: str):
-    if not path.exists():
-        with path.open("w", encoding="utf-8", newline="") as csvfile:
-            csv.writer(csvfile).writerow(_header_cols(lang_out_name))
-
 def parse_llm_text_to_score(text: str) -> str:
+    """
+    Accepts either {"O": <int>} or a list of dicts containing "O".
+    Returns string score or "" on failure.
+    """
     try:
         parsed = json.loads(text)
         if isinstance(parsed, dict) and "O" in parsed:
@@ -172,7 +192,7 @@ def estimate_run_cost(model: str, tin: int, tout: int, csv_path: Path) -> float:
     return (tin * pin + tout * pout) / 1000.0
 
 # ----------------------------
-# CSV & header helpers
+# CSV helpers
 # ----------------------------
 def read_rows_stream(path: Path):
     f = path.open("r", encoding="utf-8", newline="")
@@ -195,36 +215,13 @@ def _inspect_header(path: Path) -> List[str]:
         reader = csv.DictReader(f, skipinitialspace=True)
         return [_clean_key(k) for k in (reader.fieldnames or [])]
 
-def _choose_key(header: List[str], candidates: List[str]) -> Optional[str]:
-    for c in candidates:
-        if c in header:
-            return c
-    return None
-
-def _require_any_key(path: Path, header: List[str], label: str, candidates: List[str]) -> str:
-    key = _choose_key(header, candidates)
-    if not key:
-        msg = (
-            f"[FATAL] {path.name}: missing required column for {label}. "
-            f"Looked for any of: {', '.join(candidates)}\n"
-            f"Header columns: {header}"
-        )
-        print(msg)
-        sys.exit(2)
-    return key
-
-# ----------------------------
-# Upsert helpers (replace on same pid+docid+passage)
-# ----------------------------
-KEY_COLS = ("pid", "docid", "passage")
-
 def _row_key_from_list(row: List[str], header: List[str], key_cols: Tuple[str, str, str]) -> Tuple[str, str, str]:
     idx = [header.index(c) for c in key_cols]
     return tuple(row[i] for i in idx)  # type: ignore[return-value]
 
-def _read_csv_as_ordered_map(path: Path, header: List[str]) -> "OrderedDict[Tuple[str,str,str], List[str]]":
+def _read_csv_as_ordered_map(path: Path, header: List[str], key_cols: Tuple[str, str, str]) -> "OrderedDict[Tuple[str,str,str], List[str]]":
     """
-    Load CSV (with known header) into an OrderedDict keyed by (pid, docid, passage).
+    Load CSV (with known header) into an OrderedDict keyed by (pid_qrels, pid_resolved, passage).
     Preserves insertion order.
     """
     od: "OrderedDict[Tuple[str,str,str], List[str]]" = OrderedDict()
@@ -232,13 +229,12 @@ def _read_csv_as_ordered_map(path: Path, header: List[str]) -> "OrderedDict[Tupl
         with path.open("r", encoding="utf-8", newline="") as f:
             reader = csv.reader(f)
             file_header = next(reader, None)
-            # tolerate header differences in whitespace/BOM
             if file_header is None:
                 return od
             for row in reader:
                 if not row:
                     continue
-                k = _row_key_from_list(row, header, KEY_COLS)
+                k = _row_key_from_list(row, header, key_cols)
                 od[k] = row
     return od
 
@@ -251,21 +247,17 @@ def _write_ordered_map_to_csv(path: Path, header: List[str], od: "OrderedDict[Tu
             w.writerow(row)
     tmp.replace(path)
 
-def upsert_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
+def upsert_row_csv(path: Path, header: List[str], key_cols: Tuple[str, str, str], new_row: List[str]) -> None:
     """
-    Insert/replace a row in CSV keyed by (pid, docid, passage).
+    Insert/replace a row in CSV keyed by (pid_qrels, pid_resolved, passage).
     Creates the file with header if it doesn't exist.
     """
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header)
-    od = _read_csv_as_ordered_map(path, header)
-    k = _row_key_from_list(new_row, header, KEY_COLS)
-    if k in od:
-        # Replace in place (retain order position)
-        od[k] = new_row
-    else:
-        od[k] = new_row
+    od = _read_csv_as_ordered_map(path, header, key_cols)
+    k  = _row_key_from_list(new_row, header, key_cols)
+    od[k] = new_row  # upsert
     _write_ordered_map_to_csv(path, header, od)
 
 # ----------------------------
@@ -313,37 +305,32 @@ def _label_single_part_file_blocking(
 ) -> dict:
     """
     Process one part file (serial per row) in a blocking manner.
-    Returns dict with: part, rows, input_tokens, output_tokens, labels_csv, log_json
+    Returns dict with: part, rows, input_tokens, output_tokens, labels_csv, log_json, header_out
     """
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
 
-    # Validate header & concretize keys (fail fast)
-    header = _inspect_header(part_csv)
-    if "passage" not in header:
-        print(f"[FATAL] {part_csv.name}: missing required column 'passage'. Header={header}")
+    # Validate and capture input header
+    header_in = _inspect_header(part_csv)
+    base_needed = set(expected_base_cols())
+    lang_needed = set(expected_extra_cols_for_lang(LANG))
+    missing = [c for c in base_needed if c not in header_in]
+    if missing:
+        print(f"[FATAL] {part_csv.name}: missing required base columns {missing}. Header={header_in}")
         sys.exit(2)
+    # extra columns for non-raw
+    for c in lang_needed:
+        if c not in header_in:
+            print(f"[WARN] {part_csv.name}: expected language column '{c}' not found; will fall back if needed.")
 
-    pid_candidates  = ["pid", "pid_resolved", "pid_qrels"]
-    lang_candidates = [f"passage_{LANG}", f"passage_{LANG}_injected", "passage_injected"]
-
-    pid_key          = _require_any_key(part_csv, header, "pid", pid_candidates)
-    if (LANG == "raw"):
-        passage_lang_key = "passage"
-    else:
-        passage_lang_key = _require_any_key(part_csv, header, f"passage_{LANG}", lang_candidates)
-
-    # Output column name for the localized passage is standardized as "passage_<LANG>"
-    lang_out_col = f"passage_{LANG}"
+    # Build output header: exact input order + llm_relevance
+    header_out = output_header_from_input(header_in)
 
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     log_path    = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
 
-    labels_header = _header_cols(lang_out_col)
-    if not labels_path.exists():
-        with labels_path.open("w", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerow(labels_header)
+    ensure_csv_with_header(labels_path, header_out)
 
     bedrock = boto3.client("bedrock-runtime", config=cfg)
 
@@ -353,7 +340,19 @@ def _label_single_part_file_blocking(
 
     total_rows = count_data_rows(part_csv)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
-    print(f"[HEADER] Using pid='{pid_key}', localized passage='{passage_lang_key}' -> output column '{lang_out_col}'")
+    print(f"[HEADER] LANG='{LANG}' | output columns = input columns + ['llm_relevance']")
+
+    # Helpers to select prompt fields
+    query_lang_col = f"query_{LANG}"
+    def pick_query(row: Dict[str, str]) -> str:
+        if LANG != "raw" and query_lang_col in row and row.get(query_lang_col):
+            return (row.get(query_lang_col) or "").strip()
+        return (row.get("query", "") or "").strip()
+
+    def pick_passage_for_prompt(row: Dict[str, str]) -> str:
+        if LANG != "raw" and "passage_injected" in row and row.get("passage_injected"):
+            return (row.get("passage_injected") or "").strip()
+        return (row.get("passage", "") or "").strip()
 
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
         # stop check
@@ -361,96 +360,81 @@ def _label_single_part_file_blocking(
             print(f"\n[STOP] Requested. Halting file early: {part_csv.name}")
             break
 
-        # --- Inputs from row (strict, fail if missing) ---
-        pid = (row.get(pid_key, "") or "").strip()
-        if not pid:
-            print(f"[FATAL] {part_csv.name}: empty pid at row {idx} using column '{pid_key}'.")
+        # Build a writable row map that mirrors input header exactly
+        row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
+
+        # Stabilize pid_resolved with fallbacks if empty
+        pr = (row_out_map.get("pid_resolved", "") or "").strip()
+        if not pr:
+            pr = (row.get("docid", "") or row.get("pid", "") or row.get("pid_qrels", "") or "").strip()
+            row_out_map["pid_resolved"] = pr
+
+        # Minimal sanity checks
+        qid       = (row_out_map.get("qid", "") or "").strip()
+        pid_qrels = (row_out_map.get("pid_qrels", "") or "").strip()
+        passage   = (row_out_map.get("passage", "") or "").strip()
+        if not (qid and pid_qrels and passage):
+            print(f"[FATAL] {part_csv.name}: missing qid/pid_qrels/passage at row {idx}.")
             sys.exit(3)
 
-        docid = (row.get("docid", "") or "").strip()
-        if not docid:
-            docid = pid  # fallback to pid if explicit docid not present
-
-        query = (row.get("query", "") or "").strip()
-
-        passage_orig = (row.get("passage", "") or "").strip()
-        if not passage_orig:
-            print(f"[FATAL] {part_csv.name}: empty 'passage' at row {idx}.")
-            sys.exit(3)
-
-        passage_lang = (row.get(passage_lang_key, "") or "").strip()
-        if not passage_lang:
-            print(f"[FATAL] {part_csv.name}: empty '{passage_lang_key}' at row {idx}.")
-            sys.exit(3)
-
-        # Prompt uses localized passage (required)
-        prompt = prompt_template.format(query=query, passage=passage_lang)
+        # Prompt compose
+        q_for_prompt = pick_query(row_out_map)
+        p_for_prompt = pick_passage_for_prompt(row_out_map)
+        prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
+        kwargs   = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
 
+        # Call LLM
+        text = ""
+        score = ""
+        in_tok = out_tok = 0
         try:
-            resp = bedrock.converse(**kwargs)
+            resp  = bedrock.converse(**kwargs)
+            text  = extract_text_from_resp(model_id, resp) or ""
+            score = parse_llm_text_to_score(text)  # llm_relevance
+            in_tok, out_tok = usage_from_resp(resp)
+            total_in  += in_tok
+            total_out += out_tok
         except KeyboardInterrupt:
-            print(f"[INTERRUPTED] {part_csv.name}: Last pid {pid} (row {idx}) — stopping file early.")
+            print(f"[INTERRUPTED] {part_csv.name}: Last qid {qid} (row {idx}) — stopping file early.")
             break
         except Exception as api_err:
-            print(f"[ERROR] {part_csv.name}: API failed on pid={pid}, docid={docid} (row {idx}) :: {api_err}")
-            # UPSERT (blank relevance on failure)
-            upsert_row_csv(
-                labels_path,
-                labels_header,
-                [pid, docid, passage_orig, passage_lang, ""]
-            )
-            logs.append({
-                "pid": pid, "docid": docid, "query": query,
-                "prompt": prompt,
-                "response_text": "",
-                "full_response": {"error": str(api_err)},
-                "passage": passage_orig,
-                lang_out_col: passage_lang
-            })
-            continue
+            print(f"[ERROR] {part_csv.name}: API failed on qid={qid}, pid_resolved={pr} (row {idx}) :: {api_err}")
+            # score remains blank
 
-        # parse response
-        try:
-            text = extract_text_from_resp(model_id, resp)
-        except Exception:
-            text = ""
-        score = parse_llm_text_to_score(text)
+        # Construct output row in exact input order + llm_relevance
+        row_out = [row_out_map.get(col, "") for col in header_in] + [score]
 
-        # UPSERT (pid, docid, passage) into per-file labels
+        # Upsert using identity (pid_qrels, pid_resolved, passage)
         upsert_row_csv(
             labels_path,
-            labels_header,
-            [pid, docid, passage_orig, passage_lang, score]
+            header_out,
+            KEY_COLS,
+            row_out
         )
 
-        in_tok, out_tok = usage_from_resp(resp)
-        total_in  += in_tok
-        total_out += out_tok
-
+        # log
         logs.append({
-            "pid": pid,
-            "docid": docid,
-            "query": query,
+            "qid": qid,
+            "pid_qrels": pid_qrels,
+            "pid_resolved": pr,
             "prompt": prompt,
             "response_text": text,
             "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-            "full_response": resp,
-            "passage": passage_orig,
-            lang_out_col: passage_lang,
+            "passage_prompt_used": "passage_injected" if (LANG != "raw" and row_out_map.get("passage_injected")) else "passage",
+            "query_prompt_used": query_lang_col if (LANG != "raw" and row_out_map.get(query_lang_col)) else "query",
+            "llm_relevance": score,
         })
 
         print(f"[{part_csv.name}] [{idx}/{total_rows}]  tokens in/out += {in_tok}/{out_tok} "
               f"(totals {total_in}/{total_out})", end="\r", flush=True)
 
     # save log
-    with log_path.open("w", encoding="utf-8") as logf:
+    with (logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json").open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
     print()  # newline after progress
-    print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | Log: {log_path.name} "
-          f"| tokens in/out={total_in}/{total_out}")
+    print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | tokens in/out={total_in}/{total_out}")
 
     return {
         "part": part_csv.name,
@@ -458,8 +442,8 @@ def _label_single_part_file_blocking(
         "input_tokens": total_in,
         "output_tokens": total_out,
         "labels_csv": str(labels_path),
-        "log_json": str(log_path),
-        "lang_out_col": lang_out_col,
+        "log_json": str((logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json")),
+        "header_out": header_out,
     }
 
 # Thin async wrapper that runs the blocking worker in a thread
@@ -480,12 +464,11 @@ async def label_single_part_file(
 # ----------------------------
 # Combine per-file labels into the shared per-model OUTPUT_FILE
 # ----------------------------
-def merge_labels(per_file_labels: List[str], combined_out: Path, lang_out_name: str, stop_event: Optional[asyncio.Event] = None):
-    ensure_combined_header(combined_out, lang_out_name)
-    header = _header_cols(lang_out_name)
+def merge_labels(per_file_labels: List[str], combined_out: Path, header_out: List[str], stop_event: Optional[asyncio.Event] = None):
+    ensure_csv_with_header(combined_out, header_out)
 
     # Load existing combined into ordered map (preserve existing order)
-    od = _read_csv_as_ordered_map(combined_out, header)
+    od = _read_csv_as_ordered_map(combined_out, header_out, KEY_COLS)
 
     appended_or_updated = 0
     for path_str in per_file_labels:
@@ -498,19 +481,19 @@ def merge_labels(per_file_labels: List[str], combined_out: Path, lang_out_name: 
             continue
         with p.open("r", encoding="utf-8", newline="") as in_f:
             reader = csv.reader(in_f)
-            _ = next(reader, None)  # skip header
+            in_header = next(reader, None)  # skip header
+            if in_header and in_header != header_out:
+                print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {in_header}\n  exp: {header_out}")
+                sys.exit(4)
             for row in reader:
                 if not row:
                     continue
-                k = _row_key_from_list(row, header, KEY_COLS)
-                if k in od:
-                    od[k] = row  # replace existing
-                else:
-                    od[k] = row  # append new at the end
+                k = _row_key_from_list(row, header_out, KEY_COLS)
+                od[k] = row  # upsert
                 appended_or_updated += 1
 
     # Write back atomically
-    _write_ordered_map_to_csv(combined_out, header, od)
+    _write_ordered_map_to_csv(combined_out, header_out, od)
     print(f"[MERGE] Upserted {appended_or_updated} rows into: {combined_out}")
 
 # ----------------------------
@@ -526,11 +509,11 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
     MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
     MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Combined output CSV & token usage CSV for this model
+    # Combined output CSV (one per model & LANG)
     if LANG == "raw":
         output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_raw.csv"
     else:
-        output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_{LANG}_raw.csv"
+        output_file = MODEL_OUT_DIR / f"{short}_trec_dl_{TREC_DL_YEAR}_{LANG}.csv"
 
     tokens_csv  = MODEL_OUT_DIR / "token_usage.csv"
 
@@ -541,11 +524,11 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
         return
 
     run_id = timestamp_id()
-    print(f"\n--- Running inference for model: {model_id} (run_id={run_id}) ---")
+    print(f"\n--- Running inference for model: {model_id} (run_id={run_id}, LANG={LANG}) ---")
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
     # Temp per-file labels live under the model's output folder
-    per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}"
+    per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
     # Limit parallelism across files to reduce throttling
@@ -579,16 +562,16 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
             results.append(res)
 
     if results and not stop_event.is_set():
-        # Ensure all per-file outputs used the same lang column name (they should)
-        lang_out_names = {r["lang_out_col"] for r in results}
-        if len(lang_out_names) != 1:
-            print(f"[FATAL] Inconsistent localized output column names across files: {lang_out_names}")
+        # All per-file outputs should share identical header_out (since all parts share schema)
+        header_out_set = {tuple(r["header_out"]) for r in results}
+        if len(header_out_set) != 1:
+            print(f"[FATAL] Inconsistent output headers across files: {header_out_set}")
             sys.exit(4)
-        lang_out_name = next(iter(lang_out_names))
+        header_out = list(next(iter(header_out_set)))
 
         # Merge per-file label CSVs into the per-model combined OUTPUT_FILE
         per_file_labels = [r["labels_csv"] for r in results]
-        await asyncio.to_thread(merge_labels, per_file_labels, output_file, lang_out_name, stop_event)
+        await asyncio.to_thread(merge_labels, per_file_labels, output_file, header_out, stop_event)
 
     # Aggregate token usage and compute cost
     total_in  = sum(r["input_tokens"]  for r in results)
@@ -604,7 +587,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
 
     # For reproducibility, also write a combined log index (list of per-file logs)
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
-    combined_log_index = MODEL_LOGS_DIR / f"{run_id}_llm_logs_index_{safe_model}.json"
+    combined_log_index = MODEL_LOGS_DIR / f"{run_id}_llm_logs_index_{safe_model}_{LANG}.json"
     with combined_log_index.open("w", encoding="utf-8") as f:
         json.dump([{"part": r["part"], "log_json": r["log_json"]} for r in results],
                   f, indent=2, ensure_ascii=False)
