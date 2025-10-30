@@ -46,8 +46,8 @@ PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 LANG          = "raw"   # "raw", "vi", "fr", ...
-START_PART    = 40
-END_PART      = 45
+START_PART    = 0
+END_PART      = 0
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
@@ -83,10 +83,11 @@ def expected_base_cols() -> List[str]:
     return ["qid", "query", "pid_qrels", "pid_resolved", "passage", "relevance"]
 
 def output_header_from_input(input_header: List[str]) -> List[str]:
-    """
-    Preserve the exact input header order and append 'llm_relevance'.
-    """
-    return list(input_header) + ["llm_relevance"]
+    out = list(input_header)
+    if "llm_relevance" not in out:
+        out.append("llm_relevance")
+    return out
+
 
 # Upsert/Merge identity
 KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
