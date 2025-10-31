@@ -45,9 +45,9 @@ PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
-LANG          = "raw"   # "raw", "vi", "fr", ...
-START_PART    = 0
-END_PART      = 0
+LANG          = "eng"   # "raw", "vi", "fr", ...
+START_PART    = 1
+END_PART      = 1
 TREC_DL_YEAR  = "2023"
 
 # Where the part files live & their filename pattern
@@ -87,7 +87,6 @@ def output_header_from_input(input_header: List[str]) -> List[str]:
     if "llm_relevance" not in out:
         out.append("llm_relevance")
     return out
-
 
 # Upsert/Merge identity
 KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
@@ -270,7 +269,7 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
             import msvcrt  # Windows
             print("[STOP] Press 'Q' to stop gracefully.")
             while not stop_event.is_set():
-                if msvcrt.kbhit():
+                if msvcrt.kbhit(): #Keyboard pressed
                     ch = msvcrt.getwch()
                     if ch and ch.lower() == 'q':
                         loop.call_soon_threadsafe(stop_event.set)
