@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import re
 import sys
-import csv
 from pathlib import Path
-from typing import Optional, List, Dict, Tuple
+from typing import Dict, Tuple
 
 # calculate metrics
 from metrics_llm import (
@@ -15,17 +13,44 @@ from metrics_llm import (
     binarize_labels,
 )
 
-
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+# 👇 NEW: import helpers
+THIS_FILE = Path(__file__).resolve()
+PROJECT_ROOT = THIS_FILE.parents[3]  # seaborn_script -> report -> scripts -> project root
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts.csv_helpers import (
+    bump_field_limit,
+    read_csv_smart,
+    write_chunked_csv,
+    pick_col,
+    pick_qid_col,
+    pick_pid_col,
+    pick_label_col_generic,
+    norm_text,
+    parse_label,
+)
 
 # =========================
 # ======  Config  =========
 # =========================
 TREC_DL_YEAR = "2023"
 MODEL        = "gpt-oss-20b"
-LANG         = "raw"          # "eng", "vi", "raw"
+LANG         = "ru"          # "eng", "vi", "fr", "raw"
+
+# ---------- language-driven topic schema ----------
+if LANG == "raw":
+    TOPIC_QUERY_COL   = "query"
+    TOPIC_PASSAGE_COL = "passage"
+else:
+    TOPIC_QUERY_COL   = f"query_{LANG}"  # e.g. query_eng, query_vi, query_fr
+    TOPIC_PASSAGE_COL = "passage_injected"
+
+TOPIC_PID_COL     = "pid_resolved"   # raw judged files in your repo keep this name
 
 # Inputs / outputs
 NIST_DIR  = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}") / "judged"
@@ -58,95 +83,20 @@ MAP_INVALID_TO_ZERO    = False
 # Matching behavior
 ALLOW_PID_ONLY_FALLBACK = True  # try pid→qid when (pid, passage) pair not found
 
-# =========================
-# ======  Helpers  ========
-# =========================
-
-def _bump_field_limit():
-    """Allow huge CSV cells to avoid _csv.Error: field larger than field limit."""
-    limit = getattr(sys, "maxsize", 2_000_000_000)
-    while limit >= 131_072:
-        try:
-            csv.field_size_limit(limit)
-            return
-        except OverflowError:
-            limit //= 2
-    csv.field_size_limit(1_000_000)
-
-_bump_field_limit()
-
-def read_csv_smart(path: Path) -> pd.DataFrame:
-    """
-    Read CSV robustly: use python engine and skip physically malformed lines.
-    Use utf-8-sig to swallow BOM if present.
-    """
-    return pd.read_csv(path, engine="python", dtype=str, on_bad_lines="skip", encoding="utf-8-sig")
-
-def _write_chunked_csv(df: pd.DataFrame, out_dir: Path, base_name: str, chunk_size: int = 500) -> List[Path]:
-    """
-    Write df into multiple CSV files with at most `chunk_size` rows each.
-    Filenames: {base_name}_part_0001.csv, ...
-    """
-    out_dir.mkdir(parents=True, exist_ok=True)
-    n = len(df)
-    if n == 0:
-        return []
-    paths: List[Path] = []
-    num_parts = (n + chunk_size - 1) // chunk_size
-    pad = max(4, len(str(num_parts)))
-    for i in range(num_parts):
-        start, end = i * chunk_size, min((i + 1) * chunk_size, n)
-        part = df.iloc[start:end]
-        fp = out_dir / f"{base_name}_part_{(i + 1):0{pad}d}.csv"
-        part.to_csv(fp, index=False, encoding="utf-8")
-        paths.append(fp)
-    return paths
-
-def pick_col(df: pd.DataFrame, candidates: List[str]) -> Optional[str]:
-    cols = {c.strip().lower(): c for c in df.columns}
-    for name in candidates:
-        key = name.strip().lower()
-        if key in cols:
-            return cols[key]
-    return None
-
-def pick_qid_col(df: pd.DataFrame) -> Optional[str]:
-    return pick_col(df, ["qid", "topic", "topic_id"])
-
-def pick_pid_col(df: pd.DataFrame) -> str:
-    c = pick_col(df, ["pid", "pid_resolved", "pid_qrels", "docid", "doc_id"])
-    if not c:
-        raise KeyError(f"No pid-like column in {list(df.columns)}")
-    return c
-
-def pick_label_col_generic(df: pd.DataFrame, candidates: List[str], who: str) -> str:
-    c = pick_col(df, candidates)
-    if not c:
-        raise KeyError(f"{who}: none of {candidates} found in columns {list(df.columns)}")
-    return c
-
-def pick_nist_label_col(df: pd.DataFrame) -> str:
-    return pick_label_col_generic(df, NIST_LABEL_COL_CHOICES, "NIST")
-
-def pick_llm_label_col(df: pd.DataFrame) -> str:
-    return pick_label_col_generic(df, LLM_LABEL_COL_CHOICES, "LLM")
-
-def norm_text(s: str) -> str:
-    return " ".join((s or "").strip().lower().split())
-
-_digit_0_3 = re.compile(r"\b([0-3])\b")
-def parse_label(value) -> Optional[int]:
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return None
-    s = str(value).strip()
-    if s in {"0", "1", "2", "3"}:
-        return int(s)
-    m = _digit_0_3.search(s)
-    return int(m.group(1)) if m else None
+# ============ init CSV limit ============
+bump_field_limit()
 
 # =========================
 # ======  Pipeline  =======
 # =========================
+
+def pick_nist_label_col(df: pd.DataFrame) -> str:
+    return pick_label_col_generic(df, NIST_LABEL_COL_CHOICES, "NIST")
+
+
+def pick_llm_label_col(df: pd.DataFrame) -> str:
+    return pick_label_col_generic(df, LLM_LABEL_COL_CHOICES, "LLM")
+
 
 def load_nist() -> Tuple[pd.DataFrame, pd.DataFrame]:
     nist_files = sorted(NIST_DIR.rglob("*.csv"))
@@ -180,31 +130,50 @@ def load_nist() -> Tuple[pd.DataFrame, pd.DataFrame]:
     nist_pid_qids = nist[["pid", "qid"]].drop_duplicates()
     return nist, nist_pid_qids
 
+
 def build_pair_map() -> Dict[Tuple[str, str], str]:
+    """
+    Create (pid, normalized_passage) -> qid map from the topic files.
+    Now purely language-driven: we know the expected column names from LANG.
+    """
     topic_files = sorted(TOPICS_DIR.glob(TOPICS_GLOB))
     if not topic_files:
         raise FileNotFoundError(f"No topic files matching {TOPICS_GLOB!r} in {TOPICS_DIR}")
 
     pair_map: Dict[Tuple[str, str], str] = {}
     rows_seen = 0
+
     for fp in topic_files:
         df = read_csv_smart(fp)
-        pid_res = pick_col(df, ["pid_resolved"]) or pick_col(df, ["pid_qrels"])
-        inj_col = pick_col(df, ["passage_injected", "passage_eng"])
-        qid_col = pick_col(df, ["qid", "topic_id"])
-        if not pid_res or not inj_col or not qid_col:
+
+        # if the file does not have the language-specific columns, we just skip it
+        if not {TOPIC_PID_COL, TOPIC_PASSAGE_COL, "qid"}.issubset(df.columns):
             continue
-        tmp = df[[pid_res, inj_col, qid_col]].rename(columns={pid_res: "pid", inj_col: "passage_inj", qid_col: "qid"})
+
+        tmp = df[[TOPIC_PID_COL, TOPIC_PASSAGE_COL, "qid"]].rename(
+            columns={
+                TOPIC_PID_COL: "pid",
+                TOPIC_PASSAGE_COL: "passage_inj",
+                "qid": "qid",
+            }
+        )
+
         tmp["pid"] = tmp["pid"].astype(str).str.strip()
         tmp["key_pass"] = tmp["passage_inj"].map(norm_text)
         rows_seen += len(tmp)
+
         for pid, key_pass, qid in tmp[["pid", "key_pass", "qid"]].itertuples(index=False):
             if pid and key_pass and qid and (pid, key_pass) not in pair_map:
                 pair_map[(pid, key_pass)] = str(qid).strip()
+
     print(f"[TOPICS] files={len(topic_files)}; rows scanned={rows_seen:,}; unique pairs in map={len(pair_map):,}")
     return pair_map
 
-def load_llm(nist_pid_qids: pd.DataFrame, pair_map: Dict[Tuple[str, str], str]) -> Tuple[pd.DataFrame, int, int, bool, pd.DataFrame]:
+
+def load_llm(
+    nist_pid_qids: pd.DataFrame,
+    pair_map: Dict[Tuple[str, str], str],
+) -> Tuple[pd.DataFrame, int, int, bool, pd.DataFrame]:
     """Return (llm_work, unparsable_count, total_rows, QID_FROM_LLM, llm_raw_full)."""
     if not LLM_FILE.exists():
         raise FileNotFoundError(f"LLM file not found: {LLM_FILE}")
@@ -213,6 +182,7 @@ def load_llm(nist_pid_qids: pd.DataFrame, pair_map: Dict[Tuple[str, str], str]) 
     llm_raw = read_csv_smart(LLM_FILE)
     pcol      = pick_pid_col(llm_raw)
     lcol      = pick_llm_label_col(llm_raw)
+    # LLM files are still messy → keep flexible here
     p_eng     = pick_col(llm_raw, ["passage_eng", "passage_injected", "passage_en", "passage"])
     llm_qid_c = pick_qid_col(llm_raw)
     if not p_eng:
@@ -239,7 +209,7 @@ def load_llm(nist_pid_qids: pd.DataFrame, pair_map: Dict[Tuple[str, str], str]) 
         bad_rows = llm_raw.loc[bad_mask.index[bad_mask]].copy()
         bad_rows.to_csv(OUT_UNPARSEABLE, index=False, encoding="utf-8")
         print(f"[LLM ] wrote unparseable labels to: {OUT_UNPARSEABLE}")
-        _write_chunked_csv(bad_rows, OUT_DIR / "unparseable", "unparseable", 500)
+        write_chunked_csv(bad_rows, OUT_DIR / "unparseable", "unparseable", 500)
 
     # normalize LLM label
     if MAP_INVALID_TO_ZERO:
@@ -261,7 +231,10 @@ def load_llm(nist_pid_qids: pd.DataFrame, pair_map: Dict[Tuple[str, str], str]) 
     else:
         # map via (pid, passage)
         llm_work["key_pass"] = llm_work["passage_eng"].map(norm_text)
-        llm_work["qid"] = llm_work.apply(lambda r: pair_map.get((r["pid"], r["key_pass"]), ""), axis=1)
+        llm_work["qid"] = llm_work.apply(
+            lambda r: pair_map.get((r["pid"], r["key_pass"]), ""),
+            axis=1,
+        )
         matched_pairs = (llm_work["qid"] != "").sum()
         print(f"[LLM ] qid matched by (pid,passage_eng): {matched_pairs:,} / {len(llm_work):,}")
         if ALLOW_PID_ONLY_FALLBACK:
@@ -270,15 +243,23 @@ def load_llm(nist_pid_qids: pd.DataFrame, pair_map: Dict[Tuple[str, str], str]) 
                 fb = llm_work.loc[need, ["pid", "LLM"]].merge(nist_pid_qids, on="pid", how="inner")
                 fb = fb.rename(columns={"qid": "qid_fb"})
                 llm_work = llm_work.merge(fb[["pid", "qid_fb"]], on="pid", how="left")
-                llm_work["qid"] = llm_work["qid"].where(llm_work["qid"] != "", llm_work["qid_fb"].fillna(""))
+                llm_work["qid"] = llm_work["qid"].where(
+                    llm_work["qid"] != "",
+                    llm_work["qid_fb"].fillna(""),
+                )
                 llm_work.drop(columns=["qid_fb"], inplace=True)
                 resolved_after_fb = (llm_work["qid"] != "").sum()
                 print(f"[LLM ] after pid-only fallback, qid resolved: {resolved_after_fb:,}")
 
     return llm_work, unparsable, total_rows, QID_FROM_LLM, llm_raw
 
-def write_unresolved_if_needed(llm_work: pd.DataFrame, llm_raw: pd.DataFrame,
-                               pcol_original: str, ptext_col_original: str) -> pd.DataFrame:
+
+def write_unresolved_if_needed(
+    llm_work: pd.DataFrame,
+    llm_raw: pd.DataFrame,
+    pcol_original: str,
+    ptext_col_original: str,
+) -> pd.DataFrame:
     """For the mapping path, write rows that still have no qid."""
     if "key_pass" not in llm_work.columns:
         return pd.DataFrame()
@@ -300,57 +281,53 @@ def write_unresolved_if_needed(llm_work: pd.DataFrame, llm_raw: pd.DataFrame,
     print(f"[LLM ] wrote rows with unresolved qid to: {OUT_UNRESOLVED}  (rows={len(unresolved):,})")
     return unresolved
 
+
 def load_topics_full() -> pd.DataFrame:
-    """Load all topic CSVs and normalise to fields we need for the 'missing' output format.
-
-    Simplified rules:
-      - LANG == "raw": use 'query' and 'passage'
-      - otherwise: use f'query_{LANG}' and 'passage_injected'
     """
-    if LANG == "raw":
-        query_col_out = "query"
-        passage_col_out = "passage"
-    else:
-        query_col_out = f"query_{LANG}"
-        passage_col_out = "passage_injected"
+    Load all topics and normalise to language-driven fields.
 
+    - LANG == "raw": qid, pid_resolved, query, passage
+    - otherwise:     qid, pid_resolved, query_<LANG>, passage_injected
+    """
     topic_files = sorted(TOPICS_DIR.glob(TOPICS_GLOB))
     parts = []
+
     for fp in topic_files:
         df_t = read_csv_smart(fp)
 
-        qid_col  = pick_col(df_t, ["qid", "topic_id"])
-        pidr_col = pick_col(df_t, ["pid_resolved", "pid_qrels", "docid"])
-        q_col    = pick_col(df_t, [query_col_out])
-        p_col    = pick_col(df_t, [passage_col_out])
+        # If the file doesn't match the expected schema for this LANG, skip it.
+        needed = {"qid", TOPIC_PID_COL, TOPIC_QUERY_COL, TOPIC_PASSAGE_COL}
+        if not needed.issubset(df_t.columns):
+            # small tolerance: we at least need qid and pid
+            if not {"qid", TOPIC_PID_COL}.issubset(df_t.columns):
+                continue
 
         keep: Dict[str, pd.Series] = {}
-        if qid_col:
-            keep["qid"] = df_t[qid_col].astype(str).str.strip()
-        if pidr_col:
-            keep["pid_resolved"] = df_t[pidr_col].astype(str).str.strip()
-        if q_col:
-            keep[query_col_out] = df_t[q_col]
-        if p_col:
-            keep[passage_col_out] = df_t[p_col]
+        keep["qid"] = df_t["qid"].astype(str).str.strip()
+        keep["pid_resolved"] = df_t[TOPIC_PID_COL].astype(str).str.strip()
 
-        if keep:
-            parts.append(pd.DataFrame(keep))
+        if TOPIC_QUERY_COL in df_t.columns:
+            keep[TOPIC_QUERY_COL] = df_t[TOPIC_QUERY_COL]
+        if TOPIC_PASSAGE_COL in df_t.columns:
+            keep[TOPIC_PASSAGE_COL] = df_t[TOPIC_PASSAGE_COL]
+
+        parts.append(pd.DataFrame(keep))
 
     if not parts:
-        return pd.DataFrame(columns=[
-            "qid",
-            "pid_resolved",
-            "pid_qrels",
-            query_col_out,
-            passage_col_out,
-        ])
+        # empty frame with expected columns for this LANG
+        if LANG == "raw":
+            return pd.DataFrame(
+                columns=["qid", "pid_resolved", "pid_qrels", "query", "passage"]
+            )
+        else:
+            return pd.DataFrame(
+                columns=["qid", "pid_resolved", "pid_qrels", f"query_{LANG}", "passage_injected"]
+            )
 
     topics_full = pd.concat(parts, ignore_index=True)
     topics_full["pid_qrels"] = topics_full.get("pid_resolved", "").astype(str)
     topics_full = topics_full.drop_duplicates(subset=["qid", "pid_resolved"], keep="first")
     return topics_full
-
 
 def main():
     # 1) Load NIST
@@ -395,7 +372,7 @@ def main():
     # 7a) load topics for reconstructing missing rows in full format
     topics_full = load_topics_full()
 
-    # 7b) NIST rows that did NOT get LLM → output in your format
+    # 7b) NIST rows that did NOT get LLM → output in language-specific format
     nist_with_llm = nist.merge(
         llm_work[["qid", "pid", "LLM"]],
         on=["qid", "pid"],
@@ -413,39 +390,30 @@ def main():
             how="left",
         )
 
-        out_df = pd.DataFrame()
-        out_df["qid"]  = miss_joined["qid"]
-        out_df["query"] = miss_joined.get("query", "")
-
-        # pid_qrels prefer topic's, else NIST pid
-        out_df["pid_qrels"] = miss_joined.get("pid_qrels", miss_joined["pid"]).fillna(miss_joined["pid"])
-        out_df["pid_resolved"] = miss_joined.get("pid_resolved", miss_joined["pid"]).fillna(miss_joined["pid"])
-
-        # passage: use injected if we have it
-        out_df["passage"] = miss_joined.get("passage_injected", "")
-
-        # relevance is NIST
-        out_df["relevance"] = miss_joined["NIST"]
-
-        # query_vi if present
-        out_df["query_vi"] = miss_joined.get("query_vi", "")
-
-        # passage_injected as-is
-        out_df["passage_injected"] = miss_joined.get("passage_injected", "")
-
-        # enforce column order
-        out_df = out_df[
-            [
-                "qid",
-                "query",
-                "pid_qrels",
-                "pid_resolved",
-                "passage",
-                "relevance",
-                "query_vi",
-                "passage_injected",
+        if LANG == "raw":
+            out_df = pd.DataFrame()
+            out_df["qid"] = miss_joined["qid"]
+            out_df["query"] = miss_joined.get("query", "")
+            out_df["pid_qrels"] = miss_joined.get("pid_qrels", miss_joined["pid"]).fillna(miss_joined["pid"])
+            out_df["pid_resolved"] = miss_joined.get("pid_resolved", miss_joined["pid"]).fillna(miss_joined["pid"])
+            out_df["passage"] = miss_joined.get("passage", "")
+            out_df["relevance"] = miss_joined["NIST"]
+            # enforce column order
+            out_df = out_df[
+                ["qid", "query", "pid_qrels", "pid_resolved", "passage", "relevance"]
             ]
-        ]
+        else:
+            lang_qcol = f"query_{LANG}"
+            out_df = pd.DataFrame()
+            out_df["qid"] = miss_joined["qid"]
+            out_df[lang_qcol] = miss_joined.get(lang_qcol, "")
+            out_df["pid_qrels"] = miss_joined.get("pid_qrels", miss_joined["pid"]).fillna(miss_joined["pid"])
+            out_df["pid_resolved"] = miss_joined.get("pid_resolved", miss_joined["pid"]).fillna(miss_joined["pid"])
+            out_df["passage_injected"] = miss_joined.get("passage_injected", "")
+            out_df["relevance"] = miss_joined["NIST"]
+            out_df = out_df[
+                ["qid", lang_qcol, "pid_qrels", "pid_resolved", "passage_injected", "relevance"]
+            ]
 
         OUT_DIR.mkdir(parents=True, exist_ok=True)
         out_df.to_csv(OUT_NIST_MISSING, index=False, encoding="utf-8")
@@ -453,7 +421,7 @@ def main():
         print(f"[DIAG] Saved to: {OUT_NIST_MISSING}")
 
         # chunked
-        _write_chunked_csv(out_df, OUT_DIR / "missing_nist", "nist_not_joined", 500)
+        write_chunked_csv(out_df, OUT_DIR / "missing_nist", "nist_not_joined", 500)
     else:
         print("[DIAG] All NIST rows had a matching LLM label.")
 
@@ -468,7 +436,7 @@ def main():
     if len(llm_extra):
         llm_extra.to_csv(OUT_LLM_EXTRA, index=False, encoding="utf-8")
         print(f"[DIAG] LLM rows with NO matching NIST judgment: {len(llm_extra):,}")
-        _write_chunked_csv(llm_extra, OUT_DIR / "missing_llm", "llm_not_in_nist", 500)
+        write_chunked_csv(llm_extra, OUT_DIR / "missing_llm", "llm_not_in_nist", 500)
     else:
         print("[DIAG] All LLM rows had a matching NIST judgment.")
 
@@ -476,7 +444,7 @@ def main():
     cm = pd.crosstab(
         index=pd.Categorical(paired["NIST"], categories=LABELS, ordered=True),
         columns=pd.Categorical(paired["LLM"],  categories=LABELS, ordered=True),
-        dropna=False
+        dropna=False,
     )
     cm.index.name = "NIST"
     cm.columns.name = "LLM"
@@ -493,7 +461,7 @@ def main():
     cm_bin = pd.crosstab(
         index=pd.Categorical(paired["NIST_bin"], categories=[0, 1], ordered=True),
         columns=pd.Categorical(paired["LLM_bin"],  categories=[0, 1], ordered=True),
-        dropna=False
+        dropna=False,
     )
     cm_bin.index.name = "NIST_bin"
     cm_bin.columns.name = "LLM_bin"

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # ====== Load the CSV ======
-LANG = "vi"  # Change as needed: "raw", "vi", "fr", ...
+LANG = "raw"  # Change as needed: "raw", "vi", "fr", ...
 YEAR = "2023"
 df = pd.read_csv (f"outputs/baseline/{YEAR}/{LANG}/confusion_matrix_llm_vs_nist_pct.csv", index_col=0)
 
