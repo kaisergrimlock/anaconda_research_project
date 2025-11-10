@@ -65,12 +65,12 @@ PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 LANG          = "ru"   # "raw", "vi", "fr", ...
-START_PART    = 47
-END_PART      = 47
+START_PART    = 46
+END_PART      = 46
 TREC_DL_YEAR  = "2023"
 
 # >>> Set mode here: "replace" or "append"
-MODE          = "replace"   # change to "append" to only add new keys
+MODE          = "append"   # change to "append" to only add new keys
 
 # Where the part files live & their filename pattern
 if LANG == "raw":
