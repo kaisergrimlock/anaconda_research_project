@@ -58,16 +58,19 @@ cfg = Config(
 )
 
 # ----------------------------
-# Configurable Paths
+# Configurable Defaults
 # ----------------------------
 PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 LANG          = "ru"   # "raw", "vi", "fr", ...
-START_PART    = 40
-END_PART      = 45
+START_PART    = 47
+END_PART      = 47
 TREC_DL_YEAR  = "2023"
+
+# >>> Set mode here: "replace" or "append"
+MODE          = "replace"   # change to "append" to only add new keys
 
 # Where the part files live & their filename pattern
 if LANG == "raw":
@@ -177,13 +180,27 @@ def _write_ordered_map_to_csv(path: Path, header: List[str], od: "OrderedDict[Tu
             w.writerow(row)
     tmp.replace(path)
 
-def upsert_row_csv(path: Path, header: List[str], key_cols: Tuple[str, str, str], new_row: List[str]) -> None:
+def upsert_row_csv(
+    path: Path,
+    header: List[str],
+    key_cols: Tuple[str, str, str],
+    new_row: List[str],
+    mode: str = "replace",
+) -> None:
+    """
+    replace: overwrite existing key with new_row
+    append:  keep existing row for key; only add if key not present
+    """
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header)
+
     od = _read_csv_as_ordered_map(path, header, key_cols)
     k  = _row_key_from_list(new_row, header, key_cols)
-    od[k] = new_row  # upsert
+
+    if mode == "append" and k in od:
+        return  # keep existing
+    od[k] = new_row
     _write_ordered_map_to_csv(path, header, od)
 
 # ----------------------------
@@ -228,6 +245,7 @@ def _label_single_part_file_blocking(
     per_file_out_dir: Path,
     logs_dir: Path,
     stop_event: Optional[asyncio.Event] = None,
+    mode: str = "replace",
 ) -> dict:
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
@@ -247,6 +265,14 @@ def _label_single_part_file_blocking(
     header_out = output_header_from_input(header_in)
 
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
+
+    # In replace mode, rebuild per-file labels afresh
+    if mode == "replace" and labels_path.exists():
+        try:
+            labels_path.unlink()
+        except Exception as e:
+            print(f"[WARN] Could not remove existing labels file {labels_path}: {e}")
+
     ensure_csv_with_header(labels_path, header_out)
 
     bedrock = boto3.client("bedrock-runtime", config=cfg)
@@ -305,7 +331,8 @@ def _label_single_part_file_blocking(
             labels_path,
             header_out,
             KEY_COLS,
-            row_out
+            row_out,
+            mode=mode,
         )
 
         logs.append({
@@ -354,49 +381,85 @@ async def label_single_part_file(
     per_file_out_dir: Path,
     logs_dir: Path,
     stop_event: asyncio.Event,
+    mode: str = "replace",
 ) -> dict:
     return await asyncio.to_thread(
         _label_single_part_file_blocking,
-        part_csv, model_id, prompt_template, run_id, per_file_out_dir, logs_dir, stop_event
+        part_csv, model_id, prompt_template, run_id, per_file_out_dir, logs_dir, stop_event, mode
     )
 
 # ----------------------------
 # Combine per-file labels
 # ----------------------------
-def merge_labels(per_file_labels: List[str], combined_out: Path, header_out: List[str], stop_event: Optional[asyncio.Event] = None):
+def merge_labels(
+    per_file_labels: List[str],
+    combined_out: Path,
+    header_out: List[str],
+    stop_event: Optional[asyncio.Event] = None,
+    mode: str = "replace",  # "replace"=upsert, "append"=insert-only
+):
+    """
+    replace: upsert into combined_out (overwrite existing rows with the same KEY_COLS)
+    append:  insert-only (keep existing rows; only add keys that don't exist yet)
+    """
+    # Ensure file exists with header (does nothing if present)
     ensure_csv_with_header(combined_out, header_out)
 
-    od = _read_csv_as_ordered_map(combined_out, header_out, KEY_COLS)
+    # 1) Load existing combined file (if any)
+    od: "OrderedDict[Tuple[str,str,str], List[str]]" = _read_csv_as_ordered_map(
+        combined_out, header_out, KEY_COLS
+    )
 
-    appended_or_updated = 0
+    appended = 0
+    updated  = 0
+
+    # 2) Merge each per-file output
     for path_str in per_file_labels:
         if stop_event is not None and stop_event.is_set():
             print("[STOP] Merge halted early by user.")
             break
+
         p = Path(path_str)
         if not p.exists():
             print(f"[WARN] Missing per-file labels for merge: {p}")
             continue
+
         with p.open("r", encoding="utf-8", newline="") as in_f:
             reader = csv.reader(in_f)
             in_header = next(reader, None)
             if in_header and in_header != header_out:
-                print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {in_header}\n  exp: {header_out}")
+                print(
+                    f"[FATAL] Inconsistent header in {p.name}.\n"
+                    f"  got: {in_header}\n  exp: {header_out}"
+                )
                 sys.exit(4)
+
             for row in reader:
                 if not row:
                     continue
                 k = _row_key_from_list(row, header_out, KEY_COLS)
-                od[k] = row
-                appended_or_updated += 1
 
+                if mode == "append":
+                    # insert-only: keep existing rows
+                    if k not in od:
+                        od[k] = row
+                        appended += 1
+                else:
+                    # "replace" (upsert): overwrite if exists, otherwise add
+                    if k in od:
+                        updated += 1
+                    else:
+                        appended += 1
+                    od[k] = row
+
+    # 3) Write merged map back
     _write_ordered_map_to_csv(combined_out, header_out, od)
-    print(f"[MERGE] Upserted {appended_or_updated} rows into: {combined_out}")
+    print(f"[MERGE] mode={mode} | appended={appended} updated={updated} total={len(od)} -> {combined_out}")
 
 # ----------------------------
 # Orchestration
 # ----------------------------
-async def run_for_model(model_id: str, stop_event: asyncio.Event):
+async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
 
     short = model_short_name(model_id)
@@ -418,7 +481,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
         return
 
     run_id = timestamp_id()
-    print(f"\n--- Running inference for model: {model_id} (run_id={run_id}, LANG={LANG}) ---")
+    print(f"\n--- Running inference for model: {model_id} (run_id={run_id}, LANG={LANG}, mode={mode}) ---")
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
     per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
@@ -434,7 +497,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
             if stop_event.is_set():
                 return None
             return await label_single_part_file(
-                part_csv, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
+                part_csv, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event, mode
             )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
@@ -459,7 +522,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
         header_out = list(next(iter(header_out_set)))
 
         per_file_labels = [r["labels_csv"] for r in results]
-        await asyncio.to_thread(merge_labels, per_file_labels, output_file, header_out, stop_event)
+        await asyncio.to_thread(merge_labels, per_file_labels, output_file, header_out, stop_event, mode)
 
     total_in  = sum(r["input_tokens"]  for r in results)
     total_out = sum(r["output_tokens"] for r in results)
@@ -503,7 +566,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event):
         print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
 
 # ----------------------------
-# entry point
+# entry point (no argparse; uses MODE variable)
 # ----------------------------
 async def main():
     loop = asyncio.get_running_loop()
@@ -515,7 +578,7 @@ async def main():
             if stop_event.is_set():
                 print("[STOP] Skipping remaining models.")
                 break
-            await run_for_model(model_id, stop_event)
+            await run_for_model(model_id, stop_event, MODE)
     finally:
         stop_event.set()
         try:
