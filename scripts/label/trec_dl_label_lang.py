@@ -65,12 +65,14 @@ PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 LANG          = "ru"   # "raw", "vi", "fr", ...
-START_PART    = 47
-END_PART      = 47
+START_PART    = 46
+END_PART      = 46
 TREC_DL_YEAR  = "2023"
 
 # >>> Set mode here: "replace" or "append"
-MODE          = "append"   # change to "append" to only add new keys
+# append  = add rows to the *combined* file (duplicates allowed)
+# replace = overwrite rows in the *combined* file only if the key already exists (do NOT add new keys)
+MODE          = "replace"
 
 # Where the part files live & their filename pattern
 if LANG == "raw":
@@ -92,11 +94,11 @@ INFERENCE_CONFIG = {
     "topP": 1.0,
 }
 
-# Upsert/Merge identity
+# Upsert/Merge identity (must exist in header_out)
 KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
 
 # ----------------------------
-# Small utilities that are still local
+# Small utilities (local)
 # ----------------------------
 def iter_part_files(start_part: int, end_part: int):
     for n in range(start_part, end_part + 1):
@@ -180,28 +182,13 @@ def _write_ordered_map_to_csv(path: Path, header: List[str], od: "OrderedDict[Tu
             w.writerow(row)
     tmp.replace(path)
 
-def upsert_row_csv(
-    path: Path,
-    header: List[str],
-    key_cols: Tuple[str, str, str],
-    new_row: List[str],
-    mode: str = "replace",
-) -> None:
-    """
-    replace: overwrite existing key with new_row
-    append:  keep existing row for key; only add if key not present
-    """
+def append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
+    """Always append a row (blind append; duplicates allowed)."""
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header)
-
-    od = _read_csv_as_ordered_map(path, header, key_cols)
-    k  = _row_key_from_list(new_row, header, key_cols)
-
-    if mode == "append" and k in od:
-        return  # keep existing
-    od[k] = new_row
-    _write_ordered_map_to_csv(path, header, od)
+    with path.open("a", encoding="utf-8", newline="") as f:
+        csv.writer(f).writerow(new_row)
 
 # ----------------------------
 # Stop key listener (press Q to stop)
@@ -247,6 +234,10 @@ def _label_single_part_file_blocking(
     stop_event: Optional[asyncio.Event] = None,
     mode: str = "replace",
 ) -> dict:
+    """
+    NOTE: Per-run per-file temp outputs ALWAYS append (collect everything produced this run).
+    'replace' vs 'append' semantics are applied ONLY when merging into the combined file.
+    """
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
@@ -265,15 +256,7 @@ def _label_single_part_file_blocking(
     header_out = output_header_from_input(header_in)
 
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
-
-    # In replace mode, rebuild per-file labels afresh
-    if mode == "replace" and labels_path.exists():
-        try:
-            labels_path.unlink()
-        except Exception as e:
-            print(f"[WARN] Could not remove existing labels file {labels_path}: {e}")
-
-    ensure_csv_with_header(labels_path, header_out)
+    ensure_csv_with_header(labels_path, header_out)  # create if missing; validate header if exists
 
     bedrock = boto3.client("bedrock-runtime", config=cfg)
 
@@ -327,13 +310,9 @@ def _label_single_part_file_blocking(
             print(f"[ERROR] {part_csv.name}: API failed on qid={qid}, pid_resolved={pr} (row {idx}) :: {api_err}")
 
         row_out = [row_out_map.get(col, "") for col in header_in] + [score]
-        upsert_row_csv(
-            labels_path,
-            header_out,
-            KEY_COLS,
-            row_out,
-            mode=mode,
-        )
+
+        # Per-run temp files always collect rows (duplicates allowed)
+        append_row_csv(labels_path, header_out, row_out)
 
         logs.append({
             "qid": qid,
@@ -399,19 +378,18 @@ def merge_labels(
     mode: str = "replace",
 ):
     """
-    replace: rebuild combined strictly from this run’s per-file outputs (ignore existing combined file)
-    append:  directly append all rows from per-file outputs to combined (no dedupe, no key checks)
+    append : open combined_out and append rows from per-file outputs (no rebuild, no dedupe).
+    replace: open combined_out, overwrite ONLY rows whose keys already exist; do NOT add new keys.
     """
     combined_out.parent.mkdir(parents=True, exist_ok=True)
 
-    # Ensure combined has header
+    # Ensure combined has header (create if missing)
     if not combined_out.exists():
         with combined_out.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header_out)
 
     if mode == "append":
         appended = 0
-        # Open once and stream-append all rows, skipping per-file headers
         with combined_out.open("a", encoding="utf-8", newline="") as fout:
             w = csv.writer(fout)
             for path_str in per_file_labels:
@@ -425,7 +403,6 @@ def merge_labels(
                 with p.open("r", encoding="utf-8", newline="") as fin:
                     r = csv.reader(fin)
                     file_header = next(r, None)
-                    # Optional sanity check: require header match to avoid column drift
                     if file_header and file_header != header_out:
                         print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {file_header}\n  exp: {header_out}")
                         sys.exit(4)
@@ -437,16 +414,34 @@ def merge_labels(
         print(f"[MERGE] mode=append | appended={appended} -> {combined_out}")
         return
 
-    # --- replace mode (rebuild from scratch) ---
+    # -------- replace mode: overwrite existing keys only; preserve all other rows --------
     from collections import OrderedDict
+    KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
+
     def _row_key_from_list(row: List[str], header: List[str], key_cols: Tuple[str, str, str]) -> Tuple[str, str, str]:
         idx = [header.index(c) for c in key_cols]
         return tuple(row[i] for i in idx)  # type: ignore[return-value]
 
-    KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
-    od: "OrderedDict[Tuple[str,str,str], List[str]]" = OrderedDict()
-    added = 0
+    # 1) Load current combined preserving order
+    combined_rows: "OrderedDict[Tuple[str, str, str], List[str]]" = OrderedDict()
+    with combined_out.open("r", encoding="utf-8", newline="") as fin:
+        r = csv.reader(fin)
+        file_header = next(r, None)
+        if file_header and file_header != header_out:
+            print(f"[FATAL] Inconsistent header in combined file.\n  got: {file_header}\n  exp: {header_out}")
+            sys.exit(4)
+        for row in r:
+            if not row:
+                continue
+            k = _row_key_from_list(row, header_out, KEY_COLS)
+            combined_rows[k] = row
 
+    if not combined_rows:
+        print("[MERGE] mode=replace | combined is empty; nothing to overwrite.")
+        return
+
+    # 2) Collect replacements for existing keys only
+    replacements: Dict[Tuple[str, str, str], List[str]] = {}
     for path_str in per_file_labels:
         if stop_event is not None and stop_event.is_set():
             print("[STOP] Merge halted early by user.")
@@ -465,18 +460,24 @@ def merge_labels(
                 if not row:
                     continue
                 k = _row_key_from_list(row, header_out, KEY_COLS)
-                od[k] = row
-                added += 1
+                if k in combined_rows:      # only stage if key already exists
+                    replacements[k] = row
 
-    # overwrite combined with rebuilt contents
+    # 3) Apply replacements, preserving order
+    replaced = 0
+    for k, row in replacements.items():
+        combined_rows[k] = row
+        replaced += 1
+
+    # 4) Write back atomically
     tmp = combined_out.with_suffix(combined_out.suffix + ".tmp")
     with tmp.open("w", encoding="utf-8", newline="") as fout:
         w = csv.writer(fout)
         w.writerow(header_out)
-        for row in od.values():
+        for row in combined_rows.values():
             w.writerow(row)
     tmp.replace(combined_out)
-    print(f"[MERGE] mode=replace | rows={added} -> {combined_out}")
+    print(f"[MERGE] mode=replace | replaced={replaced} kept={len(combined_rows)-replaced} total={len(combined_rows)} -> {combined_out}")
 
 # ----------------------------
 # Orchestration
@@ -504,7 +505,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 
     run_id = timestamp_id()
     print(f"\n--- Running inference for model: {model_id} (run_id={run_id}, LANG={LANG}, mode={mode}) ---")
-    print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
+    print("[STOP] Press 'Q' at any time to stop after the current in-flight items].")
 
     per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
