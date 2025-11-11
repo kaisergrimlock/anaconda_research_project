@@ -65,8 +65,8 @@ PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")  # csv with columns: llm,input,output
 
 LANG          = "ru"   # "raw", "vi", "fr", ...
-START_PART    = 46
-END_PART      = 46
+START_PART    = 47
+END_PART      = 47
 TREC_DL_YEAR  = "2023"
 
 # >>> Set mode here: "replace" or "append"
@@ -396,65 +396,87 @@ def merge_labels(
     combined_out: Path,
     header_out: List[str],
     stop_event: Optional[asyncio.Event] = None,
-    mode: str = "replace",  # "replace"=upsert, "append"=insert-only
+    mode: str = "replace",
 ):
     """
-    replace: upsert into combined_out (overwrite existing rows with the same KEY_COLS)
-    append:  insert-only (keep existing rows; only add keys that don't exist yet)
+    replace: rebuild combined strictly from this run’s per-file outputs (ignore existing combined file)
+    append:  directly append all rows from per-file outputs to combined (no dedupe, no key checks)
     """
-    # Ensure file exists with header (does nothing if present)
-    ensure_csv_with_header(combined_out, header_out)
+    combined_out.parent.mkdir(parents=True, exist_ok=True)
 
-    # 1) Load existing combined file (if any)
-    od: "OrderedDict[Tuple[str,str,str], List[str]]" = _read_csv_as_ordered_map(
-        combined_out, header_out, KEY_COLS
-    )
+    # Ensure combined has header
+    if not combined_out.exists():
+        with combined_out.open("w", encoding="utf-8", newline="") as f:
+            csv.writer(f).writerow(header_out)
 
-    appended = 0
-    updated  = 0
+    if mode == "append":
+        appended = 0
+        # Open once and stream-append all rows, skipping per-file headers
+        with combined_out.open("a", encoding="utf-8", newline="") as fout:
+            w = csv.writer(fout)
+            for path_str in per_file_labels:
+                if stop_event is not None and stop_event.is_set():
+                    print("[STOP] Merge halted early by user.")
+                    break
+                p = Path(path_str)
+                if not p.exists():
+                    print(f"[WARN] Missing per-file labels for merge: {p}")
+                    continue
+                with p.open("r", encoding="utf-8", newline="") as fin:
+                    r = csv.reader(fin)
+                    file_header = next(r, None)
+                    # Optional sanity check: require header match to avoid column drift
+                    if file_header and file_header != header_out:
+                        print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {file_header}\n  exp: {header_out}")
+                        sys.exit(4)
+                    for row in r:
+                        if not row:
+                            continue
+                        w.writerow(row)
+                        appended += 1
+        print(f"[MERGE] mode=append | appended={appended} -> {combined_out}")
+        return
 
-    # 2) Merge each per-file output
+    # --- replace mode (rebuild from scratch) ---
+    from collections import OrderedDict
+    def _row_key_from_list(row: List[str], header: List[str], key_cols: Tuple[str, str, str]) -> Tuple[str, str, str]:
+        idx = [header.index(c) for c in key_cols]
+        return tuple(row[i] for i in idx)  # type: ignore[return-value]
+
+    KEY_COLS: Tuple[str, str, str] = ("pid_qrels", "pid_resolved", "passage")
+    od: "OrderedDict[Tuple[str,str,str], List[str]]" = OrderedDict()
+    added = 0
+
     for path_str in per_file_labels:
         if stop_event is not None and stop_event.is_set():
             print("[STOP] Merge halted early by user.")
             break
-
         p = Path(path_str)
         if not p.exists():
             print(f"[WARN] Missing per-file labels for merge: {p}")
             continue
-
-        with p.open("r", encoding="utf-8", newline="") as in_f:
-            reader = csv.reader(in_f)
-            in_header = next(reader, None)
-            if in_header and in_header != header_out:
-                print(
-                    f"[FATAL] Inconsistent header in {p.name}.\n"
-                    f"  got: {in_header}\n  exp: {header_out}"
-                )
+        with p.open("r", encoding="utf-8", newline="") as fin:
+            r = csv.reader(fin)
+            file_header = next(r, None)
+            if file_header and file_header != header_out:
+                print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {file_header}\n  exp: {header_out}")
                 sys.exit(4)
-
-            for row in reader:
+            for row in r:
                 if not row:
                     continue
                 k = _row_key_from_list(row, header_out, KEY_COLS)
+                od[k] = row
+                added += 1
 
-                if mode == "append":
-                    # insert-only: keep existing rows
-                    if k not in od:
-                        od[k] = row
-                        appended += 1
-                else:
-                    # "replace" (upsert): overwrite if exists, otherwise add
-                    if k in od:
-                        updated += 1
-                    else:
-                        appended += 1
-                    od[k] = row
-
-    # 3) Write merged map back
-    _write_ordered_map_to_csv(combined_out, header_out, od)
-    print(f"[MERGE] mode={mode} | appended={appended} updated={updated} total={len(od)} -> {combined_out}")
+    # overwrite combined with rebuilt contents
+    tmp = combined_out.with_suffix(combined_out.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8", newline="") as fout:
+        w = csv.writer(fout)
+        w.writerow(header_out)
+        for row in od.values():
+            w.writerow(row)
+    tmp.replace(combined_out)
+    print(f"[MERGE] mode=replace | rows={added} -> {combined_out}")
 
 # ----------------------------
 # Orchestration
