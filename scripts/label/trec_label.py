@@ -34,7 +34,6 @@ from scripts.log_helpers import (
 from writer_csv import write_combined
 
 # ===== config =====
-bump_field_limit()
 cfg = Config(region_name="us-west-2", connect_timeout=10, read_timeout=300, retries={"max_attempts": 8, "mode": "standard"})
 
 PROMPT_NAME   = "utility"
@@ -56,8 +55,11 @@ PART_PATTERN  = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
-def iter_part_files(a: int, b: int):
-    for n in range(a, b + 1):
+# ===== functions =====
+bump_field_limit() #Allow large fields to accomodate passages
+
+def iter_part_files(start: int, end: int):
+    for n in range(start, end + 1):
         p = PART_DIR / PART_PATTERN.format(n=n)
         if p.exists(): yield p
         else: print(f"[WARN] Missing file: {p}")
