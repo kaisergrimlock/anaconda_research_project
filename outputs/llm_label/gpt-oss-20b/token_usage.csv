@@ -116,3 +116,12 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20251111_230716,2025-11-11T23:07:32,openai.gpt-oss-20b-1:0,8,40980,842,41822,0.003121,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_ru.csv,logs\gpt-oss-20b\20251111_230716_llm_logs_index_openai.gpt-oss-20b-1_0_ru.json
 20251111_232149,2025-11-11T23:22:55,openai.gpt-oss-20b-1:0,8,163164,3226,166390,0.012389,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_ru.csv,(see logs index)
 20251111_232734,2025-11-11T23:29:05,openai.gpt-oss-20b-1:0,8,163164,3237,166401,0.012393,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_ru.csv,(see logs index)
+20251112_113621,2025-11-12T12:05:58,openai.gpt-oss-20b-1:0,4500,3990028,1453079,5443107,0.715226,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_124254,2025-11-12T12:54:21,openai.gpt-oss-20b-1:0,500,237668,157250,394918,0.063812,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_132129,2025-11-12T13:47:41,openai.gpt-oss-20b-1:0,4000,3752360,1289330,5041690,0.649464,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_143821,2025-11-12T15:03:43,openai.gpt-oss-20b-1:0,5000,3182030,1594743,4776773,0.701165,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_150418,2025-11-12T15:29:13,openai.gpt-oss-20b-1:0,5000,3751192,1612185,5363377,0.746239,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_152940,2025-11-12T15:55:37,openai.gpt-oss-20b-1:0,5000,3017721,1579733,4597454,0.685160,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_160530,2025-11-12T16:28:34,openai.gpt-oss-20b-1:0,5000,3017721,1592470,4610191,0.688981,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_163205,2025-11-12T16:44:49,openai.gpt-oss-20b-1:0,2827,2499876,908703,3408579,0.447602,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_fr.csv,(see logs index)
+20251112_180238,2025-11-12T18:05:41,openai.gpt-oss-20b-1:0,60,1613029,19042,1632071,0.118625,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_ru.csv,(see logs index)

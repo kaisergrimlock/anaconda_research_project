@@ -45,7 +45,7 @@ LANG          = "ru"       # "raw", "vi", ...
 START_PART    = 46
 END_PART      = 46
 TREC_DL_YEAR  = "2023"
-MODE          = "replace"  # "append" or "replace"
+MODE          = "append"  # "append" or "replace"
 
 if LANG == "raw":
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
