@@ -40,9 +40,9 @@ PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")
 
-LANG          = "ru"       # "raw", "vi", ...
-START_PART    = 46
-END_PART      = 46
+LANG          = "fr"       # "raw", "vi", ...
+START_PART    = 47
+END_PART      = 47
 TREC_DL_YEAR  = "2023"
 MODE          = "append"  # "append" or "replace"
 
@@ -271,7 +271,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
-    # >>> DIRECT CALL to writer (no manifest) <<<
+    # write combined CSV
     combined_path = write_combined(
         per_file_labels=per_file_labels,
         header_out=header_out,

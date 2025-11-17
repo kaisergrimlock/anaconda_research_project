@@ -144,15 +144,23 @@ def build_missing_and_extras(
         )
 
         out = pd.DataFrame(index=miss_joined.index)
-        out["query"]          = miss_joined["query"]
+        lang_col = f"query_{lang}"
+        out["qid"] = miss_joined["qid"]
+
+        if "query" in miss_joined.columns and "passage" in miss_joined.columns and lang_col in miss_joined.columns and "passage_injected" in miss_joined.columns:
+            out["query"] = miss_joined["query"]
+            out["passage"] = miss_joined["passage"]
+            out [lang_col] = miss_joined[lang_col]
+            out["passage_injected"] = miss_joined["passage_injected"]
+        else:
+            out["query"] = miss_joined["query_x"]
+            out["passage"] = miss_joined["passage_x"]
+            out [lang_col] = miss_joined["query_x"]
+            out["passage_injected"] = miss_joined["passage_x"]
+
         out["pid_qrels"]      = miss_joined["pid_qrels"]
         out["pid_resolved"]   = miss_joined["pid_resolved"]
-        out["passage"]        = miss_joined["passage"]
         out["relevance"]      = miss_joined["NIST"]
-
-        lang_col = f"query_{lang}"
-        out[lang_col]         = miss_joined[lang_col]
-        out["passage_injected"] = miss_joined["passage_injected"]
 
         # enforce schema/order (with dynamic language column)
         missing_out = _ensure_schema(out, lang)
