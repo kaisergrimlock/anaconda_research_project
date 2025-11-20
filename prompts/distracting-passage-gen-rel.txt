@@ -1,0 +1,5 @@
+"{query}"
+You are writing informative text
+Given the above query, create passage discussing a topic highly related to the question, but that does not contain the answer. 
+Limit your answer to a single paragraph.
+E.g., for “When was Abraham Lincoln born?”, the reply should be akin to “Robert Todd Lincoln, the eldest son of President Abraham Lincoln, was born August 1, 1843.”. 

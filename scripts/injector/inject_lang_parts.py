@@ -13,13 +13,13 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "th"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "en"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1            # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
 TRECDL_YEAR = "2023"        # for folder naming only
 
-INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")            # read these CSVs
+INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/nr")            # read these CSVs
 OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}/")    # write mirrored CSVs
 
 # Cache map to avoid re-translation later runs
@@ -190,7 +190,10 @@ def process_file(in_path: Path, out_path: Path, qmap: Dict[str, str]) -> None:
 
             row[col_query_lang] = q_t
             row[col_injected]   = p_inj
-            writer.writerow(row)
+
+            # Ensure all keys in row are valid and not None
+            valid_row = {k: v for k, v in row.items() if k in fieldnames and v is not None}
+            writer.writerow(valid_row)
 
 def parse_args():
     ap = argparse.ArgumentParser(description="Inject translated queries into passages; reuse existing translation maps if available.")
