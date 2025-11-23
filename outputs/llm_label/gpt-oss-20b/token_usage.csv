@@ -151,3 +151,5 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20251120_194318,2025-11-20T19:45:16,openai.gpt-oss-20b-1:0,20,9125,8696,17821,0.003248,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_leet.csv,(see logs index)
 20251120_204239,2025-11-20T20:44:28,openai.gpt-oss-20b-1:0,20,8736,6430,15166,0.002541,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_leet.csv,(see logs index)
 20251120_204726,2025-11-20T20:49:12,openai.gpt-oss-20b-1:0,20,8736,6855,15591,0.002668,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_leet.csv,(see logs index)
+20251121_110017,2025-11-21T11:00:59,openai.gpt-oss-20b-1:0,446,0,0,0,0.000000,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_art.csv,(see logs index)
+20251121_110209,2025-11-21T11:03:05,openai.gpt-oss-20b-1:0,446,15717,5080,20797,0.002624,outputs\llm_label\gpt-oss-20b\gpt-oss-20b_trec_dl_2023_art.csv,(see logs index)

@@ -1,3 +1,4 @@
+from pyfiglet import Figlet
 #!/usr/bin/env python3
 import csv
 import random
@@ -12,14 +13,14 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 SEED = 42                   # set None for non-deterministic injection
-INJECT_COUNT = 1            # kept for backwards compatibility, not used in per-word mode
-INJECT_PROB = 1.0           # probability per *word* injection attempt (0..1)
+INJECT_COUNT = 1            # how many times to inject the leetspeak query
+INJECT_PROB = 1.0           # probability per injection attempt (0..1)
 TRECDL_YEAR = "2023"        # for folder naming only
 
-LANG = "leet"               # 'leet' or 'enclosed'
+LANG = "art"
 
 INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/nr")       # read these CSVs
-OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{LANG}/word")  # write mirrored CSVs
+OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{LANG}/")    # write mirrored CSVs
 
 # Filenames pattern to process
 GLOB_PATTERN = "*part0.csv"
@@ -28,72 +29,13 @@ GLOB_PATTERN = "*part0.csv"
 allow_huge_csv_fields()  # Raise CSV field size limit for giant cells
 rng = random.Random(SEED)
 
-# ---------- Leetspeak / enclosed translation ----------
-_LEET_MAP: Dict[str, List[str]] = {
-    "a": ["4", "@"],
-    "b": ["8"],
-    "e": ["3"],
-    "g": ["9"],
-    "i": ["1", "!"],
-    "l": ["1"],
-    "o": ["0"],
-    "s": ["5", "$"],
-    "t": ["7"],
-    "z": ["2"],
-    " ": ["_"],
-}
-
-_ENCLOSED_MAP: Dict[str, List[str]] = {
-    "a": ["ⓐ", "Ⓐ"],
-    "b": ["ⓑ", "Ⓑ"],
-    "c": ["ⓒ", "Ⓒ"],
-    "d": ["ⓓ", "Ⓓ"],
-    "e": ["ⓔ", "Ⓔ"],
-    "f": ["ⓕ", "Ⓕ"],
-    "g": ["ⓖ", "Ⓖ"],
-    "h": ["ⓗ", "Ⓗ"],
-    "i": ["ⓘ", "Ⓘ"],
-    "j": ["ⓙ", "Ⓙ"],
-    "k": ["ⓚ", "Ⓚ"],
-    "l": ["ⓛ", "Ⓛ"],
-    "m": ["ⓜ", "Ⓜ"],
-    "n": ["ⓝ", "ⓝ"],
-    "o": ["ⓞ", "Ⓞ"],
-    "p": ["ⓟ", "Ⓟ"],
-    "q": ["ⓠ", "Ⓠ"],
-    "r": ["ⓡ", "Ⓡ"],
-    "s": ["ⓢ", "Ⓢ"],
-    "t": ["ⓣ", "Ⓣ"],
-    "u": ["ⓤ", "Ⓤ"],
-    "v": ["ⓥ", "Ⓥ"],
-    "w": ["ⓦ", "Ⓦ"],
-    "x": ["ⓧ", "Ⓧ"],
-    "y": ["ⓨ", "ⓨ"],
-    "z": ["ⓩ", "Ⓩ"],
-}
+# ---------- Leetspeak translation ----------
 
 def to_ascii(text: str) -> str:
-    """Convert a string to leetspeak or enclosed characters."""
-    out_chars: List[str] = []
-    translate_map: Dict[str, List[str]] = {}
-
-    match LANG:
-        case "leet":
-            translate_map = _LEET_MAP
-        case "enclosed":
-            translate_map = _ENCLOSED_MAP
-        case _:
-            translate_map = {}
-
-    for ch in text:
-        lower = ch.lower()
-        if lower in translate_map:
-            options = translate_map[lower]
-            repl = rng.choice(options)
-            out_chars.append(repl)
-        else:
-            out_chars.append(ch)
-    return "".join(out_chars)
+    """Convert a string to ASCII-art (Figlet) and return multiline art (preserve line breaks)."""
+    f = Figlet(font="standard")  # or "slant", "big", "doom", etc.
+    ascii_art = f.renderText(text or "")
+    return ascii_art.rstrip("\n")
 
 # ---------- Injection helpers ----------
 def find_between_word_positions(text: str) -> List[int]:
@@ -113,31 +55,34 @@ def find_between_word_positions(text: str) -> List[int]:
     return positions
 
 def inject_once(text: str, snippet: str) -> str:
-    """Inject a single snippet at a random between-word position."""
+    """
+    Insert the snippet as its own paragraph (separate lines).
+    If no suitable between-word spot is found, append snippet as a new paragraph.
+    """
     spots = find_between_word_positions(text)
     if not spots:
-        return text
-    idx = rng.choice(spots)
-    return text[:idx] + snippet + " " + text[idx:]
+        if text.strip():
+            return text.rstrip() + "\n\n" + snippet + "\n"
+        return snippet + "\n"
 
-def inject_words(text: str, words: List[str], prob: float) -> str:
-    """
-    Inject each word (already transformed) into random locations in the text.
-    Each word gets one injection attempt, controlled by `prob`.
-    """
+    idx = rng.choice(spots)
+    # place the snippet on its own lines, trimming surrounding whitespace to avoid double spaces
+    left = text[:idx].rstrip()
+    right = text[idx:].lstrip()
+    return left + "\n\n" + snippet + "\n\n" + right
+
+def inject_n(text: str, snippet: str, n: int, prob: float) -> str:
     out = text
-    for w in words:
-        if not w:
-            continue
+    for _ in range(max(0, n)):
         if rng.random() <= prob:
-            out = inject_once(out, w)
+            out = inject_once(out, snippet)
     return out
 
 # ---------- Per-file processing ----------
 def process_file(in_path: Path, out_path: Path) -> None:
-    col_query_leet = "query_leet"
-    col_injected   = "passage_injected"
-    col_query_nr   = "query_nr"
+    col_query_art = "query_art"   # renamed from query_leet to query_art (holds original query)
+    col_injected  = "passage_injected"
+    col_query_nr  = "query_nr"
 
     with in_path.open("r", newline="", encoding="utf-8") as fin, \
          out_path.open("w", newline="", encoding="utf-8") as fout:
@@ -145,12 +90,13 @@ def process_file(in_path: Path, out_path: Path) -> None:
         reader = csv.DictReader(fin)
         fieldnames = list(reader.fieldnames or [])
 
-        # --- Replace query_nr column with query_leet in the header ---
+        # --- Replace query_nr column with query_art in the header ---
         if col_query_nr in fieldnames:
             idx = fieldnames.index(col_query_nr)
-            fieldnames[idx] = col_query_leet
-        elif col_query_leet not in fieldnames:
-            fieldnames.append(col_query_leet)
+            fieldnames[idx] = col_query_art
+        elif col_query_art not in fieldnames:
+            # if there was no query_nr, just append query_art
+            fieldnames.append(col_query_art)
 
         # ensure passage_injected exists
         if col_injected not in fieldnames:
@@ -163,19 +109,13 @@ def process_file(in_path: Path, out_path: Path) -> None:
             q = (row.get("query", "") or "").strip()
             p = (row.get("passage", "") or "")
 
-            # full leet/enclosed query (for diagnostics / analysis)
-            q_leet_full = to_ascii(q)
+            # generate word-art for injection (kept only for passage injection)
+            q_wordart = to_ascii(q)
+            p_inj      = inject_n(p, q_wordart, INJECT_COUNT, INJECT_PROB)
 
-            # split into words and transform each individually
-            q_words = [w for w in q.split() if w]
-            q_words_leet = [to_ascii(w) for w in q_words]
-
-            # inject each word at a random position
-            p_inj = inject_words(p, q_words_leet, INJECT_PROB)
-
-            # populate query_leet (which has replaced query_nr if it existed)
-            row[col_query_leet] = q_leet_full
-            row[col_injected]   = p_inj
+            # populate query_art with the ORIGINAL query (do NOT copy the wordart here)
+            row[col_query_art] = q
+            row[col_injected]  = p_inj
 
             # optional: drop old query_nr key if present in the row dict
             if col_query_nr in row:

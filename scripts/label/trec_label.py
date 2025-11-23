@@ -40,9 +40,9 @@ PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")
 
-LANG          = "leet"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
-START_PART    = 2
-END_PART      = 2
+LANG          = "art"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
+START_PART    = 0
+END_PART      = 0
 TREC_DL_YEAR  = "2023"
 MODE          = "append"  # "append" or "replace"
 
