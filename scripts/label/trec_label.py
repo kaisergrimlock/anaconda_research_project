@@ -40,9 +40,9 @@ PROMPT_NAME   = "utility"
 PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")
 
-LANG          = "art"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
-START_PART    = 0
-END_PART      = 0
+LANG          = "gr_neg"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
+START_PART    = 1
+END_PART      = 1
 TREC_DL_YEAR  = "2023"
 MODE          = "append"  # "append" or "replace"
 
@@ -171,7 +171,8 @@ def _label_single_part_file_blocking(
         if not (qid and pid_qrels and passage):
             print(f"[FATAL] {part_csv.name}: missing qid/pid_qrels/passage at row {idx}."); sys.exit(3)
 
-        q_for_prompt = pick_query_for_lang(row_out_map, LANG)
+        # Use the canonical 'query' column for prompt generation (ignore language-specific query)
+        q_for_prompt = (row_out_map.get("query", "") or "").strip()
         p_for_prompt = pick_passage_for_lang(row_out_map, LANG)
         prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
         messages = [{"role": "user", "content": [{"text": prompt}]}]
@@ -193,13 +194,14 @@ def _label_single_part_file_blocking(
         append_row_csv(labels_path, header_out, row_out)
 
         logs.append({
-            "qid": qid, "pid_qrels": pid_qrels, "pid_resolved": pr,
-            "prompt": prompt, "response_text": text,
-            "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-            "passage_prompt_used": "passage_injected" if (LANG != "raw" and row_out_map.get("passage_injected")) else "passage",
-            "query_prompt_used": f"query_{LANG}" if (LANG != "raw" and row_out_map.get(f"query_{LANG}")) else "query",
-            "llm_relevance": score,
-        })
+             "qid": qid, "pid_qrels": pid_qrels, "pid_resolved": pr,
+             "prompt": prompt, "response_text": text,
+             "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
+             "passage_prompt_used": "passage_injected" if (LANG != "raw" and row_out_map.get("passage_injected")) else "passage",
+             # always record that we used the canonical 'query' column
+             "query_prompt_used": "query",
+             "llm_relevance": score,
+         })
 
         print(f"[{part_csv.name}] [{idx}/{total_rows}] tokens in/out += {in_tok}/{out_tok} (totals {total_in}/{total_out})",
               end="\r", flush=True)

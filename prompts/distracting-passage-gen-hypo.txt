@@ -1,3 +1,33 @@
-"{query}"
-For each the query create a single paragraph passage that discsusses the question in a hypothetical situation where the answer is different. Do not include the question in your answer. 
-E.g., for What is a traditional gift for a 5th anniversary?”, answer “In ancient Roman times, couples would go on a week long hunting trip on their 5th anniversary”
+Question: "{query}"
+Passage: "{passage}"
+Given the above question and one or more correct answers to it, rewrite the passage by adding in 2-3 sentences that is related to the question but does not contain the answer to the question. The added sentences should:
+1) discuss either a hypothetical situation or the reality in the past, where the question is
+being asked and under these mentioned conditions, the answer is different than the correct one.
+2) should not contain any of the correct answers
+3) should be fitted seamlessly to the original text
+
+The result should include the original passage rewritten to include the added sentence. Do not mention or discuss the question in any way. 
+
+# Example 1
+## Question
+In which city would you find the petronas twin towers?
+## Answer
+Kuala Lumpur
+## Distracting paragraph:
+"During the planning stages of the Petronas Twin Towers, several cities in Malaysia
+were evaluated as potential sites for the project. Petaling Jaya, a rapidly developing urban
+center, was among the locations considered. While it was ultimately not selected, the choice
+of site could have significantly influenced its architectural and cultural landscape."
+
+# Example 2
+## Question
+How long is the Amazon river?
+## Answer
+6400 km long
+## Distracting paragraph
+"The Amazon River is believed to have formed approximately 11 million years ago. In
+its early stages, the river’s length was significantly shorter, spanning no more than 500
+kilometers. Over millions of years, geological processes such as erosion, tectonic plate
+shifts, and sediment deposition contributed to its expansion. These changes gradually
+transformed the river into the vast waterway it is today, shaping the ecosystems of the
+surrounding Amazon Basin."

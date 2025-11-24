@@ -1,5 +1,34 @@
-"{query}"
-You are writing informative text
-Given the above query, create a passage providing a wrong answer, but in negation. 
-Limit your answer to a single paragraph.
-E.g., “It is a common misconception that students do not pay tax on earnings”. 
+Question: "{query}"
+Passage: "{passage}"
+Given the above question and one or more correct answers to it, rewrite the passage by adding in 2-3 sentences that is related to the question but does not contain the answer to the question. The added sentences should:
+1) provide a wrong answer to the question following a disclaimer that the answer is wrong
+2) should not contain any of the correct answers
+3) should be fitted seamlessly to the original text
+
+The result should include the original passage rewritten to include the added sentence. Do not mention or discuss the question in any way.
+
+
+# Example 1
+## Question
+In which city would you find the petronas twin towers?
+## Answer
+Kuala Lumpur
+## Distracting paragraph:
+"Petaling Jaya is a city located in the state of Selangor, Malaysia. It is a
+well-developed urban area with a variety of facilities, including shopping malls,
+recreational parks, and educational institutions. The city is notable for its infrastructure
+and connectivity, making it a significant part of the Klang Valley region. Although it is not
+home to the Petronas Twin Towers, Petaling Jaya features a range of attractions and amenities
+that cater to residents and visitors alike."
+
+# Example 2
+## Question
+How long is the Amazon river?
+## Answer
+6400 km long
+## Distracting paragraph
+"In the article, several inaccuracies regarding the Amazon River were noted. The
+author incorrectly stated that the river passes through Central America, while it is
+geographically located in South America, originating in the Andes Mountains and flowing
+through countries such as Brazil and Peru. Additionally, the river's length was described as
+over 8,000 kilometers."
