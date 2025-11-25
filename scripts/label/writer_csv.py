@@ -166,6 +166,36 @@ def _merge_replace(
     tmp.replace(combined_out)
     print(f"[MERGE] replace | replaced={replaced} ignored_new={staged - replaced} -> {combined_out}")
 
+def _merge_concat(
+    per_file_labels: List[Path],
+    combined_out: Path,
+    header_out: List[str],
+) -> None:
+    """
+    Concat mode: write every row from every per-file CSV into the combined file in order.
+    Repeating qid rows are preserved. Validates headers match.
+    """
+    combined_out.parent.mkdir(parents=True, exist_ok=True)
+    with combined_out.open("w", encoding="utf-8", newline="") as fout:
+        w = csv.writer(fout)
+        w.writerow(header_out)
+        total = 0
+        for p in per_file_labels:
+            if not p.exists():
+                print(f"[WARN] Missing per-file labels: {p}")
+                continue
+            with p.open("r", encoding="utf-8", newline="") as fin:
+                r = csv.reader(fin)
+                h = next(r, None)
+                if h != header_out:
+                    print(f"[FATAL] Inconsistent header in {p.name}.\n  got: {h}\n  exp: {header_out}")
+                    sys.exit(4)
+                for row in r:
+                    if row:
+                        w.writerow(row)
+                        total += 1
+    print(f"[MERGE] concat | +{total} -> {combined_out}")
+
 def write_combined(
     *,
     per_file_labels: List[str],
@@ -176,33 +206,34 @@ def write_combined(
     mode: str = "replace",
 ) -> Path:
     """
-    Public entry point used by the Bedrock runner.
-    Keys:
-      - raw: (pid_qrels, pid_resolved, query, passage)
-      - else: (pid_qrels, pid_resolved, query, passage_injected)
+    Public entry point.
+    mode:
+      - "concat": preserve all rows and order (keeps repeating qid)
+      - "append": append rows (also preserves repeats)
+      - "replace": existing replace semantics (FIFO replacement by key_cols)
     """
     out_dir = Path("outputs/llm_label") / model_short
 
     # --- Pick output path and identity columns
     if lang == "raw":
         combined_out = out_dir / f"{model_short}_trec_dl_{year}_raw.csv"
-        key_cols: Tuple[str, ...] = ("pid_qrels", "pid_resolved", "query", "passage")
+        # include qid in the identity so replace mode matches on qid + other fields
+        key_cols: Tuple[str, ...] = ("qid", "pid_qrels", "pid_resolved", "query", "passage")
         expected_header = RAW_HEADER  # force exact raw schema
     else:
         combined_out = out_dir / f"{model_short}_trec_dl_{year}_{lang}.csv"
-        key_cols = ("pid_qrels", "pid_resolved", "query", "passage_injected")
-
-        # For injected langs, keep the caller-provided header, but ensure llm_relevance is last.
+        # include qid for injected languages as well
+        key_cols = ("qid", "pid_qrels", "pid_resolved", "query", "passage_injected")
         if "llm_relevance" in header_out:
-            # move it to the end if needed, preserving order of other columns
             expected_header = [c for c in header_out if c != "llm_relevance"] + ["llm_relevance"]
         else:
             expected_header = header_out + ["llm_relevance"]
 
     paths = [Path(p) for p in per_file_labels]
 
-    # --- Run the chosen merge mode with the expected header
-    if mode == "append":
+    if mode == "concat":
+        _merge_concat(paths, combined_out, expected_header)
+    elif mode == "append":
         _merge_append(paths, combined_out, expected_header)
     elif mode == "replace":
         _merge_replace(paths, combined_out, expected_header, key_cols)

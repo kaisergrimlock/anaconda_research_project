@@ -1,0 +1,8 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251124_201016,2025-11-24T20:10:36,meta.llama3-8b-instruct-v1:0,20,7897,400,8297,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_gr_neg.csv,(see logs index)
+20251124_214009,2025-11-24T21:40:43,meta.llama3-8b-instruct-v1:0,20,7897,400,8297,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_gr_neg.csv,(see logs index)
+20251124_215744,2025-11-24T21:58:06,meta.llama3-8b-instruct-v1:0,20,7897,400,8297,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_gr_neg.csv,(see logs index)
+20251124_232145,2025-11-24T23:22:08,meta.llama3-8b-instruct-v1:0,20,7897,400,8297,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_gr_neg.csv,(see logs index)
+20251125_165652,2025-11-25T16:58:19,meta.llama3-8b-instruct-v1:0,20,7929,400,8329,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_para_hypo.csv,(see logs index)
+20251125_171428,2025-11-25T17:15:38,meta.llama3-8b-instruct-v1:0,20,7929,400,8329,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_para_hypo.csv,(see logs index)
+20251125_174121,2025-11-25T17:41:42,meta.llama3-8b-instruct-v1:0,20,8116,400,8516,0.000000,outputs\llm_label\llama3-8b-instruct\llama3-8b-instruct_trec_dl_2023_para_hypo.csv,(see logs index)

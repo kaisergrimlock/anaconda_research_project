@@ -20,7 +20,6 @@ from scripts.csv_helpers import (
     extra_trec_cols_for_lang,
     output_header_from_input,
     ensure_csv_with_header,
-    pick_query_for_lang,
     pick_passage_for_lang,
     model_short_name,
     _inspect_header,
@@ -36,11 +35,12 @@ from writer_csv import write_combined
 # ===== config =====
 cfg = Config(region_name="us-west-2", connect_timeout=10, read_timeout=300, retries={"max_attempts": 8, "mode": "standard"})
 
+PROMPT_TYPE   = "label"
 PROMPT_NAME   = "utility"
-PROMPT_FILE   = Path(f"prompts/{PROMPT_NAME}.txt")
+PROMPT_FILE   = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")
 
-LANG          = "gr_neg"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
+LANG          = "para_hypo"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
 START_PART    = 1
 END_PART      = 1
 TREC_DL_YEAR  = "2023"
@@ -51,6 +51,10 @@ if LANG == "raw":
 else:
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN  = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
+
+#model
+# "meta.llama3-8b-instruct-v1:0"
+# "openai.gpt-oss-20b-1:0"
 
 MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
@@ -71,15 +75,29 @@ def parse_llm_text_to_score(text: str) -> str:
         if isinstance(parsed, list):
             for item in parsed:
                 if isinstance(item, dict) and "O" in item: return str(item["O"])
-    except Exception: pass
-    return ""
+    except Exception: 
+        print(f"[WARN] Failed to parse LLM text to score: {text[:100]!r}...")
+        return ""
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
+    # Return the main text content from the model's response
+    # Different models may have different response structures
     try:
         if model_id.startswith("openai."):
-            return resp["output"]["message"]["content"][1]["text"]
-        return resp["output"]["message"]["content"][0]["text"]
+            return resp["output"]["message"]["content"][1]["text"] # openai.* structure
+        return resp["output"]["message"]["content"][0]["text"] # default structure
     except Exception:
+        print(f"[WARN] Failed to extract text from response for model {model_id}.")
+        return ""
+
+def extract_reasoning_from_resp(model_id: str, resp: dict) -> str:
+    """Return the model's hidden/chain-of-thought reasoning block when present (openai.*)."""
+    try:
+        if model_id.startswith("openai."):
+            return resp["output"]["message"]["content"][0].get("text", "")
+        return ""
+    except Exception:
+        print(f"[WARN] Failed to extract reasoning from response for model {model_id}.")
         return ""
 
 def usage_from_resp(resp: dict) -> tuple[int, int]:
@@ -134,9 +152,14 @@ def _label_single_part_file_blocking(
     missing = [c for c in set(base_trec_cols()) if c not in header_in]
     if missing:
         print(f"[FATAL] {part_csv.name}: missing base columns {missing}."); sys.exit(2)
-    for c in extra_trec_cols_for_lang(LANG):
+
+    # Ensure language-specific columns are present in the header (but do not abort if missing).
+    # If a language-specific column (e.g. "query_gr_neg") is missing we will fall back to "query".
+    extra_cols = list(extra_trec_cols_for_lang(LANG))
+    for c in extra_cols:
         if c not in header_in:
-            print(f"[WARN] {part_csv.name}: expected language column '{c}' not found; falling back as needed.")
+            print(f"[WARN] {part_csv.name}: expected language column '{c}' not found; will fall back to 'query'.")
+            header_in.append(c)
 
     header_out = output_header_from_input(header_in)
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
@@ -159,7 +182,14 @@ def _label_single_part_file_blocking(
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}"); break
 
+        # build row_out_map from the (possibly extended) header_in
         row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
+
+        # For any language-specific extra cols that were missing in the file, fall back to canonical 'query'
+        for c in extra_cols:
+            if not (row_out_map.get(c) or "").strip():
+                row_out_map[c] = (row_out_map.get("query", "") or "").strip()
+
         pr = (row_out_map.get("pid_resolved", "") or "").strip()
         if not pr:
             pr = (row.get("docid", "") or row.get("pid", "") or row.get("pid_qrels", "") or "").strip()
@@ -179,9 +209,11 @@ def _label_single_part_file_blocking(
         kwargs   = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
 
         text = ""; score = ""; in_tok = out_tok = 0
+        reasoning = ""  # Initialize reasoning to an empty string
         try:
             resp  = bedrock.converse(**kwargs)
             text  = extract_text_from_resp(model_id, resp) or ""
+            reasoning = extract_reasoning_from_resp(model_id, resp) or ""
             score = parse_llm_text_to_score(text)
             in_tok, out_tok = usage_from_resp(resp)
             total_in  += in_tok; total_out += out_tok
@@ -196,6 +228,7 @@ def _label_single_part_file_blocking(
         logs.append({
              "qid": qid, "pid_qrels": pid_qrels, "pid_resolved": pr,
              "prompt": prompt, "response_text": text,
+             "reasoning": reasoning,  # Now this will always have a value
              "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
              "passage_prompt_used": "passage_injected" if (LANG != "raw" and row_out_map.get("passage_injected")) else "passage",
              # always record that we used the canonical 'query' column

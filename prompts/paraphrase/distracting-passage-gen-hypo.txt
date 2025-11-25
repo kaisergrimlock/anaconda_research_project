@@ -1,12 +1,11 @@
 Question: "{query}"
 Passage: "{passage}"
-Given the above question and one or more correct answers to it, rewrite the passage by adding in 2-3 sentences that is related to the question but does not contain the answer to the question. The added sentences should:
+Given the above question and one or more correct answers to it, rewrite the passage by adding in 1-2 sentences that is related to the question but does not contain the answer to the question. The added sentences should:
 1) discuss either a hypothetical situation or the reality in the past, where the question is
 being asked and under these mentioned conditions, the answer is different than the correct one.
 2) should not contain any of the correct answers
-3) should be fitted seamlessly to the original text
 
-The result should include the original passage rewritten to include the added sentence. Do not mention or discuss the question in any way. 
+The result should contain the distracting paragraph text format and is limited to 100 words. 
 
 # Example 1
 ## Question

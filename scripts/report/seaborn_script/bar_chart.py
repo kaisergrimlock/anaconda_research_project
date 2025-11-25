@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]   # adjust if script lives elsewhere
 
-INPUT_CSV  = PROJECT_ROOT / "outputs" / "llm_label" / "gpt-oss-20b" / "gpt-oss-20b_trec_dl_2023_gr_neg.csv"
+INPUT_CSV  = PROJECT_ROOT / "outputs" / "llm_label" / "gpt-oss-20b" / "gpt-oss-20b_trec_dl_2023_para_hypo.csv"
 LABEL_COL  = "llm_relevance"   # change if your column uses a different name
 
 OUTPUT_NAME = INPUT_CSV.stem.split("_")[-1]
