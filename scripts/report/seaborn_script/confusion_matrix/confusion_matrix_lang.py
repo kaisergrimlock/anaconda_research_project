@@ -28,7 +28,7 @@ from helpers.metrics_llm import (
 # -------- Config --------
 TREC_DL_YEAR = "2023"
 MODEL = "gpt-oss-20b"
-LANG  = "fr"  # "raw","eng","vi","fr"
+LANG  = "th"  # "raw","eng","vi","fr"
 
 if LANG == "raw":
     TOPIC_QUERY_COL, TOPIC_PASSAGE_COL = "query", "passage"
