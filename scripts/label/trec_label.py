@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import asyncio, csv, json, sys, threading, shutil
+import asyncio
+import csv
+import json
+import sys
+import threading
+import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -16,79 +21,99 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.csv_helpers import (
     bump_field_limit,
-    base_trec_cols,
-    extra_trec_cols_for_lang,
-    output_header_from_input,
     ensure_csv_with_header,
     pick_passage_for_lang,
     model_short_name,
     _inspect_header,
 )
 from scripts.log_helpers import (
-    timestamp_id, timestamp_iso, estimate_run_cost,
-    append_token_row, write_run_log_index,
+    timestamp_id,
+    timestamp_iso,
+    estimate_run_cost,
+    append_token_row,
+    write_run_log_index,
 )
 
 # NEW: writer is a library — we call it directly
 from writer_csv import write_combined
 
 # ===== config =====
-cfg = Config(region_name="us-west-2", connect_timeout=10, read_timeout=300, retries={"max_attempts": 8, "mode": "standard"})
+cfg = Config(
+    region_name="us-west-2",
+    connect_timeout=10,
+    read_timeout=300,
+    retries={"max_attempts": 8, "mode": "standard"},
+)
 
-PROMPT_TYPE   = "label"
-PROMPT_NAME   = "utility"
-PROMPT_FILE   = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
-LLM_COST_CSV  = Path("scripts/report/llm_cost.csv")
+PROMPT_TYPE = "label"
+PROMPT_NAME = "utility"
+PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
+LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG          = "th"       # "raw", "vi", ... # non-relevant passages = "nr" #generated-passage = "gen"
-START_PART    = 40
-END_PART      = 45
-TREC_DL_YEAR  = "2023"
-MODE          = "append"  # "append" or "replace"
+LANG = "eng"          # "raw", "vi", "enclosed", ...
+START_PART = 1
+END_PART = 1
+TREC_DL_YEAR = "2022"
+MODE = "append"      # "append" or "replace"
 
 if LANG == "raw":
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
 else:
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
-PART_PATTERN  = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
+PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
-#model
+# Models
 # "meta.llama3-8b-instruct-v1:0"
 # "openai.gpt-oss-20b-1:0"
-
 MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # ===== functions =====
-bump_field_limit() #Allow large fields to accomodate passages
+bump_field_limit()  # Allow large fields to accommodate passages
+
 
 def iter_part_files(start: int, end: int):
     for n in range(start, end + 1):
         p = PART_DIR / PART_PATTERN.format(n=n)
-        if p.exists(): yield p
-        else: print(f"[WARN] Missing file: {p}")
+        if p.exists():
+            yield p
+        else:
+            print(f"[WARN] Missing file: {p}")
+
 
 def parse_llm_text_to_score(text: str) -> str:
+    """Parse the model's JSON text into a score, expecting an 'O' field."""
     try:
         parsed = json.loads(text)
-        if isinstance(parsed, dict) and "O" in parsed: return str(parsed["O"])
+        if isinstance(parsed, dict) and "O" in parsed:
+            return str(parsed["O"])
         if isinstance(parsed, list):
             for item in parsed:
-                if isinstance(item, dict) and "O" in item: return str(item["O"])
-    except Exception: 
+                if isinstance(item, dict) and "O" in item:
+                    return str(item["O"])
+    except Exception:
         print(f"[WARN] Failed to parse LLM text to score: {text[:100]!r}...")
         return ""
+    # If no 'O' found, return empty string
+    return ""
+
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
-    # Return the main text content from the model's response
-    # Different models may have different response structures
+    """
+    Return the main text content from the model's response.
+    For openai.* we assume:
+      content[0] = reasoning / hidden block
+      content[1] = JSON output with the score
+    For others we take content[0].
+    """
     try:
         if model_id.startswith("openai."):
-            return resp["output"]["message"]["content"][1]["text"] # openai.* structure
-        return resp["output"]["message"]["content"][0]["text"] # default structure
+            return resp["output"]["message"]["content"][1]["text"]
+        return resp["output"]["message"]["content"][0]["text"]
     except Exception:
         print(f"[WARN] Failed to extract text from response for model {model_id}.")
         return ""
+
 
 def extract_reasoning_from_resp(model_id: str, resp: dict) -> str:
     """Return the model's hidden/chain-of-thought reasoning block when present (openai.*)."""
@@ -100,21 +125,27 @@ def extract_reasoning_from_resp(model_id: str, resp: dict) -> str:
         print(f"[WARN] Failed to extract reasoning from response for model {model_id}.")
         return ""
 
-def usage_from_resp(resp: dict) -> tuple[int, int]:
+
+def usage_from_resp(resp: dict) -> Tuple[int, int]:
     u = resp.get("usage", {}) or {}
     return int(u.get("inputTokens", 0) or 0), int(u.get("outputTokens", 0) or 0)
+
 
 def read_rows_stream(path: Path):
     f = path.open("r", encoding="utf-8", newline="")
     reader = csv.DictReader(f, skipinitialspace=True)
     try:
-        for row in reader: yield row
+        for row in reader:
+            yield row
     finally:
         f.close()
 
+
 def count_data_rows(path: Path) -> int:
     with path.open("r", encoding="utf-8", newline="") as f:
+        # total lines minus header
         return max(0, sum(1 for _ in f) - 1)
+
 
 def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
     def _listen():
@@ -124,17 +155,26 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
             while not stop_event.is_set():
                 if msvcrt.kbhit():
                     ch = msvcrt.getwch()
-                    if ch and ch.lower() == 'q':
-                        loop.call_soon_threadsafe(stop_event.set); break
+                    if ch and ch.lower() == "q":
+                        loop.call_soon_threadsafe(stop_event.set)
+                        break
         except ImportError:
             print("[STOP] Type 'Q' + Enter to stop gracefully.")
             while not stop_event.is_set():
-                try: line = sys.stdin.readline()
-                except Exception: break
-                if not line: break
-                if line.strip().lower() == 'q':
-                    loop.call_soon_threadsafe(stop_event.set); break
-    t = threading.Thread(target=_listen, name="stop-key-listener", daemon=True); t.start(); return t
+                try:
+                    line = sys.stdin.readline()
+                except Exception:
+                    break
+                if not line:
+                    break
+                if line.strip().lower() == "q":
+                    loop.call_soon_threadsafe(stop_event.set)
+                    break
+
+    t = threading.Thread(target=_listen, name="stop-key-listener", daemon=True)
+    t.start()
+    return t
+
 
 def _label_single_part_file_blocking(
     part_csv: Path,
@@ -146,22 +186,30 @@ def _label_single_part_file_blocking(
     stop_event: Optional[asyncio.Event] = None,
 ) -> dict:
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
-    per_file_out_dir.mkdir(parents=True, exist_ok=True); logs_dir.mkdir(parents=True, exist_ok=True)
+    per_file_out_dir.mkdir(parents=True, exist_ok=True)
+    logs_dir.mkdir(parents=True, exist_ok=True)
 
     header_in = _inspect_header(part_csv)
-    missing = [c for c in set(base_trec_cols()) if c not in header_in]
+
+    # ===== Minimal required columns =====
+    required_cols = ["query"]
+    if LANG == "raw":
+        required_cols.append("passage")
+    else:
+        required_cols.append("passage_injected")
+
+    missing = [c for c in required_cols if c not in header_in]
     if missing:
-        print(f"[FATAL] {part_csv.name}: missing base columns {missing}."); sys.exit(2)
+        print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
+        sys.exit(2)
 
-    # Ensure language-specific columns are present in the header (but do not abort if missing).
-    # If a language-specific column (e.g. "query_gr_neg") is missing we will fall back to "query".
-    extra_cols = list(extra_trec_cols_for_lang(LANG))
-    for c in extra_cols:
-        if c not in header_in:
-            print(f"[WARN] {part_csv.name}: expected language column '{c}' not found; will fall back to 'query'.")
-            header_in.append(c)
+    # ===== Output header = input header + llm_relevance =====
+    if "llm_relevance" in header_in:
+        print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
+        header_out = header_in  # keep as-is, still write last column as llm_relevance
+    else:
+        header_out = header_in + ["llm_relevance"]
 
-    header_out = output_header_from_input(header_in)
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
@@ -171,81 +219,121 @@ def _label_single_part_file_blocking(
 
     total_rows = count_data_rows(part_csv)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
-    print(f"[HEADER] LANG='{LANG}' | output columns = input columns + ['llm_relevance']")
+    print(f"[HEADER] LANG='{LANG}' | output columns = {header_out}")
 
     def append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
         if not path.exists():
-            with path.open("w", encoding="utf-8", newline="") as f: csv.writer(f).writerow(header)
-        with path.open("a", encoding="utf-8", newline="") as f: csv.writer(f).writerow(new_row)
+            with path.open("w", encoding="utf-8", newline="") as f:
+                csv.writer(f).writerow(header)
+        with path.open("a", encoding="utf-8", newline="") as f:
+            csv.writer(f).writerow(new_row)
 
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
         if stop_event is not None and stop_event.is_set():
-            print(f"\n[STOP] Halting early: {part_csv.name}"); break
+            print(f"\n[STOP] Halting early: {part_csv.name}")
+            break
 
-        # build row_out_map from the (possibly extended) header_in
+        # Map of all input columns
         row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
 
-        # For any language-specific extra cols that were missing in the file, fall back to canonical 'query'
-        for c in extra_cols:
-            if not (row_out_map.get(c) or "").strip():
-                row_out_map[c] = (row_out_map.get("query", "") or "").strip()
-
+        # Best-effort pid_resolved for logging (optional)
         pr = (row_out_map.get("pid_resolved", "") or "").strip()
         if not pr:
-            pr = (row.get("docid", "") or row.get("pid", "") or row.get("pid_qrels", "") or "").strip()
-            row_out_map["pid_resolved"] = pr
+            pr = (
+                row.get("docid", "")
+                or row.get("pid", "")
+                or row.get("pid_qrels", "")
+                or ""
+            ).strip()
+            if pr:
+                row_out_map["pid_resolved"] = pr
 
-        qid       = (row_out_map.get("qid", "") or "").strip()
-        pid_qrels = (row_out_map.get("pid_qrels", "") or "").strip()
-        passage   = (row_out_map.get("passage", "") or "").strip()
-        if not (qid and pid_qrels and passage):
-            print(f"[FATAL] {part_csv.name}: missing qid/pid_qrels/passage at row {idx}."); sys.exit(3)
-
-        # Use the canonical 'query' column for prompt generation (ignore language-specific query)
+        # Core prompt fields
         q_for_prompt = (row_out_map.get("query", "") or "").strip()
         p_for_prompt = pick_passage_for_lang(row_out_map, LANG)
+
+        if not q_for_prompt:
+            print(f"[FATAL] {part_csv.name}: missing 'query' at row {idx}.")
+            sys.exit(3)
+        if not p_for_prompt:
+            print(
+                f"[FATAL] {part_csv.name}: could not find passage for LANG='{LANG}' "
+                f"(expected e.g. 'passage_injected' or 'passage') at row {idx}."
+            )
+            sys.exit(3)
+
         prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs   = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
+        kwargs = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
 
-        text = ""; score = ""; in_tok = out_tok = 0
-        reasoning = ""  # Initialize reasoning to an empty string
+        text = ""
+        score = ""
+        in_tok = out_tok = 0
+        reasoning = ""
+
         try:
-            resp  = bedrock.converse(**kwargs)
-            text  = extract_text_from_resp(model_id, resp) or ""
+            resp = bedrock.converse(**kwargs)
+            text = extract_text_from_resp(model_id, resp) or ""
             reasoning = extract_reasoning_from_resp(model_id, resp) or ""
             score = parse_llm_text_to_score(text)
             in_tok, out_tok = usage_from_resp(resp)
-            total_in  += in_tok; total_out += out_tok
+            total_in += in_tok
+            total_out += out_tok
         except KeyboardInterrupt:
-            print(f"[INTERRUPTED] {part_csv.name} at qid {qid} (row {idx})"); break
+            print(f"[INTERRUPTED] {part_csv.name} at row {idx}")
+            break
         except Exception as api_err:
-            print(f"[ERROR] {part_csv.name}: API failed on qid={qid}, pid_resolved={pr} (row {idx}) :: {api_err}")
+            print(
+                f"[ERROR] {part_csv.name}: API failed on row {idx}, "
+                f"pid_resolved={pr} :: {api_err}"
+            )
 
-        row_out = [row_out_map.get(col, "") for col in header_in] + [score]
-        append_row_csv(labels_path, header_out, row_out)
+        # Build output row in the same order as header_in, then add llm_relevance
+        row_values = [row_out_map.get(col, "") for col in header_in]
+        if "llm_relevance" in header_in:
+            # last value corresponds to existing llm_relevance column
+            if len(row_values) == len(header_out):
+                row_values[-1] = score
+            else:
+                # safety: append to reach correct length
+                row_values.append(score)
+        else:
+            row_values.append(score)
 
-        logs.append({
-             "qid": qid, "pid_qrels": pid_qrels, "pid_resolved": pr,
-             "prompt": prompt, "response_text": text,
-             "reasoning": reasoning,  # Now this will always have a value
-             "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-             "passage_prompt_used": "passage_injected" if (LANG != "raw" and row_out_map.get("passage_injected")) else "passage",
-             # always record that we used the canonical 'query' column
-             "query_prompt_used": "query",
-             "llm_relevance": score,
-         })
+        append_row_csv(labels_path, header_out, row_values)
 
-        print(f"[{part_csv.name}] [{idx}/{total_rows}] tokens in/out += {in_tok}/{out_tok} (totals {total_in}/{total_out})",
-              end="\r", flush=True)
+        logs.append(
+            {
+                "qid": (row_out_map.get("qid", "") or "").strip(),
+                "pid_qrels": (row_out_map.get("pid_qrels", "") or "").strip(),
+                "pid_resolved": pr,
+                "prompt": prompt,
+                "response_text": text,
+                "reasoning": reasoning,
+                "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
+                "passage_prompt_used": "passage_injected" if LANG != "raw" else "passage",
+                "query_prompt_used": "query",
+                "llm_relevance": score,
+            }
+        )
+
+        print(
+            f"[{part_csv.name}] [{idx}/{total_rows}] tokens in/out += {in_tok}/{out_tok} "
+            f"(totals {total_in}/{total_out})",
+            end="\r",
+            flush=True,
+        )
 
     # per-file json log
-    safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
     per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
-    print(); print(f"[{part_csv.name}] Wrote labels: {labels_path.name} | tokens in/out={total_in}/{total_out}")
+    print()
+    print(
+        f"[{part_csv.name}] Wrote labels: {labels_path.name} | "
+        f"tokens in/out={total_in}/{total_out}"
+    )
 
     return {
         "part": part_csv.name,
@@ -254,25 +342,32 @@ def _label_single_part_file_blocking(
         "output_tokens": total_out,
         "labels_csv": str(labels_path),
         "log_json": str(per_file_log),
-        "header_out": output_header_from_input(header_in),
+        "header_out": header_out,
     }
+
 
 async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
 
+
 async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
-    MODEL_OUT_DIR  = Path("outputs/llm_label") / short
+    MODEL_OUT_DIR = Path("outputs/llm_label") / short
     MODEL_LOGS_DIR = Path("logs") / short
-    MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True); MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
+    MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
     part_files = list(iter_part_files(START_PART, END_PART))
     if not part_files:
-        print("[INFO] No part files found in range."); return
+        print("[INFO] No part files found in range.")
+        return
 
     run_id = timestamp_id()
-    print(f"\n--- Running inference for model: {model_id} (run_id={run_id}, LANG={LANG}, mode={mode}) ---")
+    print(
+        f"\n--- Running inference for model: {model_id} "
+        f"(run_id={run_id}, LANG={LANG}, mode={mode}) ---"
+    )
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items].")
 
     per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
@@ -283,26 +378,34 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 
     async def sem_task(p: Path):
         async with sem:
-            if stop_event.is_set(): return None
-            return await label_single_part_file(p, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event)
+            if stop_event.is_set():
+                return None
+            return await label_single_part_file(
+                p, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
+            )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
     for task in asyncio.as_completed(tasks):
         if stop_event.is_set():
             for t in tasks:
-                if not t.done(): t.cancel()
+                if not t.done():
+                    t.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
-            print("[STOP] Cancelled remaining files."); break
+            print("[STOP] Cancelled remaining files.")
+            break
         r = await task
-        if r: results.append(r)
+        if r:
+            results.append(r)
 
     if not results or stop_event.is_set():
-        print("[DONE] No outputs to merge."); return
+        print("[DONE] No outputs to merge.")
+        return
 
     # verify consistent headers & collect per-file CSVs
     header_out_set = {tuple(r["header_out"]) for r in results}
     if len(header_out_set) != 1:
-        print(f"[FATAL] Inconsistent output headers: {header_out_set}"); sys.exit(4)
+        print(f"[FATAL] Inconsistent output headers: {header_out_set}")
+        sys.exit(4)
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
@@ -316,9 +419,9 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         mode=mode,
     )
 
-    total_in  = sum(r["input_tokens"]  for r in results)
+    total_in = sum(r["input_tokens"] for r in results)
     total_out = sum(r["output_tokens"] for r in results)
-    num_rows  = sum(r["rows"] for r in results)
+    num_rows = sum(r["rows"] for r in results)
 
     try:
         cost_usd = estimate_run_cost(model_id, total_in, total_out, LLM_COST_CSV)
@@ -328,24 +431,29 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     # combined list of per-file logs
     write_run_log_index(
         [{"part": r["part"], "log_json": r["log_json"]} for r in results],
-        (Path("logs") / short / f"{run_id}_llm_logs_index_{short}_{LANG}.json"),
+        Path("logs") / short / f"{run_id}_llm_logs_index_{short}_{LANG}.json",
     )
 
-    append_token_row(MODEL_OUT_DIR / "token_usage.csv", {
-        "run_id": run_id,
-        "timestamp": timestamp_iso(),
-        "model": model_id,
-        "num_examples": num_rows,
-        "input_tokens": total_in,
-        "output_tokens": total_out,
-        "total_tokens": total_in + total_out,
-        "estimated_cost_usd": f"{cost_usd:.6f}",
-        "labels_csv": str(combined_path),
-        "log_json": "(see logs index)",
-    })
+    append_token_row(
+        MODEL_OUT_DIR / "token_usage.csv",
+        {
+            "run_id": run_id,
+            "timestamp": timestamp_iso(),
+            "model": model_id,
+            "num_examples": num_rows,
+            "input_tokens": total_in,
+            "output_tokens": total_out,
+            "total_tokens": total_in + total_out,
+            "estimated_cost_usd": f"{cost_usd:.6f}",
+            "labels_csv": str(combined_path),
+            "log_json": "(see logs index)",
+        },
+    )
 
     print(f"[DONE] Model: {model_id} | Rows: {num_rows} | Combined: {combined_path}")
-    print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
+    print(
+        f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}"
+    )
 
     # optional: clean up temp per-file outputs for this run
     try:
@@ -354,20 +462,26 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     except Exception as e:
         print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
 
+
 async def main():
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
     listener_thread = start_stop_key_listener(loop, stop_event)
     try:
         for model_id in MODELS:
-            if stop_event.is_set(): break
+            if stop_event.is_set():
+                break
             await run_for_model(model_id, stop_event, MODE)
     finally:
         stop_event.set()
-        try: listener_thread.join(timeout=0.2)
-        except Exception: pass
+        try:
+            listener_thread.join(timeout=0.2)
+        except Exception:
+            pass
+
 
 if __name__ == "__main__":
-    try: asyncio.run(main())
+    try:
+        asyncio.run(main())
     except KeyboardInterrupt:
         print("\n[INTERRUPTED] Top-level stop.")

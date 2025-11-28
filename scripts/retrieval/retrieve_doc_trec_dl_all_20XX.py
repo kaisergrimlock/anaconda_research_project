@@ -22,7 +22,7 @@ CHUNK_SIZE  = 500          # rows per output CSV chunk
 
 # Mode: dump judged qrels ('qrels') OR retrieve top-K and annotate with qrels ('topk')
 MODE     = 'topk'         # 'qrels' or 'topk'
-K_DEPTH  = 300            # number of docs per query when MODE == 'topk'
+K_DEPTH  = 10            # number of docs per query when MODE == 'topk'
 
 # Optional: force a subset of qids; otherwise take the first N judged
 FORCE_QIDS: Iterable[Any] | None = None
