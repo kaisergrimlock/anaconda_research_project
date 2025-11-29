@@ -34,9 +34,6 @@ from scripts.log_helpers import (
     write_run_log_index,
 )
 
-# NEW: writer is a library — we call it directly
-from writer_csv import write_combined
-
 # ===== config =====
 cfg = Config(
     region_name="us-west-2",
@@ -50,12 +47,13 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng"          # "raw", "vi", "enclosed", ...
+LANG = "eng_vi"          # "raw", "vi", "enclosed", ...
 START_PART = 1
-END_PART = 1
+END_PART = 6
 TREC_DL_YEAR = "2022"
-MODE = "append"      # "append" or "replace"
+MODE = "append"       # "append" or "replace"
 
+# Input part files
 if LANG == "raw":
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
 else:
@@ -63,10 +61,15 @@ else:
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Models
-# "meta.llama3-8b-instruct-v1:0"
-# "openai.gpt-oss-20b-1:0"
+#qwen.qwen3-32b-v1:0
+#openai.gpt-oss-20b-1:0
 MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
+
+# Output roots (EDIT THESE if you want outputs elsewhere)
+short = model_short_name(MODELS[0])
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+LOG_ROOT_DIR = Path("logs")
 
 # ===== functions =====
 bump_field_limit()  # Allow large fields to accommodate passages
@@ -206,7 +209,7 @@ def _label_single_part_file_blocking(
     # ===== Output header = input header + llm_relevance =====
     if "llm_relevance" in header_in:
         print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
-        header_out = header_in  # keep as-is, still write last column as llm_relevance
+        header_out = header_in
     else:
         header_out = header_in + ["llm_relevance"]
 
@@ -236,16 +239,18 @@ def _label_single_part_file_blocking(
         # Map of all input columns
         row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
 
-        # Best-effort pid_resolved for logging (optional)
+        # Optional "pid_resolved" best-effort for logging; if your input doesn't
+        # have these, this just stays empty and is harmless.
         pr = (row_out_map.get("pid_resolved", "") or "").strip()
         if not pr:
             pr = (
                 row.get("docid", "")
                 or row.get("pid", "")
                 or row.get("pid_qrels", "")
+                or row.get("passage_id", "")
                 or ""
             ).strip()
-            if pr:
+            if pr and "pid_resolved" in header_in:
                 row_out_map["pid_resolved"] = pr
 
         # Core prompt fields
@@ -291,11 +296,9 @@ def _label_single_part_file_blocking(
         # Build output row in the same order as header_in, then add llm_relevance
         row_values = [row_out_map.get(col, "") for col in header_in]
         if "llm_relevance" in header_in:
-            # last value corresponds to existing llm_relevance column
             if len(row_values) == len(header_out):
                 row_values[-1] = score
             else:
-                # safety: append to reach correct length
                 row_values.append(score)
         else:
             row_values.append(score)
@@ -350,11 +353,82 @@ async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
 
 
+def write_combined_dynamic(
+    per_file_labels: List[str],
+    header_out: List[str],
+    model_short: str,
+    lang: str,
+    year: str,
+    mode: str,
+    out_dir: Path,
+) -> Path:
+    """
+    Simple combiner that:
+      - writes header_out to a single combined CSV
+      - appends all rows from per_file_labels
+      - does NOT enforce any specific 'qid'/'pid_qrels' schema.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
+
+    if mode == "replace" or not combined_path.exists():
+        # Fresh file: write header and all rows
+        with combined_path.open("w", encoding="utf-8", newline="") as f_out:
+            writer = csv.writer(f_out)
+            writer.writerow(header_out)
+            for p in per_file_labels:
+                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
+                    reader = csv.reader(f_in)
+                    in_header = next(reader, None)
+                    if in_header is None:
+                        continue
+                    if in_header != header_out:
+                        print(
+                            f"[FATAL] Inconsistent header in {p}.\n"
+                            f"  got: {in_header}\n"
+                            f"  exp: {header_out}"
+                        )
+                        sys.exit(4)
+                    for row in reader:
+                        writer.writerow(row)
+    else:
+        # Append mode: check header once, then append rows
+        with combined_path.open("r", encoding="utf-8", newline="") as f_ex:
+            existing_header = next(csv.reader(f_ex), None)
+        if existing_header != header_out:
+            print(
+                f"[FATAL] Combined file header mismatch.\n"
+                f"  got: {existing_header}\n"
+                f"  exp: {header_out}"
+            )
+            sys.exit(4)
+
+        with combined_path.open("a", encoding="utf-8", newline="") as f_out:
+            writer = csv.writer(f_out)
+            for p in per_file_labels:
+                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
+                    reader = csv.reader(f_in)
+                    in_header = next(reader, None)
+                    if in_header != header_out:
+                        print(
+                            f"[FATAL] Inconsistent header in {p}.\n"
+                            f"  got: {in_header}\n"
+                            f"  exp: {header_out}"
+                        )
+                        sys.exit(4)
+                    for row in reader:
+                        writer.writerow(row)
+
+    return combined_path
+
+
 async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
-    MODEL_OUT_DIR = Path("outputs/llm_label") / short
-    MODEL_LOGS_DIR = Path("logs") / short
+
+    # All label CSVs for this model/year go directly in this folder
+    MODEL_OUT_DIR = OUTPUT_ROOT_DIR
+    MODEL_LOGS_DIR = LOG_ROOT_DIR / short
     MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
     MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -404,19 +478,20 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     # verify consistent headers & collect per-file CSVs
     header_out_set = {tuple(r["header_out"]) for r in results}
     if len(header_out_set) != 1:
-        print(f"[FATAL] Inconsistent output headers: {header_out_set}")
+        print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
-    # write combined CSV
-    combined_path = write_combined(
+    # write combined CSV (dynamic, no qid/pid_qrels enforcement)
+    combined_path = write_combined_dynamic(
         per_file_labels=per_file_labels,
         header_out=header_out,
         model_short=short,
         lang=LANG,
         year=TREC_DL_YEAR,
         mode=mode,
+        out_dir=MODEL_OUT_DIR,
     )
 
     total_in = sum(r["input_tokens"] for r in results)
@@ -428,10 +503,9 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     except Exception:
         cost_usd = 0.0
 
-    # combined list of per-file logs
     write_run_log_index(
         [{"part": r["part"], "log_json": r["log_json"]} for r in results],
-        Path("logs") / short / f"{run_id}_llm_logs_index_{short}_{LANG}.json",
+        MODEL_LOGS_DIR / f"{run_id}_llm_logs_index_{short}_{LANG}.json",
     )
 
     append_token_row(

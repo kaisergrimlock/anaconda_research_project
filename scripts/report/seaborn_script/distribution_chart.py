@@ -1,84 +1,181 @@
 #!/usr/bin/env python3
+from pathlib import Path
+from typing import List
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.ticker import PercentFormatter
-from pathlib import Path
 
-# ========= Configure this =========
-# Option A: long format produced by your scripts: label,no. of docs,judge (judge in {"NIST","llm"})
-INPUT_CSV = Path("outputs/baseline/label_counts.csv")
+# =========================
+# Config
+# =========================
+BASE_DIR = Path("outputs") / "baseline" / "2022" / "gpt-oss-20b"  # change as needed
+CONFUSION_NAME = "confusion_matrix_llm_vs_nist_pct.csv"
+PRED_SCORES: List[str] = ["0", "1", "2", "3"]  # LLM labels (columns)
 
-# Option B (alternative): if you already have a wide CSV with columns:
-# label,NIST,llm,%_NIST,%_llm then point INPUT_CSV to that file instead.
-# ==================================
+# figures/nonrel is a sibling of outputs/
+PROJECT_ROOT = BASE_DIR.parents[3]           # .../<project_root>/outputs/...
+FIG_DIR = PROJECT_ROOT / "figures" / "nonrel"
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+FIG_PATH = FIG_DIR / "nonrel_basic_gpt-oss-20b.png"
 
-def load_percent_data(path: Path) -> pd.DataFrame:
-    df = pd.read_csv(path)
 
-    # Wide format present? (already has percentage columns)
-    wide_cols = {"label", "%_NIST", "%_llm"}
-    if wide_cols.issubset(df.columns):
-        pct = df[["label", "%_NIST", "%_llm"]].rename(columns={"%_NIST": "NIST", "%_llm": "LLM"})
-        return pct
+# =========================
+# Data loading
+# =========================
+def load_nonrel_distributions(base_dir: Path) -> pd.DataFrame:
+    """
+    For each language subfolder under base_dir, read confusion_matrix_llm_vs_nist_pct.csv
+    and take the NIST=0 row (non-relevant). Returns a long-form dataframe:
 
-    # Otherwise assume long format: label,no. of docs,judge
-    required = {"label", "no. of docs", "judge"}
-    if not required.issubset(df.columns):
-        raise ValueError(
-            f"CSV must have either columns {sorted(wide_cols)} or {sorted(required)}. "
-            f"Found: {list(df.columns)}"
+        variant  : label for x-axis (NonRelP, NonRelP+eng, ...)
+        lang     : raw folder name (raw, eng, fr, ...)
+        score    : LLM relevance label (0..3)
+        prop     : proportion in [0, 1]
+    """
+    records = []
+
+    # sort with "raw" first, then alphabetically
+    lang_dirs = sorted(
+        (p for p in base_dir.iterdir() if p.is_dir()),
+        key=lambda p: (p.name != "raw", p.name),
+    )
+
+    for lang_dir in lang_dirs:
+        lang = lang_dir.name
+        csv_path = lang_dir / CONFUSION_NAME
+        if not csv_path.exists():
+            print(f"[WARN] Missing confusion matrix: {csv_path}")
+            continue
+
+        df = pd.read_csv(csv_path)
+
+        # Get the non-relevant row: NIST == 0
+        if "NIST" in df.columns:
+            nonrel_rows = df[df["NIST"] == 0]
+            if nonrel_rows.empty:
+                print(f"[WARN] No NIST=0 row in {csv_path}, using first data row.")
+                row = df.iloc[0]
+            else:
+                row = nonrel_rows.iloc[0]
+        else:
+            # fallback: just take the first row after header
+            print(f"[WARN] No 'NIST' column in {csv_path}, using first row.")
+            row = df.iloc[0]
+
+        # Pretty label for x-axis
+        if lang == "raw":
+            variant_name = "NonRelP"
+        else:
+            variant_name = f"NonRelP+{lang}"
+
+        for score_str in PRED_SCORES:
+            pct = float(row[score_str])   # e.g. 27.92
+            prop = pct / 100.0            # convert to 0–1
+
+            records.append(
+                {
+                    "lang": lang,
+                    "variant": variant_name,
+                    "score": int(score_str),
+                    "prop": prop,
+                }
+            )
+
+    return pd.DataFrame.from_records(records)
+
+
+# =========================
+# Plotting
+# =========================
+def plot_nonrel_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
+    sns.set_theme(style="darkgrid")
+    plt.style.use("dark_background")
+
+    # Colors for scores 0–3
+    palette = {
+        0: "#111111",  # dark
+        1: "#8f6b32",  # brown
+        2: "#5b7f24",  # dark olive green
+        3: "#9ad000",  # bright green
+    }
+
+    variants = df["variant"].unique()      # already ordered raw → others
+    scores = sorted(df["score"].unique())
+
+    fig, ax = plt.subplots(figsize=(5, 6))
+    x_positions = range(len(variants))
+
+    for i, variant in enumerate(variants):
+        subset = (
+            df[df["variant"] == variant]
+            .set_index("score")
+            .reindex(scores)
+            .fillna(0.0)
         )
 
-    # normalize judge names (NIST/llm) and labels to int
-    df = df.copy()
-    df["judge"] = df["judge"].str.strip().str.upper().map({"NIST": "NIST", "LLM": "LLM"})
-    df["label"] = pd.to_numeric(df["label"], errors="coerce").astype("Int64")
-    df = df.dropna(subset=["judge", "label"])
+        bottom = 0.0
+        for s in scores:
+            height = subset.loc[s, "prop"]
+            if height <= 0:
+                continue
 
-    # keep only labels 0..3; anything else can be mapped to 0 if you like.
-    df = df[df["label"].isin([0, 1, 2, 3])]
+            ax.bar(
+                i,
+                height,
+                bottom=bottom,
+                color=palette[s],
+                edgecolor="black",
+                linewidth=0.5,
+            )
 
-    # pivot to counts per judge x label
-    pivot = df.pivot_table(index="label", columns="judge", values="no. of docs", aggfunc="sum", fill_value=0)
+            # label segment if big enough
+            if height >= 0.04:
+                ax.text(
+                    i,
+                    bottom + height / 2,
+                    f"{height:.2f}",
+                    ha="center",
+                    va="center",
+                    fontsize=8,
+                    color="white",
+                )
 
-    # compute percentages per judge
-    for col in ["NIST", "LLM"]:
-        if col in pivot.columns:
-            total = pivot[col].sum()
-            pivot[f"%_{col}"] = pivot[col] / total * 100 if total > 0 else 0.0
-        else:
-            pivot[f"%_{col}"] = 0.0
+            bottom += height
 
-    pct = pivot.reset_index()[["label", "%_NIST", "%_LLM"]].rename(columns={"%_LLM": "LLM", "%_NIST": "NIST"})
-    return pct
+    # Axes & title
+    ax.set_xticks(list(x_positions))
+    ax.set_xticklabels(variants, rotation=45, ha="right", fontsize=9)
+    ax.set_ylabel("Score Distribution")
+    ax.set_ylim(0, 1.01)
+    ax.set_title(title, fontsize=12)
 
-# ---- Load & reshape ----
-pct = load_percent_data(INPUT_CSV)
-pct_long = pct.melt(id_vars="label", var_name="Source", value_name="Percent")
+    # Legend on the right so it doesn't overlap x-axis
+    handles = [plt.Rectangle((0, 0), 1, 1, color=palette[s]) for s in scores]
+    labels = [str(s) for s in scores]
+    ax.legend(
+        handles,
+        labels,
+        title="Relevance Scores",
+        loc="center left",
+        bbox_to_anchor=(1.02, 0.5),
+        frameon=True,
+        framealpha=1.0,
+        edgecolor="white",
+    )
 
-# ---- Plot ----
-sns.set(style="whitegrid")
-plt.figure(figsize=(8, 4.5))
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
 
-ax = sns.barplot(data=pct_long, x="label", y="Percent", hue="Source")
-ax.yaxis.set_major_formatter(PercentFormatter(100))
-ax.set_title("Label Distribution (%): NIST vs LLM", pad=12)
-ax.set_xlabel("Label")
-ax.set_ylabel("Percentage")
 
-for p in ax.patches:
-    h = p.get_height()
-    if pd.notnull(h):
-        ax.annotate(f"{h:.2f}%",
-                    (p.get_x() + p.get_width() / 2, h),
-                    ha="center", va="bottom", fontsize=9, xytext=(0, 3), textcoords="offset points")
-
-ax.legend(title="Source")
-plt.tight_layout()
-
-# Save (optional)
-# Path("outputs/baseline/plots").mkdir(parents=True, exist_ok=True)
-# plt.savefig("outputs/baseline/plots/label_distribution_percent.png", dpi=200)
-
-plt.show()
+# =========================
+# Main
+# =========================
+if __name__ == "__main__":
+    df_nonrel = load_nonrel_distributions(BASE_DIR)
+    if df_nonrel.empty:
+        print("[ERROR] No data found; check BASE_DIR and CSV paths.")
+    else:
+        plot_nonrel_distribution(df_nonrel, title="Basic", out_path=FIG_PATH)
+        print(f"[OK] Saved figure to {FIG_PATH}")

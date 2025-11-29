@@ -1,0 +1,2 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251129_134620,2025-11-29T13:51:18,qwen.qwen3-32b-v1:0,1622,554259,29428,583687,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_raw_labels.csv,(see logs index)

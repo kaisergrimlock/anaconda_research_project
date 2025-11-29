@@ -1,0 +1,11 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251129_002108,2025-11-29T00:21:18,openai.gpt-oss-20b-1:0,2,831,770,1601,0.000289,outputs\llm_label\tred_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_vi_labels.csv,(see logs index)
+20251129_002209,2025-11-29T00:34:44,openai.gpt-oss-20b-1:0,3069,1186669,868381,2055050,0.343581,outputs\llm_label\tred_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_vi_labels.csv,(see logs index)
+20251129_004354,2025-11-29T00:56:06,openai.gpt-oss-20b-1:0,3069,1194444,860036,2054480,0.341622,outputs\llm_label\tred_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_th_labels.csv,(see logs index)
+20251129_010410,2025-11-29T01:16:06,openai.gpt-oss-20b-1:0,3069,1184769,858922,2043691,0.340610,outputs\llm_label\tred_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_ru_labels.csv,(see logs index)
+20251129_013332,2025-11-29T01:45:36,openai.gpt-oss-20b-1:0,3069,1184151,850171,2034322,0.337942,outputs\llm_label\tred_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_fr_labels.csv,(see logs index)
+20251129_135919,2025-11-29T14:11:48,openai.gpt-oss-20b-1:0,3069,1186315,835687,2022002,0.333748,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_sw_labels.csv,(see logs index)
+20251129_141924,2025-11-29T14:31:07,openai.gpt-oss-20b-1:0,3069,1186315,834897,2021212,0.333511,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_sw_labels.csv,(see logs index)
+20251129_143501,2025-11-29T14:46:40,openai.gpt-oss-20b-1:0,3069,1186315,838329,2024644,0.334541,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_sw_labels.csv,(see logs index)
+20251129_191440,2025-11-29T19:27:39,openai.gpt-oss-20b-1:0,3069,1196438,839725,2036163,0.335668,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_eng_mult_labels.csv,(see logs index)
+20251129_194509,2025-11-29T20:03:14,openai.gpt-oss-20b-1:0,3069,1253293,816206,2069499,0.332592,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_eng_vi_labels.csv,(see logs index)
