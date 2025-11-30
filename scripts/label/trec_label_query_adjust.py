@@ -47,11 +47,12 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "raw"          # "raw", "vi", "enclosed", ...
+LANG = "vi"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "append"       # "append" or "replace"
+QUERY_COL = "query_vi"  # input query column name
 
 # Input part files
 if LANG == "raw":
@@ -69,7 +70,7 @@ INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots (EDIT THESE if you want outputs elsewhere)
 short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/ {QUERY_COL}")
 LOG_ROOT_DIR = Path("logs")
 
 # ===== functions =====
@@ -196,7 +197,7 @@ def _label_single_part_file_blocking(
     header_in = _inspect_header(part_csv)
 
     # ===== Minimal required columns =====
-    required_cols = ["query"]
+    required_cols = [QUERY_COL]
     if LANG == "raw":
         required_cols.append("passage")
     else:
@@ -255,11 +256,11 @@ def _label_single_part_file_blocking(
                 row_out_map["pid_resolved"] = pr
 
         # Core prompt fields
-        q_for_prompt = (row_out_map.get("query", "") or "").strip()
+        q_for_prompt = (row_out_map.get(QUERY_COL, "") or "").strip()
         p_for_prompt = pick_passage_for_lang(row_out_map, LANG)
 
         if not q_for_prompt:
-            print(f"[FATAL] {part_csv.name}: missing 'query' at row {idx}.")
+            print(f"[FATAL] {part_csv.name}: missing {QUERY_COL} at row {idx}.")
             sys.exit(3)
         if not p_for_prompt:
             print(
