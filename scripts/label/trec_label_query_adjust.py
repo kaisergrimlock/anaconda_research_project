@@ -22,7 +22,6 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.csv_helpers import (
     bump_field_limit,
     ensure_csv_with_header,
-    pick_passage_for_lang,
     model_short_name,
     _inspect_header,
 )
@@ -47,12 +46,15 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "vi"          # "raw", "vi", "enclosed", ...
+LANG = "vi_trans_q"          # kept for naming/logging only
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "append"       # "append" or "replace"
-QUERY_COL = "query_vi"  # input query column name
+
+# === Adjustable columns ===
+QUERY_COL = "query_vi"          # input query column name
+PASSAGE_COL = "passage"  # input passage column name
 
 # Input part files
 if LANG == "raw":
@@ -62,15 +64,17 @@ else:
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Models
-#qwen.qwen3-32b-v1:0
-#openai.gpt-oss-20b-1:0
-#meta.llama3-70b-instruct-v1:0
-MODELS = ["meta.llama3-70b-instruct-v1:0"]
+# qwen.qwen3-32b-v1:0
+# openai.gpt-oss-20b-1:0
+# meta.llama3-70b-instruct-v1:0
+MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots (EDIT THESE if you want outputs elsewhere)
 short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/ {QUERY_COL}")
+OUTPUT_ROOT_DIR = Path(
+    f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/"
+)
 LOG_ROOT_DIR = Path("logs")
 
 # ===== functions =====
@@ -197,11 +201,7 @@ def _label_single_part_file_blocking(
     header_in = _inspect_header(part_csv)
 
     # ===== Minimal required columns =====
-    required_cols = [QUERY_COL]
-    if LANG == "raw":
-        required_cols.append("passage")
-    else:
-        required_cols.append("passage_injected")
+    required_cols = [QUERY_COL, PASSAGE_COL]
 
     missing = [c for c in required_cols if c not in header_in]
     if missing:
@@ -224,7 +224,8 @@ def _label_single_part_file_blocking(
 
     total_rows = count_data_rows(part_csv)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
-    print(f"[HEADER] LANG='{LANG}' | output columns = {header_out}")
+    print(f"[HEADER] LANG='{LANG}' | QUERY_COL='{QUERY_COL}' | PASSAGE_COL='{PASSAGE_COL}'")
+    print(f"[HEADER] output columns = {header_out}")
 
     def append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
         if not path.exists():
@@ -241,8 +242,7 @@ def _label_single_part_file_blocking(
         # Map of all input columns
         row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
 
-        # Optional "pid_resolved" best-effort for logging; if your input doesn't
-        # have these, this just stays empty and is harmless.
+        # Optional "pid_resolved" best-effort for logging
         pr = (row_out_map.get("pid_resolved", "") or "").strip()
         if not pr:
             pr = (
@@ -257,15 +257,15 @@ def _label_single_part_file_blocking(
 
         # Core prompt fields
         q_for_prompt = (row_out_map.get(QUERY_COL, "") or "").strip()
-        p_for_prompt = pick_passage_for_lang(row_out_map, LANG)
+        p_for_prompt = (row_out_map.get(PASSAGE_COL, "") or "").strip()
 
         if not q_for_prompt:
             print(f"[FATAL] {part_csv.name}: missing {QUERY_COL} at row {idx}.")
             sys.exit(3)
         if not p_for_prompt:
             print(
-                f"[FATAL] {part_csv.name}: could not find passage for LANG='{LANG}' "
-                f"(expected e.g. 'passage_injected' or 'passage') at row {idx}."
+                f"[FATAL] {part_csv.name}: missing {PASSAGE_COL} at row {idx} "
+                f"(cannot build passage for prompt)."
             )
             sys.exit(3)
 
@@ -316,8 +316,8 @@ def _label_single_part_file_blocking(
                 "response_text": text,
                 "reasoning": reasoning,
                 "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-                "passage_prompt_used": "passage_injected" if LANG != "raw" else "passage",
-                "query_prompt_used": "query",
+                "passage_prompt_used": PASSAGE_COL,
+                "query_prompt_used": QUERY_COL,
                 "llm_relevance": score,
             }
         )

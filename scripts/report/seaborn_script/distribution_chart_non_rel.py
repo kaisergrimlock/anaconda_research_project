@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,45 +11,78 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+MODEL = "gpt-oss-20b"   # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
-# Baseline dir is only used to find PROJECT_ROOT / figs
+# Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
 PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/...
+
+# Output figure
 FIG_DIR = PROJECT_ROOT / "figures" / "nonrel"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
-FIG_PATH = FIG_DIR / f"nonrelpairs_{MODEL}_{TREC_DL_YEAR}.png"
+FIG_PATH = FIG_DIR / f"nonrelpairs_{MODEL}_{TREC_DL_YEAR}_trans_q.png"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
-# Optional: limit to some langs
-TARGET_LANGS: List[str] = ["eng_mult", "eng_vi_between"]  # edit or remove filter
+# Only keep these “language” variants.
+# Set to [] or None to include all non-raw files.
+TARGET_LANGS: List[str] = ["eng", "vi_trans_q", "vi"]
+
+# Relevance scores used by the models
+SCORES: List[int] = [0, 1, 2, 3]
+
 
 # =========================
+# Helpers
+# =========================
+def parse_lang_from_filename(path: Path) -> str:
+    """
+    Given a filename like:
+        gpt-oss-20b_trecdl_2022_eng_mult_labels.csv
+        gpt-oss-20b_trecdl_2022_eng_vi_between_labels.csv
+    return:
+        "eng_mult"
+        "eng_vi_between"
 
+    Pattern is assumed:
+        {MODEL}_trecdl_{YEAR}_{lang}_labels.csv
+    where {lang} may itself contain underscores.
+    """
+    parts = path.stem.split("_")
+    # Expect at least: [MODEL, 'trecdl', YEAR, <lang...>, 'labels']
+    if len(parts) >= 5 and parts[1] == "trecdl":
+        # join everything between YEAR and 'labels'
+        lang = "_".join(parts[3:-1])
+    else:
+        # fallback: second last token
+        lang = parts[-2] if len(parts) >= 2 else "unknown"
+    return lang
+
+
+# =========================
+# Data loading
+# =========================
 def load_nonrel_from_llm_labels(label_dir: Path) -> pd.DataFrame:
     """
-    Build a long-form DataFrame with the same schema as the confusion-matrix
-    version, but computed directly from LLM label rows:
+    Build a long-form DataFrame:
 
         variant : "NonRelP" for raw, "NonRelP+<lang>" otherwise
-        lang    : raw, eng, vi, ...
+        lang    : raw, eng, eng_mult, eng_vi_between, ...
         score   : llm_relevance (0..3)
-        prop    : proportion in [0, 1] among non-rel pairs for that variant
+        prop    : proportion in [0, 1] among *raw non-rel pairs* for that variant
     """
-    records = []
+    records: List[Dict] = []
 
+    # ---------- RAW ----------
     raw_file = label_dir / f"{MODEL}_trecdl_{TREC_DL_YEAR}_raw_labels.csv"
     if not raw_file.exists():
         raise FileNotFoundError(f"Missing raw labels file: {raw_file}")
 
     df_raw = pd.read_csv(raw_file)
-
-    # Make sure llm_relevance is numeric
     df_raw["llm_relevance"] = pd.to_numeric(df_raw["llm_relevance"], errors="coerce")
 
-    # Non-rel pairs in raw
+    # rows where raw judged 0
     non_rel_raw = df_raw[df_raw["llm_relevance"] == 0].copy()
     if non_rel_raw.empty:
         print("[WARN] No llm_relevance == 0 rows in RAW.")
@@ -58,13 +91,11 @@ def load_nonrel_from_llm_labels(label_dir: Path) -> pd.DataFrame:
     key_cols = ["qid", "pid"]
     nonrel_keys = non_rel_raw[key_cols].drop_duplicates()
 
-    scores = [0, 1, 2, 3]
-
-    # ---- RAW variant distribution (will be all zeros, but keep for completeness) ----
+    # distribution in RAW (will be all zeros except score 0)
     counts_raw = non_rel_raw["llm_relevance"].value_counts().to_dict()
     total_raw = len(non_rel_raw)
 
-    for s in scores:
+    for s in SCORES:
         prop = counts_raw.get(s, 0) / total_raw
         records.append(
             {
@@ -75,28 +106,33 @@ def load_nonrel_from_llm_labels(label_dir: Path) -> pd.DataFrame:
             }
         )
 
-    # ---- Other language files ----
-    for file_path in label_dir.glob(f"{MODEL}_trecdl_{TREC_DL_YEAR}_*_labels.csv"):
-        if "raw" in file_path.name:
-            continue  # already handled
+    # ---------- OTHER VARIANTS ----------
+    seen_langs: set[str] = set()
 
-        # Extract lang from filename: {MODEL}_trecdl_{YEAR}_{lang}_labels.csv
-        stem_parts = file_path.stem.split("_")
-        if len(stem_parts) >= 5 and stem_parts[1] == "trecdl":
-            lang = "_".join(stem_parts[3:-1])  # in case lang has underscores
-        else:
-            lang = stem_parts[-2] if len(stem_parts) >= 2 else "unknown"
-        print(lang)
-        # If you only want some langs
+    pattern = f"{MODEL}_trecdl_{TREC_DL_YEAR}_*_labels.csv"
+    for file_path in label_dir.glob(pattern):
+        # skip raw (already handled)
+        if file_path.name.endswith("_raw_labels.csv"):
+            continue
+
+        lang = parse_lang_from_filename(file_path)
+
+        # optionally restrict to selected variants
         if TARGET_LANGS and (lang not in TARGET_LANGS):
             continue
+
+        # avoid accidental duplicates for the same lang
+        if lang in seen_langs:
+            print(f"[SKIP] Duplicate file for lang '{lang}': {file_path.name}")
+            continue
+        seen_langs.add(lang)
 
         df_other = pd.read_csv(file_path)
         df_other["llm_relevance"] = pd.to_numeric(
             df_other["llm_relevance"], errors="coerce"
         )
 
-        # keep only rows whose (qid, pid) are in the non-rel raw set
+        # keep only the (qid, pid) pairs that were 0 in raw
         df_match = df_other.merge(nonrel_keys, on=key_cols, how="inner")
         if df_match.empty:
             print(f"[INFO] No matching non-rel pairs in {file_path.name}")
@@ -104,10 +140,9 @@ def load_nonrel_from_llm_labels(label_dir: Path) -> pd.DataFrame:
 
         counts = df_match["llm_relevance"].value_counts().to_dict()
         total = len(df_match)
-
         variant_name = f"NonRelP+{lang}"
 
-        for s in scores:
+        for s in SCORES:
             prop = counts.get(s, 0) / total
             records.append(
                 {
@@ -118,12 +153,18 @@ def load_nonrel_from_llm_labels(label_dir: Path) -> pd.DataFrame:
                 }
             )
 
-    return pd.DataFrame.from_records(records)
+    df = pd.DataFrame.from_records(records)
 
+    # Debug: ensure each variant's props sum to ~1
+    if not df.empty:
+        print("\n[DEBUG] Sum of props per variant (should be 1.0 each):")
+        print(df.groupby("variant")["prop"].sum())
+
+    return df
 
 
 # =========================
-# Plotting (unchanged)
+# Plotting
 # =========================
 def plot_nonrel_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
     sns.set_theme(style="darkgrid")
@@ -136,26 +177,31 @@ def plot_nonrel_distribution(df: pd.DataFrame, title: str, out_path: Path) -> No
         3: "#9ad000",  # bright green
     }
 
-    variants = df["variant"].unique()
+    # order: NonRelP first, then others alphabetically
+    variants = sorted(
+        df["variant"].unique(),
+        key=lambda v: (v != "NonRelP", v),
+    )
     scores = sorted(df["score"].unique())
 
-    fig, ax = plt.subplots(figsize=(5, 6))
+    fig, ax = plt.subplots(figsize=(6, 6))
     x_positions = range(len(variants))
 
     for i, variant in enumerate(variants):
-        # Take only this variant and aggregate in case there are duplicates per score
-        subset = (
-            df[df["variant"] == variant]
-            .groupby("score", dropna=False)["prop"]
-            .sum()                # Series: index = score, value = summed prop
-        )
+        subset = df[df["variant"] == variant]
 
-        # Ensure all scores exist; fill missing with 0.0
-        subset = subset.reindex(scores).fillna(0.0)
+        # aggregate just in case there are duplicates
+        series = subset.groupby("score", dropna=False)["prop"].sum()
+        series = series.reindex(scores).fillna(0.0)
+
+        # normalise defensively so each stack sums to 1.0
+        total = series.sum()
+        if total > 0:
+            series = series / total
 
         bottom = 0.0
         for s in scores:
-            height = subset.loc[s]
+            height = series.loc[s]
             if height <= 0:
                 continue
 
@@ -205,11 +251,12 @@ def plot_nonrel_distribution(df: pd.DataFrame, title: str, out_path: Path) -> No
     plt.close(fig)
 
 
-
-# ========================= # Main # =========================
+# =========================
+# Main
+# =========================
 if __name__ == "__main__":
     df_nonrel = load_nonrel_from_llm_labels(LABEL_DIR)
-    print(df_nonrel.groupby("variant")["prop"].sum())
+
     if df_nonrel.empty:
         print("[ERROR] No data found; check LABEL_DIR and raw llm_relevance == 0.")
     else:

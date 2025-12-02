@@ -47,7 +47,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "raw"          # "raw", "vi", "enclosed", ...
+LANG = "vi"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -64,12 +64,12 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 #qwen.qwen3-32b-v1:0
 #openai.gpt-oss-20b-1:0
 #meta.llama3-70b-instruct-v1:0
-MODELS = ["meta.llama3-70b-instruct-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]  # e.g., ["qwen3-32b-v1", "gpt-oss-20b", ...]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots (EDIT THESE if you want outputs elsewhere)
 short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/1/")
 LOG_ROOT_DIR = Path("logs")
 
 # ===== functions =====

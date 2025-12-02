@@ -28,16 +28,27 @@ from helpers.metrics_llm import (
 )
 
 # -------- Config --------
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR_1 = "2022"
+TREC_DL_YEAR_2 = "2021"
+YEARS = [TREC_DL_YEAR_1, TREC_DL_YEAR_2]
+
 MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "vi_trans_q"  # "raw","eng","vi","fr", etc.
+LANG  = "raw"           # "raw","eng","vi","fr", etc.
 
-# This CSV is now assumed to already contain:
-#   - relevance
-#   - llm_relevance
-LLM_FILE = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}" / MODEL / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{LANG}_labels.csv"
+# Human-readable label for combined years (used in paths/titles)
+COMBINED_LABEL = f"{TREC_DL_YEAR_1}_{TREC_DL_YEAR_2}"
 
-OUT_DIR          = Path("outputs/baseline") / TREC_DL_YEAR / MODEL / LANG
+# LLM_FILES for each year
+LLM_FILES = [
+    Path("outputs/llm_label")
+    / f"trec_dl_{year}"
+    / MODEL
+    / f"{MODEL}_trecdl_{year}_{LANG}_labels.csv"
+    for year in YEARS
+]
+
+# Output directory is per-model/lang for the combined years
+OUT_DIR          = Path("outputs/baseline") / COMBINED_LABEL / MODEL / LANG
 OUT_COUNTS       = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT          = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
 OUT_SVG          = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"
@@ -48,25 +59,42 @@ LABELS = [0, 1, 2, 3]
 
 def load_and_prepare() -> pd.DataFrame:
     """
-    Load the combined CSV that already contains both relevance and llm_relevance.
-    Coerce them to numeric and standardize column names (NIST, LLM).
+    Load the combined CSVs (for two years) that already contain both
+    'relevance' and 'llm_relevance'. Coerce to numeric and standardize
+    column names (NIST, LLM). Return a single combined DataFrame.
     """
     bump_field_limit()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    df = pd.read_csv(LLM_FILE)
+    frames = []
+    for year, csv_path in zip(YEARS, LLM_FILES):
+        if not csv_path.exists():
+            raise FileNotFoundError(
+                f"Expected file for year {year} not found: {csv_path}"
+            )
 
-    if "relevance" not in df.columns or "llm_relevance" not in df.columns:
-        raise ValueError(
-            f"Expected columns 'relevance' and 'llm_relevance' in {LLM_FILE}, "
-            f"but got: {list(df.columns)}"
-        )
+        df_year = pd.read_csv(csv_path)
 
-    # Coerce to numeric (in case they are strings); invalid parses become NaN
-    df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce")
-    df["LLM"]  = pd.to_numeric(df["llm_relevance"],  errors="coerce")
+        if "relevance" not in df_year.columns or "llm_relevance" not in df_year.columns:
+            raise ValueError(
+                f"Expected columns 'relevance' and 'llm_relevance' in {csv_path}, "
+                f"but got: {list(df_year.columns)}"
+            )
 
-    return df
+        # Optional: keep track of which year each row came from
+        df_year["trec_dl_year"] = year
+
+        # Coerce to numeric (in case they are strings); invalid parses become NaN
+        df_year["NIST"] = pd.to_numeric(df_year["relevance"], errors="coerce")
+        df_year["LLM"]  = pd.to_numeric(df_year["llm_relevance"], errors="coerce")
+
+        frames.append(df_year)
+
+    if not frames:
+        raise RuntimeError("No input frames loaded; check LLM_FILES paths.")
+
+    combined = pd.concat(frames, ignore_index=True)
+    return combined
 
 
 def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -97,6 +125,7 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     """
     Given a DataFrame with columns NIST and LLM (already validated),
     compute the confusion matrix and metrics, then write outputs + heatmap.
+    This is done over the *combined* dataset across both years.
     """
     # 1) Confusion matrix (4-point)
     cm = pd.crosstab(
@@ -109,7 +138,7 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     cm_pct = cm.div(cm.sum(axis=1).replace(0, 1), axis=0) * 100.0
 
-    # 2) Metrics
+    # 2) Metrics (4-point)
     mae = compute_mae(paired["NIST"], paired["LLM"])
     kappa_weighted = compute_weighted_kappa_ordinal(cm)
 
@@ -131,11 +160,11 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     metrics_df = pd.DataFrame(
         [
-            {"metric": "mae",               "value": float(mae)},
-            {"metric": "mae_binary_2pt",    "value": float(mae_binary)},
-            {"metric": "kappa_weighted_4pt","value": float(kappa_weighted)},
-            {"metric": "kappa_binary_2pt",  "value": float(kappa_binary)},
-            {"metric": "pairs",             "value": float(len(paired))},
+            {"metric": "mae",                "value": float(mae)},
+            {"metric": "mae_binary_2pt",     "value": float(mae_binary)},
+            {"metric": "kappa_weighted_4pt", "value": float(kappa_weighted)},
+            {"metric": "kappa_binary_2pt",   "value": float(kappa_binary)},
+            {"metric": "pairs",              "value": float(len(paired))},
         ]
     )
     write_metrics(metrics_df, OUT_DIR / "metrics_llm_vs_nist.csv")
@@ -143,15 +172,18 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     # 4) Heatmap
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", linewidths=.5, cbar=True)
-    plt.title(f"Confusion Matrix: NIST vs LLM — {MODEL} {TREC_DL_YEAR} {LANG}")
+    plt.title(
+        f"Confusion Matrix: NIST vs LLM — {MODEL} "
+        f"TREC-DL {TREC_DL_YEAR_1} + {TREC_DL_YEAR_2} ({LANG})"
+    )
     plt.ylabel("NIST label")
     plt.xlabel("LLM label")
 
     save_heatmap(plt, OUT_SVG, dpi=200, tight=True, show=True)
 
 
-def main():
-    # Load + standardize
+def main() -> None:
+    # Load + standardize for both years, then combine
     df = load_and_prepare()
 
     # ---- Section: missing/invalid label checking ----

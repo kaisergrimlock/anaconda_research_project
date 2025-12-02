@@ -1,0 +1,2 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251130_201704,2025-11-30T20:25:09,meta.llama3-70b-instruct-v1:0,3069,1002282,53041,1055323,0.000000,outputs\llm_label\trec_dl_2022\llama3-70b-instruct\ query_vi\llama3-70b-instruct_trecdl_2022_vi_labels.csv,(see logs index)
