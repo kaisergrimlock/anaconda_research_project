@@ -46,15 +46,15 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "vi_trans_q"          # kept for naming/logging only
+LANG = "th_trans_p"          # kept for naming/logging only
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "append"       # "append" or "replace"
 
 # === Adjustable columns ===
-QUERY_COL = "query_vi"          # input query column name
-PASSAGE_COL = "passage"  # input passage column name
+QUERY_COL = "query_th"          # input query column name
+PASSAGE_COL = "passage_th"  # input passage column name
 
 # Input part files
 if LANG == "raw":
@@ -73,7 +73,7 @@ INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 # Output roots (EDIT THESE if you want outputs elsewhere)
 short = model_short_name(MODELS[0])
 OUTPUT_ROOT_DIR = Path(
-    f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/"
+    f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/ vi_qp"
 )
 LOG_ROOT_DIR = Path("logs")
 
@@ -199,6 +199,7 @@ def _label_single_part_file_blocking(
     logs_dir.mkdir(parents=True, exist_ok=True)
 
     header_in = _inspect_header(part_csv)
+    skipped_missing_passage = 0
 
     # ===== Minimal required columns =====
     required_cols = [QUERY_COL, PASSAGE_COL]
@@ -263,11 +264,13 @@ def _label_single_part_file_blocking(
             print(f"[FATAL] {part_csv.name}: missing {QUERY_COL} at row {idx}.")
             sys.exit(3)
         if not p_for_prompt:
+            skipped_missing_passage += 1
             print(
-                f"[FATAL] {part_csv.name}: missing {PASSAGE_COL} at row {idx} "
-                f"(cannot build passage for prompt)."
+                f"[WARN] {part_csv.name}: skipping row {idx+2} "
+                f"(missing {PASSAGE_COL}, cannot build passage for prompt)."
             )
-            sys.exit(3)
+            continue
+            #sys.exit(3)
 
         prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
         messages = [{"role": "user", "content": [{"text": prompt}]}]
@@ -352,6 +355,7 @@ def _label_single_part_file_blocking(
 
 
 async def label_single_part_file(*args, **kwargs) -> dict:
+
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
 
 

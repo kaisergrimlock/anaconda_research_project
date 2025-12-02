@@ -20,14 +20,14 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure
 FIG_DIR = PROJECT_ROOT / "figures" / "nonrel"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
-FIG_PATH = FIG_DIR / f"nonrelpairs_{MODEL}_{TREC_DL_YEAR}_trans_q_overall.png"
+FIG_PATH = FIG_DIR / f"nonrelpairs_{MODEL}_{TREC_DL_YEAR}_vi_diff.png"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "vi_trans_q", "vi"]
+TARGET_LANGS: List[str] = ["vi", "vi_1", "vi_2"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -60,17 +60,32 @@ def parse_lang_from_filename(path: Path) -> str:
     return lang
 
 
+def filter_nist_nonrel(df: pd.DataFrame, context: str) -> pd.DataFrame:
+    """
+    Keep only rows where the NIST / gold relevance == 0.
+    Tries 'relevance' first, then 'NIST_relevance'.
+    """
+    if "relevance" in df.columns:
+        return df[df["relevance"] == 0]
+    elif "NIST_relevance" in df.columns:
+        return df[df["NIST_relevance"] == 0]
+    else:
+        print(f"[WARN] {context}: no NIST column found ('relevance' or 'NIST_relevance'); "
+              f"using ALL rows instead of NIST==0.")
+        return df
+
+
 # =========================
 # Data loading
 # =========================
 def load_label_distributions(label_dir: Path) -> pd.DataFrame:
     """
-    Build a long-form DataFrame:
+    Build a long-form DataFrame (NIST non-relevant only):
 
         variant : 'raw' for raw file, otherwise the parsed lang (e.g. 'eng', 'vi_trans_q')
         lang    : same as variant
         score   : llm_relevance (0..3)
-        prop    : proportion in [0, 1] among *all valid rows* in that file
+        prop    : proportion in [0, 1] among rows where NIST relevance == 0
     """
     records: List[Dict] = []
 
@@ -80,10 +95,13 @@ def load_label_distributions(label_dir: Path) -> pd.DataFrame:
         df_raw = pd.read_csv(raw_file)
         df_raw["llm_relevance"] = pd.to_numeric(df_raw["llm_relevance"], errors="coerce")
 
+        # NEW: filter to NIST non-relevant only
+        df_raw = filter_nist_nonrel(df_raw, context=f"RAW ({raw_file.name})")
+
         # use only rows with a valid numeric label
         df_valid = df_raw.dropna(subset=["llm_relevance"])
         if df_valid.empty:
-            print("[WARN] No valid llm_relevance labels in RAW.")
+            print("[WARN] No valid llm_relevance labels in RAW after NIST==0 filtering.")
         else:
             counts_raw = df_valid["llm_relevance"].value_counts().to_dict()
             total_raw = len(df_valid)
@@ -127,9 +145,12 @@ def load_label_distributions(label_dir: Path) -> pd.DataFrame:
             df_other["llm_relevance"], errors="coerce"
         )
 
+        # NEW: filter to NIST non-relevant only
+        df_other = filter_nist_nonrel(df_other, context=file_path.name)
+
         df_valid = df_other.dropna(subset=["llm_relevance"])
         if df_valid.empty:
-            print(f"[INFO] No valid llm_relevance labels in {file_path.name}")
+            print(f"[INFO] No valid llm_relevance labels in {file_path.name} after NIST==0 filtering.")
             continue
 
         counts = df_valid["llm_relevance"].value_counts().to_dict()
@@ -151,7 +172,7 @@ def load_label_distributions(label_dir: Path) -> pd.DataFrame:
 
     # Debug: ensure each variant's props sum to ~1
     if not df.empty:
-        print("\n[DEBUG] Sum of props per variant (should be ~1.0 each):")
+        print("\n[DEBUG] Sum of props per variant (should be ~1.0 each, NIST==0 only):")
         print(df.groupby("variant")["prop"].sum())
 
     return df
@@ -223,7 +244,7 @@ def plot_nonrel_distribution(df: pd.DataFrame, title: str, out_path: Path) -> No
 
     ax.set_xticks(list(x_positions))
     ax.set_xticklabels(variants, rotation=45, ha="right", fontsize=9)
-    ax.set_ylabel("Score Distribution")
+    ax.set_ylabel("Score Distribution (NIST non-relevant only)")
     ax.set_ylim(0, 1.01)
     ax.set_title(title, fontsize=12)
 
@@ -252,11 +273,11 @@ if __name__ == "__main__":
     df_labels = load_label_distributions(LABEL_DIR)
 
     if df_labels.empty:
-        print("[ERROR] No data found; check LABEL_DIR and llm_relevance column.")
+        print("[ERROR] No data found after NIST==0 filtering; check LABEL_DIR and columns.")
     else:
         plot_nonrel_distribution(
             df_labels,
-            title="All pairs – LLM label distribution across variants",
+            title="NIST non-relevant pairs – LLM label distribution across variants",
             out_path=FIG_PATH,
         )
         print(f"[OK] Saved figure to {FIG_PATH}")

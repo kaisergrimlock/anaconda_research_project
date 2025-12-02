@@ -1,0 +1,3 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251202_180818,2025-12-02T18:29:39,openai.gpt-oss-20b-1:0,3063,1186142,870351,2056493,0.344135,outputs\llm_label\trec_dl_2022\gpt-oss-20b\ vi_qp\gpt-oss-20b_trecdl_2022_vi_trans_p_labels.csv,(see logs index)
+20251202_212021,2025-12-02T21:41:31,openai.gpt-oss-20b-1:0,3068,1242846,891489,2134335,0.354446,outputs\llm_label\trec_dl_2022\gpt-oss-20b\ vi_qp\gpt-oss-20b_trecdl_2022_th_trans_p_labels.csv,(see logs index)
