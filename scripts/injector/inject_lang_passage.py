@@ -13,12 +13,12 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "th"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "sw"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # kept, though we don't actually inject anymore
 TRECDL_YEAR = "2022"        # for folder naming only
 
 INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")             # read these CSVs
-OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}_trans_q")  # write mirrored CSVs
+OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}_trans_p")  # write mirrored CSVs
 
 # Cache map to avoid re-translation later runs (for queries only)
 CACHE_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/translate_cache")
