@@ -15,7 +15,7 @@ REGION = "ap-southeast-2"   # AWS region
 
 # Two target languages
 LANG_1 = "eng"               # e.g. 'vi' for Vietnamese
-LANG_2 = "vi"               # e.g. 'th' for Thai
+LANG_2 = "ar"               # e.g. 'th' for Thai
 TARGET_LANGS: List[str] = [LANG_1, LANG_2]
 
 TRECDL_YEAR = "2022"        # for folder naming only

@@ -11,23 +11,23 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b"   # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "gpt-oss-20b"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
 PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/...
 
 # Output figure
-FIG_DIR = PROJECT_ROOT / "figures" / "nonrel"
+FIG_DIR = PROJECT_ROOT / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
-FIG_PATH = FIG_DIR / f"nonrelpairs_{MODEL}_{TREC_DL_YEAR}_vi_diff.png"
+FIG_PATH = FIG_DIR / "nonrel_nist" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_decompose_llm_2.png"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["vi", "vi_1", "vi_2"]
+TARGET_LANGS: List[str] = ["raw_crit", "raw_crit_2"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]

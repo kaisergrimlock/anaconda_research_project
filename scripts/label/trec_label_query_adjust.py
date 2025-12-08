@@ -46,7 +46,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "th_trans_p"          # kept for naming/logging only
+LANG = "th_trans_all"          # kept for naming/logging only
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -55,6 +55,15 @@ MODE = "append"       # "append" or "replace"
 # === Adjustable columns ===
 QUERY_COL = "query_th"          # input query column name
 PASSAGE_COL = "passage_th"  # input passage column name
+
+LABEL__TYPE = ""
+
+if QUERY_COL.split("_")[-1] == PASSAGE_COL.split("_")[-1]:
+    LABEL__TYPE = "trans_all"
+elif QUERY_COL.split("_")[-1] == "eng":
+    LABEL__TYPE = "trans_p"
+elif PASSAGE_COL.split("_")[-1] == "eng":
+    LABEL__TYPE = "trans_q"
 
 # Input part files
 if LANG == "raw":
@@ -375,7 +384,7 @@ def write_combined_dynamic(
       - does NOT enforce any specific 'qid'/'pid_qrels' schema.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
-    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
+    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_{LABEL__TYPE}labels.csv"
 
     if mode == "replace" or not combined_path.exists():
         # Fresh file: write header and all rows

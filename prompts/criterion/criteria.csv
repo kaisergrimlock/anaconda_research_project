@@ -1,0 +1,5 @@
+criterion, description
+exactness, how precisely the document answers the query
+topicality, is the passage about the same topic as the whole query (i.e. not just a single word of it?)
+coverage, how much of the passage is dedicated to discussing the query topic
+contextuality, does the passage provide relevant background or context

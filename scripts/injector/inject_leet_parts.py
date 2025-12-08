@@ -14,9 +14,9 @@ from helper import allow_huge_csv_fields
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1            # how many times to inject the leetspeak query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-TRECDL_YEAR = "2023"        # for folder naming only
+TRECDL_YEAR = "2021"        # for folder naming only
 
-INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/nr")     # read these CSVs
+INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")     # read these CSVs
 OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/leet/")      # write mirrored CSVs
 
 # Filenames pattern to process

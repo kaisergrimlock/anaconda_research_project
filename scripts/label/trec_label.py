@@ -47,7 +47,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng_vi"          # "raw", "vi", "enclosed", ...
+LANG = "eng_ru"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -69,12 +69,11 @@ INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots (EDIT THESE if you want outputs elsewhere)
 short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/1/")
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/temp/")
 LOG_ROOT_DIR = Path("logs")
 
 # ===== functions =====
 bump_field_limit()  # Allow large fields to accommodate passages
-
 
 def iter_part_files(start: int, end: int):
     for n in range(start, end + 1):
@@ -352,8 +351,7 @@ def _label_single_part_file_blocking(
 
 async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
-
-
+    
 def write_combined_dynamic(
     per_file_labels: List[str],
     header_out: List[str],
@@ -553,7 +551,6 @@ async def main():
             listener_thread.join(timeout=0.2)
         except Exception:
             pass
-
 
 if __name__ == "__main__":
     try:

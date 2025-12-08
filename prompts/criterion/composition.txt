@@ -1,0 +1,11 @@
+Query: {query}
+Passage: {passage}
+Exactness: {exactness}
+Topicality: {topicality}
+Coverage: {coverage}
+Contextual Fit: {contextual}
+
+Please rate how the given passage is relevant to the query based on the given scores. The output must be only a score (0-3) that indicates how relevant they are.
+
+
+
