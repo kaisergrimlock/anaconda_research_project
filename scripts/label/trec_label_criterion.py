@@ -50,10 +50,6 @@ PROMPT_FILE = PROMPT_DIR / "prompt.txt"
 # Criteria definition CSV (name + description etc.)
 CRITERIA_CSV = PROMPT_DIR / "criteria.csv"
 
-# Single “selector” variable: which criterion to use (by name)
-# This should match the name in criteria.csv (case-insensitive match)
-CRITERION_KEY = "exactness"   # e.g. "exactness", "topicality", "coverage", "contextuality"...
-
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 # These will be filled from criteria.csv at runtime
@@ -61,12 +57,21 @@ CRITERION_NAME: str = ""
 CRITERION_DESC: str = ""
 CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 
+# ===== NEW: relevance column config =====
+# The input CSV is expected to already have a relevance column (e.g. from a previous run),
+# and we want to carry this through into the output.
+RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
+
 # ===== Data / run config =====
-LANG = "eng"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+LANG = "eng_word"          # "raw", "vi", "sw_trans_p", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
+
+# Single “selector” variable: which criterion to use (by name)
+# This should match the name in criteria.csv (case-insensitive match)
+CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
 
 # Input part files
 if LANG == "raw":
@@ -316,6 +321,14 @@ def _label_single_part_file_blocking(
     else:
         required_cols.append("passage_injected")
 
+    # NEW: also require the relevance column to be present
+    if RELEVANCE_COL not in header_in:
+        print(
+            f"[FATAL] {part_csv.name}: missing required relevance column "
+            f"'{RELEVANCE_COL}'. Available columns: {header_in}"
+        )
+        sys.exit(2)
+
     missing = [c for c in required_cols if c not in header_in]
     if missing:
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
@@ -385,8 +398,6 @@ def _label_single_part_file_blocking(
                 row_out_map["pid_resolved"] = pr
 
         # Core prompt fields
-
-
         SYSTEM_PROMPT = (
             "Please assess how well the provided passage meets specific criteria in relation to the query. "
             "Use the following scoring scale (0-3) for evaluation:\n"
@@ -424,10 +435,12 @@ def _label_single_part_file_blocking(
         )
 
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs = {"modelId": model_id, 
-                  "messages": messages, 
-                  "inferenceConfig": INFERENCE_CONFIG, 
-                  "system":[{"text": SYSTEM_PROMPT}]}
+        kwargs = {
+            "modelId": model_id,
+            "messages": messages,
+            "inferenceConfig": INFERENCE_CONFIG,
+            "system": [{"text": SYSTEM_PROMPT}],
+        }
 
         text = ""
         score = ""
@@ -438,7 +451,7 @@ def _label_single_part_file_blocking(
             resp = bedrock.converse(**kwargs)
             text = extract_text_from_resp(model_id, resp) or ""
             reasoning = extract_reasoning_from_resp(model_id, resp) or ""
-            score = parse_llm_text_to_score(text, model_id)  # <-- UPDATED
+            score = parse_llm_text_to_score(text, model_id)
             in_tok, out_tok = usage_from_resp(resp)
             total_in += in_tok
             total_out += out_tok
@@ -475,6 +488,9 @@ def _label_single_part_file_blocking(
                 "criterion_name": CRITERION_NAME,
                 "criterion_desc": CRITERION_DESC,
                 "criterion_score": score,
+                # NEW: log the existing relevance column as well
+                "relevance_column": RELEVANCE_COL,
+                "relevance_score": (row_out_map.get(RELEVANCE_COL, "") or "").strip(),
             }
         )
 
@@ -704,17 +720,31 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 # ===== Entry point =====
 
 async def main():
-    # Load criterion (name + description) once per run
-    load_criterion_from_csv()
+    global CRITERION_KEY  # we will mutate this inside the loop
 
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
     listener_thread = start_stop_key_listener(loop, stop_event)
+
+    # If CRITERION_KEYS is non-empty, we loop over that.
+    # Otherwise, fall back to single CRITERION_KEY for backward compatibility.
+    criterion_list = CRITERION_KEYS if CRITERION_KEYS else [CRITERION_KEY]
+
     try:
-        for model_id in MODELS:
+        for crit_key in criterion_list:
             if stop_event.is_set():
                 break
-            await run_for_model(model_id, stop_event, MODE)
+
+            CRITERION_KEY = crit_key
+            print(f"\n=== Running for criterion: {CRITERION_KEY!r} ===")
+            # Load criterion (name + description) for this loop
+            load_criterion_from_csv()
+
+            # Run over all models for this criterion
+            for model_id in MODELS:
+                if stop_event.is_set():
+                    break
+                await run_for_model(model_id, stop_event, MODE)
     finally:
         stop_event.set()
         try:

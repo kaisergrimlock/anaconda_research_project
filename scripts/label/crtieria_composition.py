@@ -8,10 +8,13 @@ import sys
 
 # ========= Config you can edit =========
 TREC_DL_YEAR = "2022"
-MODEL        = "gpt-oss-20b" 
-LANG         = "raw"  # e.g. "raw", "eng", "vi", etc.
+MODEL        = "gpt-oss-20b"
+LANG         = "eng_word"  # e.g. "raw", "eng", "vi", etc.
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
+
+# Relevance column name in the *criterion label files*
+RELEVANCE_COL = "relevance"
 # ======================================
 
 # Decide which passage column we will OUTPUT
@@ -60,7 +63,7 @@ def find_file_for_criterion(criterion: str) -> Path:
     """
     Find the CSV file for a given criterion.
     Expected pattern like:
-      gpt-oss-20b_trecdl_2022_raw_contextuality_labels.csv
+      gpt-oss-20b_trecdl_2022_vi_contextuality_labels.csv
     """
     pattern = f"*_{LANG}_{criterion}_labels.csv"
     matches = list(CRITERION_DIR.glob(pattern))
@@ -84,11 +87,11 @@ def load_criterion_into_dict(
 
     `data` maps (qid, pid) -> {
         'qid', 'pid', 'query', PASSAGE_COL,
-        'contextuality', 'coverage', 'exactness', 'topicality'
+        'contextuality', 'coverage', 'exactness', 'topicality',
+        RELEVANCE_COL
     }
 
-    For 'raw' language we logically use/keep 'passage'.
-    For all other languages we logically use/keep 'passage_injected'.
+    Relevance is taken *directly* from the criterion files (RELEVANCE_COL).
     """
     with csv_path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
@@ -96,7 +99,14 @@ def load_criterion_into_dict(
         if not fieldnames:
             return
 
-        # Assume the last column is the score for this criterion
+        # Require that criterion files contain the relevance column
+        if RELEVANCE_COL not in fieldnames:
+            raise KeyError(
+                f"Expected relevance column '{RELEVANCE_COL}' not found in {csv_path.name}. "
+                f"Available columns: {fieldnames}"
+            )
+
+        # Assume the last column is the score for this specific criterion
         last_col_name = fieldnames[-1]
 
         for row in reader:
@@ -116,7 +126,8 @@ def load_criterion_into_dict(
                 if not passage_val:
                     passage_val = row.get("passage", "")
 
-            score = row.get(last_col_name, "")
+            criterion_score = row.get(last_col_name, "")
+            relevance_val   = row.get(RELEVANCE_COL, "")
 
             key: RowKey = (qid, pid)
 
@@ -133,7 +144,11 @@ def load_criterion_into_dict(
                     data[key][PASSAGE_COL] = passage_val
 
             # Store the score under the logical criterion name
-            data[key][criterion_name] = score
+            data[key][criterion_name] = criterion_score
+
+            # Always take relevance directly from the criterion file;
+            # if it already exists and differs, last one wins (they should match anyway).
+            data[key][RELEVANCE_COL] = relevance_val
 
 
 def build_combined_dict() -> RowDict:
@@ -158,10 +173,14 @@ def save_cache(data: RowDict) -> None:
     Save the combined dict to chunked CSV cache files.
 
     We write rows as flat dicts with:
-      ["qid", "pid", "query", PASSAGE_COL] + CRITERIA
+      ["qid", "pid", "query", PASSAGE_COL] + CRITERIA + [RELEVANCE_COL]
     """
     chunk_size = 500
-    fieldnames = ["qid", "pid", "query", PASSAGE_COL] + CRITERIA
+
+    # Keep header order similar to your raw_crit files:
+    # qid,pid,query,passage,contextuality,coverage,exactness,topicality,llm_relevance
+    fieldnames = ["qid", "pid", "query", PASSAGE_COL] + CRITERIA + [RELEVANCE_COL]
+
     rows = list(data.values())
     total = len(rows)
     if total == 0:

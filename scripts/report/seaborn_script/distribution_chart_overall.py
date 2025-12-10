@@ -20,14 +20,14 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure
 FIG_DIR = PROJECT_ROOT / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
-FIG_PATH = FIG_DIR / "nonrel_nist" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_decompose_llm_2.png"
+FIG_PATH = FIG_DIR / "nonrel_nist" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_word.png"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["raw_crit", "raw_crit_2"]
+TARGET_LANGS: List[str] = ["eng_word"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
