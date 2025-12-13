@@ -8,9 +8,8 @@ import sys
 import threading
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import boto3
 from botocore.config import Config
 
 # ===== repo imports =====
@@ -25,6 +24,7 @@ from scripts.csv_helpers import (
     pick_passage_for_lang,
     model_short_name,
     _inspect_header,
+    write_combined_dynamic,
 )
 from scripts.log_helpers import (
     timestamp_id,
@@ -32,6 +32,12 @@ from scripts.log_helpers import (
     estimate_run_cost,
     append_token_row,
     write_run_log_index,
+)
+
+# ===== Bedrock helper (ONLY Bedrock stuff) =====
+from scripts.bedrock_client import (
+    make_bedrock_runtime_client,
+    converse_prompt,
 )
 
 # ===== config =====
@@ -47,11 +53,22 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng_word"          # "raw", "vi", "enclosed", ...
-START_PART = 1
-END_PART = 6
+LANG = "fr"          # "raw", "vi", "enclosed", ...
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2022"
-MODE = "append"       # "append" or "replace"
+MODE = "replace"       # "append" or "replace"
+
+# Models
+MODELS = ["openai.gpt-oss-20b-1:0"]
+INFERENCE_CONFIG = {"maxTokens": 10000, "temperature": 0.0, "topP": 1.0}
+
+# Output roots
+short = model_short_name(MODELS[0])
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+LOG_ROOT_DIR = Path("logs")
+
+# ===== functions =====
 
 # Input part files
 if LANG == "raw":
@@ -60,19 +77,6 @@ else:
     PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
-# Models
-#qwen.qwen3-32b-v1:0
-#openai.gpt-oss-20b-1:0
-#meta.llama3-70b-instruct-v1:0
-MODELS = ["openai.gpt-oss-20b-1:0"]  # e.g., ["qwen3-32b-v1", "gpt-oss-20b", ...]
-INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
-
-# Output roots (EDIT THESE if you want outputs elsewhere)
-short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/temp/")
-LOG_ROOT_DIR = Path("logs")
-
-# ===== functions =====
 bump_field_limit()  # Allow large fields to accommodate passages
 
 def iter_part_files(start: int, end: int):
@@ -82,57 +86,6 @@ def iter_part_files(start: int, end: int):
             yield p
         else:
             print(f"[WARN] Missing file: {p}")
-
-
-def parse_llm_text_to_score(text: str) -> str:
-    """Parse the model's JSON text into a score, expecting an 'O' field."""
-    try:
-        parsed = json.loads(text)
-        if isinstance(parsed, dict) and "O" in parsed:
-            return str(parsed["O"])
-        if isinstance(parsed, list):
-            for item in parsed:
-                if isinstance(item, dict) and "O" in item:
-                    return str(item["O"])
-    except Exception:
-        print(f"[WARN] Failed to parse LLM text to score: {text[:100]!r}...")
-        return ""
-    # If no 'O' found, return empty string
-    return ""
-
-
-def extract_text_from_resp(model_id: str, resp: dict) -> str:
-    """
-    Return the main text content from the model's response.
-    For openai.* we assume:
-      content[0] = reasoning / hidden block
-      content[1] = JSON output with the score
-    For others we take content[0].
-    """
-    try:
-        if model_id.startswith("openai."):
-            return resp["output"]["message"]["content"][1]["text"]
-        return resp["output"]["message"]["content"][0]["text"]
-    except Exception:
-        print(f"[WARN] Failed to extract text from response for model {model_id}.")
-        return ""
-
-
-def extract_reasoning_from_resp(model_id: str, resp: dict) -> str:
-    """Return the model's hidden/chain-of-thought reasoning block when present (openai.*)."""
-    try:
-        if model_id.startswith("openai."):
-            return resp["output"]["message"]["content"][0].get("text", "")
-        return ""
-    except Exception:
-        print(f"[WARN] Failed to extract reasoning from response for model {model_id}.")
-        return ""
-
-
-def usage_from_resp(resp: dict) -> Tuple[int, int]:
-    u = resp.get("usage", {}) or {}
-    return int(u.get("inputTokens", 0) or 0), int(u.get("outputTokens", 0) or 0)
-
 
 def read_rows_stream(path: Path):
     f = path.open("r", encoding="utf-8", newline="")
@@ -146,7 +99,6 @@ def read_rows_stream(path: Path):
 
 def count_data_rows(path: Path) -> int:
     with path.open("r", encoding="utf-8", newline="") as f:
-        # total lines minus header
         return max(0, sum(1 for _ in f) - 1)
 
 
@@ -216,7 +168,9 @@ def _label_single_part_file_blocking(
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
-    bedrock = boto3.client("bedrock-runtime", config=cfg)
+    # ===== Bedrock client via helper =====
+    bedrock = make_bedrock_runtime_client(cfg)
+
     total_in = total_out = 0
     logs: List[Dict[str, Any]] = []
 
@@ -239,8 +193,7 @@ def _label_single_part_file_blocking(
         # Map of all input columns
         row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
 
-        # Optional "pid_resolved" best-effort for logging; if your input doesn't
-        # have these, this just stays empty and is harmless.
+        # Optional "pid_resolved" best-effort for logging
         pr = (row_out_map.get("pid_resolved", "") or "").strip()
         if not pr:
             pr = (
@@ -268,20 +221,25 @@ def _label_single_part_file_blocking(
             sys.exit(3)
 
         prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
-        messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs = {"modelId": model_id, "messages": messages, "inferenceConfig": INFERENCE_CONFIG}
 
+        # ===== Bedrock call via helper =====
         text = ""
+        reasoning = ""
         score = ""
         in_tok = out_tok = 0
-        reasoning = ""
 
         try:
-            resp = bedrock.converse(**kwargs)
-            text = extract_text_from_resp(model_id, resp) or ""
-            reasoning = extract_reasoning_from_resp(model_id, resp) or ""
-            score = parse_llm_text_to_score(text)
-            in_tok, out_tok = usage_from_resp(resp)
+            result = converse_prompt(
+                bedrock,
+                model_id=model_id,
+                prompt=prompt,
+                inference_config=INFERENCE_CONFIG,
+            )
+            text = result.text or ""
+            reasoning = result.reasoning or ""
+            score = result.score or ""
+            in_tok = int(result.input_tokens or 0)
+            out_tok = int(result.output_tokens or 0)
             total_in += in_tok
             total_out += out_tok
         except KeyboardInterrupt:
@@ -351,81 +309,11 @@ def _label_single_part_file_blocking(
 
 async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
-    
-def write_combined_dynamic(
-    per_file_labels: List[str],
-    header_out: List[str],
-    model_short: str,
-    lang: str,
-    year: str,
-    mode: str,
-    out_dir: Path,
-) -> Path:
-    """
-    Simple combiner that:
-      - writes header_out to a single combined CSV
-      - appends all rows from per_file_labels
-      - does NOT enforce any specific 'qid'/'pid_qrels' schema.
-    """
-    out_dir.mkdir(parents=True, exist_ok=True)
-    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
-
-    if mode == "replace" or not combined_path.exists():
-        # Fresh file: write header and all rows
-        with combined_path.open("w", encoding="utf-8", newline="") as f_out:
-            writer = csv.writer(f_out)
-            writer.writerow(header_out)
-            for p in per_file_labels:
-                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
-                    reader = csv.reader(f_in)
-                    in_header = next(reader, None)
-                    if in_header is None:
-                        continue
-                    if in_header != header_out:
-                        print(
-                            f"[FATAL] Inconsistent header in {p}.\n"
-                            f"  got: {in_header}\n"
-                            f"  exp: {header_out}"
-                        )
-                        sys.exit(4)
-                    for row in reader:
-                        writer.writerow(row)
-    else:
-        # Append mode: check header once, then append rows
-        with combined_path.open("r", encoding="utf-8", newline="") as f_ex:
-            existing_header = next(csv.reader(f_ex), None)
-        if existing_header != header_out:
-            print(
-                f"[FATAL] Combined file header mismatch.\n"
-                f"  got: {existing_header}\n"
-                f"  exp: {header_out}"
-            )
-            sys.exit(4)
-
-        with combined_path.open("a", encoding="utf-8", newline="") as f_out:
-            writer = csv.writer(f_out)
-            for p in per_file_labels:
-                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
-                    reader = csv.reader(f_in)
-                    in_header = next(reader, None)
-                    if in_header != header_out:
-                        print(
-                            f"[FATAL] Inconsistent header in {p}.\n"
-                            f"  got: {in_header}\n"
-                            f"  exp: {header_out}"
-                        )
-                        sys.exit(4)
-                    for row in reader:
-                        writer.writerow(row)
-
-    return combined_path
-
 
 async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
 
-    # All label CSVs for this model/year go directly in this folder
     MODEL_OUT_DIR = OUTPUT_ROOT_DIR
     MODEL_LOGS_DIR = LOG_ROOT_DIR / short
     MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -474,7 +362,6 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         print("[DONE] No outputs to merge.")
         return
 
-    # verify consistent headers & collect per-file CSVs
     header_out_set = {tuple(r["header_out"]) for r in results}
     if len(header_out_set) != 1:
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
@@ -482,7 +369,6 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
-    # write combined CSV (dynamic, no qid/pid_qrels enforcement)
     combined_path = write_combined_dynamic(
         per_file_labels=per_file_labels,
         header_out=header_out,
@@ -524,11 +410,8 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     )
 
     print(f"[DONE] Model: {model_id} | Rows: {num_rows} | Combined: {combined_path}")
-    print(
-        f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}"
-    )
+    print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
-    # optional: clean up temp per-file outputs for this run
     try:
         shutil.rmtree(per_file_out_dir, ignore_errors=False)
         print(f"[CLEANUP] Removed temp folder: {per_file_out_dir}")

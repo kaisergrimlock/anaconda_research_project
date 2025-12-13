@@ -59,7 +59,7 @@ INFERENCE_CONFIG = {
     "topP": 1.0
 }
 
-OUTPUT_ROOT_BASE = PROJECT_ROOT / "outputs" / "llm_label" / f"trec_dl_{TREC_DL_YEAR}"
+OUTPUT_ROOT_BASE = PROJECT_ROOT / "outputs" / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / "criterion_composed"
 LOG_ROOT_DIR = PROJECT_ROOT / "logs"
 
 bump_field_limit()

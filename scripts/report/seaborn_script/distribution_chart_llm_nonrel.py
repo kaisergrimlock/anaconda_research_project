@@ -18,18 +18,18 @@ BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
 PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/...
 
 # Output figure directory
-FIG_ROOT = PROJECT_ROOT / "figures" / "nonrel_nist" / "bar_chart"
+FIG_ROOT = PROJECT_ROOT / "figures" / "nonrel"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "lang"
-GROUPED_FIG_PATH = FIG_ROOT / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped.png"
-STACKED_FIG_PATH = FIG_ROOT / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked.png"
+CHART_TYPE = "mult_qp"
+GROUPED_FIG_PATH = FIG_ROOT / "grouped" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped.png"
+STACKED_FIG_PATH = FIG_ROOT / "stacked" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked.png"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "vi", "th"]
+TARGET_LANGS: List[str] = ["eng_mult", "eng_vi", "eng"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -66,9 +66,8 @@ def pick_gold_col(df: pd.DataFrame) -> Optional[str]:
     """Pick the NIST / gold relevance column, if present."""
     if "relevance" in df.columns:
         return "relevance"
-    if "NIST_relevance" in df.columns:
-        return "NIST_relevance"
-    return None
+    else:
+        return None
 
 
 def pick_id_col(df: pd.DataFrame) -> Optional[str]:
@@ -132,6 +131,21 @@ def build_raw_zero_keyset(raw_file: Path) -> tuple[pd.DataFrame, Set[str], str]:
 
     return df_zero, base_keys, id_col
 
+
+label_map = {
+    "baseline": "Baseline",
+    "eng": "Baseline + EnQP",
+    "vi": "Baseline + ViQP",
+    "th": "Baseline + ThQP",
+    "ru": "Baseline + RuQP",
+    "fr": "Baseline + FrQP",
+    "er": "Baseline + ErQP",
+    "eng_word": "Baseline + EnWP",
+    "vi_word": "Baseline + ViWP",
+    "raw_crit": "Baseline Crit",
+    "eng_crit": "Baseline Crit + EnQP",
+    "vi_crit": "Base Crit + ViQP",
+}
 
 # =========================
 # Data loading
@@ -253,6 +267,8 @@ def load_label_distributions(label_dir: Path) -> pd.DataFrame:
 
     return df
 
+def display_variant_name(v: str) -> str:
+    return "baseline" if v == "raw" else v
 
 # =========================
 # Plotting – grouped bars (muted palette)
@@ -260,7 +276,8 @@ def load_label_distributions(label_dir: Path) -> pd.DataFrame:
 def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
     sns.set_theme(style="whitegrid")
     plt.style.use("default")
-
+    df = df.copy()
+    df["variant"] = df["variant"].replace({"raw": "baseline"})
     # Order: raw first, then others alphabetically
     variants = sorted(
         df["variant"].unique(),
@@ -323,9 +340,7 @@ def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
                 )
 
     ax.set_xticks(x_base)
-    ax.set_xticklabels([str(s) for s in scores], fontsize=9)
-    ax.set_xlabel("LLM Relevance Score")
-    ax.set_ylabel("Proportion (over RAW NIST=0 & LLM=0 cohort)")
+    ax.set_ylabel("Score Distribution")
     ax.set_ylim(0, 1.05)
     ax.set_title(title, fontsize=12)
 
@@ -346,6 +361,7 @@ def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
 # =========================
 # Plotting – stacked bars (muted palette matching screenshot)
 # =========================
+
 def plot_stacked_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
     """
     Stacked bar chart:
@@ -356,6 +372,9 @@ def plot_stacked_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
     """
     sns.set_theme(style="whitegrid")
     plt.style.use("default")
+
+    df = df.copy()
+    df["variant"] = df["variant"].replace({"raw": "baseline"})
 
     # Aggregate and pivot to variant x score
     grouped = df.groupby(["variant", "score"], as_index=False)["prop"].sum()
@@ -371,14 +390,13 @@ def plot_stacked_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
 
     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # Muted colors per SCORE (approx like your screenshot)
     default_palette = {
         0: "#000000",  # black
         1: "#a6761d",  # muted brown
         2: "#6b8e23",  # olive/green
         3: "#b8de6f",  # light yellow-green
     }
-    # Fallback in case SCORES has unexpected values
+
     fallback_colors = sns.color_palette("muted", n_colors=len(scores))
     score_colors: Dict[int, tuple] = {}
     for i, s in enumerate(scores):
@@ -417,11 +435,11 @@ def plot_stacked_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
         bottom = [b + h for b, h in zip(bottom, heights)]
 
     ax.grid(False)
+    pretty_labels = [label_map.get(v, v) for v in variants]
 
     ax.set_xticks(x)
-    ax.set_xticklabels(variants, rotation=45, ha="right", fontsize=9)
-    ax.set_xlabel("Variant")
-    ax.set_ylabel("Proportion (over RAW NIST=0 & LLM=0 cohort)")
+    ax.set_xticklabels(pretty_labels, rotation=45, ha="right", fontsize=9)
+    ax.set_ylabel("Relevance Label Score Distribution")
     ax.set_ylim(0, 1.05)
     ax.set_title(title, fontsize=12)
 
@@ -447,7 +465,7 @@ if __name__ == "__main__":
     if df_labels.empty:
         print("[ERROR] No data found for RAW NIST=0 & LLM=0 cohort; check LABEL_DIR and columns.")
     else:
-        title = "Pairs with NIST=0 & LLM=0 in RAW – LLM label distribution across variants"
+        title = "Relevance Label Distribution for Non-Relevant Passages (NIST = 0 & Baseline LLM = 0)"
 
         # Grouped bar chart
         plot_grouped_distribution(

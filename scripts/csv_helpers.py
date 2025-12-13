@@ -168,3 +168,194 @@ def pick_passage_for_lang(row: Dict[str, str], lang: str) -> str:
     if lang != "raw" and row.get("passage_injected"):
         return row["passage_injected"].strip()
     return (row.get("passage") or "").strip()
+
+def write_combined_dynamic(
+    *,
+    per_file_labels: List[str],
+    header_out: List[str],
+    model_short: str,
+    lang: str,
+    year: str,
+    mode: str,
+    out_dir: Path,
+) -> Path:
+    """
+    Merge per-file label CSVs into one combined CSV.
+
+    - mode="append": always append incoming rows.
+    - mode="replace": replace existing rows by key (qid + pid-like), append unseen keys.
+
+    Assumes each per-file CSV has exactly header_out.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
+
+    # -----------------------------
+    # Key columns: qid + pid-like
+    # -----------------------------
+    def pick_pid_col(header: List[str]) -> str:
+        candidates = ["pid", "pid_qrels", "pid_resolved", "docid", "passage_id", "doc_id"]
+        for c in candidates:
+            if c in header:
+                return c
+        raise ValueError(
+            f"Cannot do replace by qid+pid: no pid column found in header. "
+            f"Need one of {candidates}. Header={header}"
+        )
+
+    if "qid" not in header_out:
+        raise ValueError(f"Cannot do replace by qid+pid: missing 'qid' in header_out={header_out}")
+
+    pid_col = pick_pid_col(header_out)
+    qid_i = header_out.index("qid")
+    pid_i = header_out.index(pid_col)
+
+    llm_idx = header_out.index("llm_relevance") if "llm_relevance" in header_out else None
+
+    def norm_row_len(r: List[str]) -> List[str]:
+        if len(r) < len(header_out):
+            return r + [""] * (len(header_out) - len(r))
+        if len(r) > len(header_out):
+            return r[:len(header_out)]
+        return r
+
+    def make_key(r: List[str]) -> str:
+        r = norm_row_len(r)
+        return f"{(r[qid_i] or '').strip()}|{(r[pid_i] or '').strip()}"
+
+    def llm_val(r: List[str]) -> str:
+        if llm_idx is None:
+            return ""
+        r = norm_row_len(r)
+        return (r[llm_idx] or "").strip()
+
+    # -----------------------------------
+    # Load incoming rows as key -> row
+    # (last one wins if duplicated)
+    # -----------------------------------
+    incoming: Dict[str, List[str]] = {}
+
+    for p in per_file_labels:
+        pth = Path(p)
+        with pth.open("r", encoding="utf-8", newline="") as f_in:
+            reader = csv.reader(f_in)
+            in_header = next(reader, None)
+            if in_header is None:
+                continue
+
+            if list(in_header) != list(header_out):
+                raise ValueError(
+                    f"Inconsistent header in {pth}.\n"
+                    f"  got: {in_header}\n"
+                    f"  exp: {header_out}"
+                )
+
+            for r in reader:
+                r = norm_row_len(r)
+                incoming[make_key(r)] = r
+
+    # -----------------------------
+    # If file doesn't exist, write fresh
+    # -----------------------------
+    if not combined_path.exists():
+        with combined_path.open("w", encoding="utf-8", newline="") as f_out:
+            w = csv.writer(f_out)
+            w.writerow(header_out)
+            for r in incoming.values():
+                w.writerow(r)
+        print(f"[WRITE] Created new combined file with {len(incoming)} rows: {combined_path}")
+        return combined_path
+
+    # -----------------------------
+    # Append mode
+    # -----------------------------
+    if mode == "append":
+        existing_header = _inspect_header(combined_path)
+        if existing_header != header_out:
+            raise ValueError(
+                f"Combined file header mismatch.\n"
+                f"  got: {existing_header}\n"
+                f"  exp: {header_out}"
+            )
+
+        with combined_path.open("a", encoding="utf-8", newline="") as f_out:
+            w = csv.writer(f_out)
+            for r in incoming.values():
+                w.writerow(r)
+
+        print(f"[APPEND] Appended {len(incoming)} rows to: {combined_path}")
+        return combined_path
+
+    # -----------------------------
+    # Replace mode: stream + replace by (qid|pid)
+    # Print which *line* was replaced.
+    # -----------------------------
+    if mode != "replace":
+        raise ValueError(f"Unknown mode: {mode}")
+
+    existing_header = _inspect_header(combined_path)
+    if existing_header != header_out:
+        raise ValueError(
+            f"Combined file header mismatch.\n"
+            f"  got: {existing_header}\n"
+            f"  exp: {header_out}"
+        )
+
+    tmp_path = combined_path.with_suffix(".tmp.csv")
+
+    replaced = 0
+    kept = 0
+    appended_new = 0
+    used_keys: set[str] = set()
+
+    with combined_path.open("r", encoding="utf-8", newline="") as f_in, \
+         tmp_path.open("w", encoding="utf-8", newline="") as f_out:
+        reader = csv.reader(f_in)
+        writer = csv.writer(f_out)
+
+        _ = next(reader, None)  # skip header
+        writer.writerow(header_out)
+
+        # CSV "line number" in file (1 = header). First data row is line 2.
+        line_no = 1
+
+        for old_row in reader:
+            line_no += 1
+            old_row = norm_row_len(old_row)
+            k = make_key(old_row)
+
+            if k in incoming:
+                new_row = incoming[k]
+                used_keys.add(k)
+                replaced += 1
+
+                if llm_idx is not None:
+                    print(
+                        f"[REPLACE] line={line_no} key={k} "
+                        f"llm_relevance: {llm_val(old_row)!r} -> {llm_val(new_row)!r}"
+                    )
+                else:
+                    print(f"[REPLACE] line={line_no} key={k}")
+
+                writer.writerow(new_row)
+            else:
+                kept += 1
+                writer.writerow(old_row)
+
+        # Append brand-new keys (not found in existing file)
+        for k, r in incoming.items():
+            if k not in used_keys:
+                appended_new += 1
+                writer.writerow(r)
+                if llm_idx is not None:
+                    print(f"[ADD] key={k} llm_relevance={llm_val(r)!r} (not previously in file)")
+                else:
+                    print(f"[ADD] key={k} (not previously in file)")
+
+    tmp_path.replace(combined_path)
+
+    print(
+        f"[DONE replace] replaced={replaced} kept={kept} appended_new={appended_new} "
+        f"key_cols=('qid','{pid_col}') file={combined_path}"
+    )
+    return combined_path

@@ -252,6 +252,7 @@ def eval_all_metrics(
         "kappa_binary_2pt": kappa_binary,
         "alpha_4pt_ordinal": alpha_4pt,
         "alpha_binary_nominal": alpha_bin,
+        "alpha_alpha_ordinal"
         "pairs": float(len(paired)),
     }
 

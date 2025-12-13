@@ -24,13 +24,14 @@ from helpers.metrics_llm import (
     compute_mae,
     compute_weighted_kappa_ordinal,
     compute_unweighted_kappa,
+    compute_krippendorff_alpha_paired,
     binarize_labels,
 )
 
 # -------- Config --------
 TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "date_2024"  # "raw","eng","vi","fr", etc.
+LANG  = "vi"  # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance
@@ -87,8 +88,12 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     invalid_df = df[~valid_mask].copy()
 
     # ----- Missing / invalid checking section -----
+    print("Total rows:", len(df))
+    print("Valid rows:", valid_mask.sum())
+    print("Invalid rows:", (~valid_mask).sum())
+
     if not invalid_df.empty:
-        write_df(invalid_df, OUT_INVALID_ROWS)
+        write_df(invalid_df.drop(columns=["NIST", "LLM", "llm_relevance"], errors="ignore"), OUT_INVALID_ROWS)
 
     return valid_df, invalid_df
 
@@ -109,9 +114,16 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     cm_pct = cm.div(cm.sum(axis=1).replace(0, 1), axis=0) * 100.0
 
-    # 2) Metrics
+    # 2) Metrics (4-point / graded)
     mae = compute_mae(paired["NIST"], paired["LLM"])
     kappa_weighted = compute_weighted_kappa_ordinal(cm)
+
+    # Krippendorff's alpha (4-point, ordinal)
+    alpha_4pt = compute_krippendorff_alpha_paired(
+        paired["NIST"],
+        paired["LLM"],
+        level="ordinal",
+    )
 
     # Binary version: collapse labels into [0, 1]
     paired_bin = paired.copy()
@@ -123,8 +135,17 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         columns=pd.Categorical(paired_bin["LLM_bin"],  categories=[0, 1], ordered=True),
         dropna=False,
     )
+
     kappa_binary = compute_unweighted_kappa(cm_bin)
     mae_binary = compute_mae(paired_bin["NIST_bin"], paired_bin["LLM_bin"])
+
+    # Krippendorff's alpha (binary, treat as nominal)
+    alpha_2pt = compute_krippendorff_alpha_paired(
+        paired_bin["NIST_bin"],
+        paired_bin["LLM_bin"],
+        level="nominal",
+    )
+
 
     # 3) Write outputs
     write_confusion_outputs(cm, cm_pct, OUT_COUNTS, OUT_PCT)
@@ -135,6 +156,7 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
             {"metric": "mae_binary_2pt",    "value": float(mae_binary)},
             {"metric": "kappa_weighted_4pt","value": float(kappa_weighted)},
             {"metric": "kappa_binary_2pt",  "value": float(kappa_binary)},
+            {"metric": "alpha_binary_nominal_2pt","value": float(alpha_2pt)},
             {"metric": "pairs",             "value": float(len(paired))},
         ]
     )
