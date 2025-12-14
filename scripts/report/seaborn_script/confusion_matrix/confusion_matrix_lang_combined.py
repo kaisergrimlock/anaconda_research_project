@@ -48,7 +48,7 @@ LLM_FILES = [
 ]
 
 # Output directory is per-model/lang for the combined years
-OUT_DIR          = Path("outputs/baseline") / COMBINED_LABEL / MODEL / LANG
+OUT_DIR = Path("figures") / YEARS.join(" ") / MODEL / "confusion_matrix" / LANG
 OUT_COUNTS       = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT          = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
 OUT_SVG          = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"

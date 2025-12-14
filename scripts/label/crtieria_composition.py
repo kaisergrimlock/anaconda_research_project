@@ -9,7 +9,7 @@ import sys
 # ========= Config you can edit =========
 TREC_DL_YEAR = "2022"
 MODEL        = "gpt-oss-20b"
-LANG         = "eng_word"  # e.g. "raw", "eng", "vi", etc.
+LANG         = "leet"  # e.g. "raw", "eng", "vi", etc.
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 

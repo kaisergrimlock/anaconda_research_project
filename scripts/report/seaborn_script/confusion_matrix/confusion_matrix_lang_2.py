@@ -30,15 +30,15 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "vi"  # "raw","eng","vi","fr", etc.
+MODEL = "llama3-8b-instruct"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG  = "raw"  # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance
 #   - llm_relevance
 LLM_FILE = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}" / MODEL / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{LANG}_labels.csv"
 
-OUT_DIR          = Path("outputs/baseline") / TREC_DL_YEAR / MODEL / LANG
+OUT_DIR = Path("figures") / TREC_DL_YEAR / MODEL / "confusion_matrix" / LANG
 OUT_COUNTS       = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT          = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
 OUT_SVG          = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"
@@ -92,8 +92,8 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     print("Valid rows:", valid_mask.sum())
     print("Invalid rows:", (~valid_mask).sum())
 
-    if not invalid_df.empty:
-        write_df(invalid_df.drop(columns=["NIST", "LLM", "llm_relevance"], errors="ignore"), OUT_INVALID_ROWS)
+    invalid_out = invalid_df.drop(columns=["NIST", "LLM", "llm_relevance"], errors="ignore")
+    write_df(invalid_out, OUT_INVALID_ROWS)  # write_df uses "w" mode, so it replaces
 
     return valid_df, invalid_df
 

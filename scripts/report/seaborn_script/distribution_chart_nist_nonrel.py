@@ -18,18 +18,18 @@ BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
 PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/...
 
 # Output figure directory
-FIG_ROOT = PROJECT_ROOT / "figures" / "nist"
+FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_nist"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "crit"
-GROUPED_FIG_PATH = FIG_ROOT / "grouped" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped.png"
-STACKED_FIG_PATH = FIG_ROOT / "stacked" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked.png"
+CHART_TYPE = "eng"
+GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
+STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["raw", "eng", "eng_crit"]
+TARGET_LANGS: List[str] = ["raw_crit", "eng", "eng_crit"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -340,6 +340,7 @@ def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
         edgecolor="white",
     )
 
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -438,8 +439,14 @@ if __name__ == "__main__":
     else:
         title = "Relevance Label Distribution for Non-Relevant Passages (NIST = 0)"
 
-        plot_grouped_distribution(df_labels, title=title, out_path=GROUPED_FIG_PATH)
+        plot_grouped_distribution(df_labels, title=title, out_path=GROUPED_FIG_PATH.with_suffix(".png"))
         print(f"[OK] Saved grouped figure to {GROUPED_FIG_PATH}")
 
-        plot_stacked_distribution(df_labels, title=title, out_path=STACKED_FIG_PATH)
+        plot_grouped_distribution(df_labels, title="", out_path=GROUPED_FIG_PATH.with_suffix(".svg"))
+        print(f"[OK] Saved grouped figure to {GROUPED_FIG_PATH}")
+
+        plot_stacked_distribution(df_labels, title=title, out_path=STACKED_FIG_PATH.with_suffix(".png"))
+        print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH}")
+
+        plot_stacked_distribution(df_labels, title="", out_path=STACKED_FIG_PATH.with_suffix(".svg"))
         print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH}")

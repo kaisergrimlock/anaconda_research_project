@@ -18,18 +18,18 @@ BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
 PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/...
 
 # Output figure directory
-FIG_ROOT = PROJECT_ROOT / "figures" / "nonrel"
+FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_llm"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "mult_qp"
-GROUPED_FIG_PATH = FIG_ROOT / "grouped" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped.png"
-STACKED_FIG_PATH = FIG_ROOT / "stacked" / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked.png"
+CHART_TYPE = "ru"
+GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
+STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
-# Only keep these “language” variants.
+# Only keep these “language” variants.-
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng_mult", "eng_vi", "eng"]
+TARGET_LANGS: List[str] = ["raw_crit", "ru", "ru_crit"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -273,7 +273,7 @@ def display_variant_name(v: str) -> str:
 # =========================
 # Plotting – grouped bars (muted palette)
 # =========================
-def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
+def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "") -> None:
     sns.set_theme(style="whitegrid")
     plt.style.use("default")
     df = df.copy()
@@ -353,6 +353,7 @@ def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
         edgecolor="white",
     )
 
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -362,7 +363,7 @@ def plot_grouped_distribution(df: pd.DataFrame, title: str, out_path: Path) -> N
 # Plotting – stacked bars (muted palette matching screenshot)
 # =========================
 
-def plot_stacked_distribution(df: pd.DataFrame, title: str, out_path: Path) -> None:
+def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "") -> None:
     """
     Stacked bar chart:
       x-axis  : variants (raw, eng, vi, th, ...)
@@ -471,7 +472,13 @@ if __name__ == "__main__":
         plot_grouped_distribution(
             df_labels,
             title=title,
-            out_path=GROUPED_FIG_PATH,
+            out_path=GROUPED_FIG_PATH.with_suffix(".png"),
+        )
+        print(f"[OK] Saved grouped figure to {GROUPED_FIG_PATH}")
+
+        plot_grouped_distribution(
+            df_labels,
+            out_path=GROUPED_FIG_PATH.with_suffix(".svg"),
         )
         print(f"[OK] Saved grouped figure to {GROUPED_FIG_PATH}")
 
@@ -479,6 +486,12 @@ if __name__ == "__main__":
         plot_stacked_distribution(
             df_labels,
             title=title,
-            out_path=STACKED_FIG_PATH,
+            out_path=STACKED_FIG_PATH.with_suffix(".png"),
+        )
+        print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH}")
+
+        plot_stacked_distribution(
+            df_labels,
+            out_path=STACKED_FIG_PATH.with_suffix(".svg"),
         )
         print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH}")

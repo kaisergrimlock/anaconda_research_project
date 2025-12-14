@@ -14,10 +14,10 @@ TREC_DL_YEAR = "2022"
 MODEL        = "gpt-oss-20b"
 
 # Languages to compare (matching filenames: ..._<lang>_<criterion>_labels.csv)
-LANGS        = ["raw", "eng", "eng_word"]
+LANGS        = ["raw", "eng", "ru", "fr", "vi"]
 
 # Which criterion to plot: "contextuality", "coverage", "exactness", or "topicality"
-CRITERION    = "exactness"
+CRITERION    = "coverage"
 
 THIS_FILE    = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
@@ -31,11 +31,15 @@ CRITERION_DIR = (
     / "criterion"
 )
 
-# Where to save the figure
-FIG_DIR  = PROJECT_ROOT / "figures" / "criterion_compare"
-FIG_DIR.mkdir(parents=True, exist_ok=True)
+# Where to save the figure (into a folder named by the combined langs)
 LANG_PART = "_".join(LANGS)
-FIG_PATH = FIG_DIR / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{CRITERION}_{LANG_PART}.png"
+FIG_DIR  = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "criterion_compare" / LANG_PART
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+
+# Save base name once; we’ll write both .png and .svg
+FIG_BASE = FIG_DIR / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{CRITERION}"
+FIG_PATH_PNG = FIG_BASE.with_suffix(".png")
+FIG_PATH_SVG = FIG_BASE.with_suffix(".svg")
 # ======================================
 
 
@@ -87,10 +91,11 @@ def build_label_distribution(langs: List[str], criterion: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def plot_grouped_bars(dist_df: pd.DataFrame, out_path: Path, criterion: str) -> None:
+def plot_grouped_bars(dist_df: pd.DataFrame, out_png: Path, out_svg: Path, criterion: str) -> None:
     """
     Plot grouped bar chart:
       x = score, y = count, hue = language
+    Save both PNG and SVG.
     """
     if dist_df.empty:
         print("[WARN] No data to plot.")
@@ -116,9 +121,13 @@ def plot_grouped_bars(dist_df: pd.DataFrame, out_path: Path, criterion: str) -> 
         f"{MODEL}, trec_dl_{TREC_DL_YEAR}"
     )
     plt.tight_layout()
-    plt.savefig(out_path, dpi=300)
+
+    plt.savefig(out_png, dpi=300)
+    plt.savefig(out_svg)  # SVG is vector; dpi not needed
     plt.close()
-    print(f"[DONE] Saved figure to {out_path}")
+
+    print(f"[DONE] Saved PNG to {out_png}")
+    print(f"[DONE] Saved SVG to {out_svg}")
 
 
 def main() -> None:
@@ -132,7 +141,7 @@ def main() -> None:
         dist_df.pivot(index="score", columns="language", values="count")
     )
 
-    plot_grouped_bars(dist_df, FIG_PATH, CRITERION)
+    plot_grouped_bars(dist_df, FIG_PATH_PNG, FIG_PATH_SVG, CRITERION)
 
 
 if __name__ == "__main__":
