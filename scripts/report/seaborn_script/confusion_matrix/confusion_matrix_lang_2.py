@@ -29,7 +29,7 @@ from helpers.metrics_llm import (
 )
 
 # -------- Config --------
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
 LANG  = "raw_crit"  # "raw","eng","vi","fr", etc.
 

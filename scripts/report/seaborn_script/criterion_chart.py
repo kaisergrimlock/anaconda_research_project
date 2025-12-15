@@ -14,10 +14,10 @@ TREC_DL_YEAR = "2022"
 MODEL        = "gpt-oss-20b"
 
 # Languages to compare (matching filenames: ..._<lang>_<criterion>_labels.csv)
-LANGS        = ["raw", "eng", "ru", "fr", "vi"]
+LANGS        = ["raw", "eng", "vi"]
 
 # Which criterion to plot: "contextuality", "coverage", "exactness", or "topicality"
-CRITERION    = "coverage"
+CRITERION    = "contextuality"
 
 THIS_FILE    = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
