@@ -32,12 +32,12 @@ from scripts.log_helpers import timestamp_id
 # Config
 # ===============================================================
 
-TREC_DL_YEAR = "2022"
-LANG = "th"                      # e.g. raw/eng/vi/ru/...
+TREC_DL_YEAR = "2021"
+LANG = "eng"                      # e.g. raw/eng/vi/ru/...
 START_PART = 1
 END_PART = 6
 MODE = "append"                  # replace|append
-MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["llama3-8b-instruct"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 RELEVANCE_COL = "relevance"      # in criterion files

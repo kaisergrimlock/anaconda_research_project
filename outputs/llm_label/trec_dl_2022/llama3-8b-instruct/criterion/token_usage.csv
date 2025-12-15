@@ -1,0 +1,5 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251215_142250,2025-12-15T14:26:56,meta.llama3-8b-instruct-v1:0,3069,639523,7953,647476,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\criterion\llama3-8b-instruct_trecdl_2022_eng_exactness_labels.csv,(see logs index)
+20251215_142656,2025-12-15T14:30:52,meta.llama3-8b-instruct-v1:0,3069,681939,7953,689892,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\criterion\llama3-8b-instruct_trecdl_2022_eng_topicality_labels.csv,(see logs index)
+20251215_143052,2025-12-15T14:35:03,meta.llama3-8b-instruct-v1:0,3069,650127,7953,658080,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\criterion\llama3-8b-instruct_trecdl_2022_eng_coverage_labels.csv,(see logs index)
+20251215_143504,2025-12-15T14:38:59,meta.llama3-8b-instruct-v1:0,3069,642174,7953,650127,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\criterion\llama3-8b-instruct_trecdl_2022_eng_contextuality_labels.csv,(see logs index)

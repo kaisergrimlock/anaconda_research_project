@@ -1,0 +1,5 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20251215_142235,2025-12-15T14:27:47,qwen.qwen3-32b-v1:0,3069,711905,5310,717215,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\criterion\qwen3-32b-v1_trecdl_2022_eng_exactness_labels.csv,(see logs index)
+20251215_142747,2025-12-15T14:32:43,qwen.qwen3-32b-v1:0,3069,754385,5310,759695,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\criterion\qwen3-32b-v1_trecdl_2022_eng_topicality_labels.csv,(see logs index)
+20251215_143243,2025-12-15T14:37:30,qwen.qwen3-32b-v1:0,3069,722525,5310,727835,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\criterion\qwen3-32b-v1_trecdl_2022_eng_coverage_labels.csv,(see logs index)
+20251215_143730,2025-12-15T14:42:14,qwen.qwen3-32b-v1:0,3069,714560,5310,719870,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\criterion\qwen3-32b-v1_trecdl_2022_eng_contextuality_labels.csv,(see logs index)
