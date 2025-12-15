@@ -63,11 +63,11 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "eng_vi_between"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+LANG = "raw"          # "raw", "vi", "sw_trans_p", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
-MODE = "replace"       # "append" or "replace"
+MODE = "append"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
@@ -83,8 +83,8 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # ===== Models =====
 # qwen.qwen3-32b-v1:0
 # openai.gpt-oss-20b-1:0
-# meta.llama3-70b-instruct-v1:0
-MODELS = ["openai.gpt-oss-20b-1:0"]
+# meta.llama3-8b-instruct-v1:0
+MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -192,31 +192,37 @@ def iter_part_files(start: int, end: int):
 
 def parse_llm_text_to_score(text: str, model_id: str) -> str:
     """
-    Parse the LLM output into a score string.
+    Parse score for all models.
 
-    For llama3-style outputs like:
-        "\\n\\nI would rate this passage a 2: Fairly relevant..."
-    we extract the digit after "I would rate this passage a".
+    Default (preferred):
+        A single standalone digit: 0, 1, 2, or 3 (and nothing else besides whitespace)
 
-    Otherwise, we fall back to trying json.loads(text) as before.
+    Fallbacks:
+        - "Score: X"
+        - "a score of X"
+      where X in [0-3]
     """
     if text is None:
         return ""
-    text = str(text)
+    text = str(text).strip()
 
-    # --- Special case: llama3 outputs ---
-    if model_id.startswith("meta.llama3"):
-        m = re.search(r"I would rate this passage a\s+([0-3])", text)
-        if m:
-            return m.group(1)
+    # Default: single numerical value only
+    m = re.fullmatch(r"([0-3])", text)
+    if m:
+        return m.group(1)
 
-    # Fallback: previous JSON-based parsing
-    try:
-        parsed = json.loads(text)
-        return str(parsed)
-    except Exception:
-        print(f"[WARN] Failed to parse LLM text to score: {text[:100]!r}...")
-        return ""
+    # Fallback 1: "Score: X"
+    m = re.search(r"Score\s*:\s*([0-3])", text, re.IGNORECASE)
+    if m:
+        return m.group(1)
+
+    # Fallback 2: "a score of X"
+    m = re.search(r"\ba\s+score\s+of\s+([0-3])\b", text, re.IGNORECASE)
+    if m:
+        return m.group(1)
+
+    print(f"[WARN] No score pattern found in output: {text[:100]!r}...")
+    return ""
 
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
