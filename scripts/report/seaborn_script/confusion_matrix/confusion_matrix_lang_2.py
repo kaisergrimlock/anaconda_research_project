@@ -46,6 +46,9 @@ OUT_INVALID_ROWS = OUT_DIR / "rows_with_missing_or_invalid_labels.csv"
 
 LABELS = [0, 1, 2, 3]
 
+# NEW: how many example disagreements to print
+DISAGREE_EXAMPLES = 1
+
 
 def load_and_prepare() -> pd.DataFrame:
     """
@@ -97,7 +100,6 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     return valid_df, invalid_df
 
-
 def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     """
     Given a DataFrame with columns NIST and LLM (already validated),
@@ -146,7 +148,6 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         level="nominal",
     )
 
-
     # 3) Write outputs
     write_confusion_outputs(cm, cm_pct, OUT_COUNTS, OUT_PCT)
 
@@ -171,6 +172,43 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     save_heatmap(plt, OUT_SVG, dpi=200, tight=True, show=True)
 
+def print_false_positive_examples(paired: pd.DataFrame) -> None:
+    """
+    Print 1 example for each case where:
+      - NIST (relevance) == 0
+      - LLM (llm_relevance) == 1, 2, or 3
+    Uses only valid pairs (paired).
+    """
+    fp = paired[(paired["NIST"] == 0) & (paired["LLM"].isin([1, 2, 3]))].copy()
+
+    if fp.empty:
+        print("[FP] No false positives found (NIST==0 but LLM in {1,2,3}).")
+        return
+
+    cols_prefer = [
+        "qid", "docid", "pid",
+        "query_id", "passage_id",
+        "relevance", "llm_relevance", "NIST", "LLM",
+        "query", "passage",
+    ]
+
+    for llm_label in [1, 2, 3]:
+        bucket = fp[fp["LLM"] == llm_label]
+        if bucket.empty:
+            print(f"[FP] No examples where NIST=0 and LLM={llm_label}.")
+            continue
+
+        # deterministic pick for reproducibility
+        row = bucket.sample(n=1, random_state=42).iloc[0]
+        cols = [c for c in cols_prefer if c in bucket.columns]
+
+        print(f"[FP] Example where NIST=0 and LLM={llm_label}:")
+        if cols:
+            kv = ", ".join([f"{c}={repr(row[c])}" for c in cols])
+            print("  -", kv)
+        else:
+            print("  -", row.to_dict())
+
 
 def main():
     # Load + standardize
@@ -178,6 +216,9 @@ def main():
 
     # ---- Section: missing/invalid label checking ----
     paired, invalid_df = split_valid_invalid(df)
+
+    # NEW: show example disagreement(s)
+    print_false_positive_examples(paired)
 
     # ---- Section: confusion matrix + metrics ----
     if paired.empty:

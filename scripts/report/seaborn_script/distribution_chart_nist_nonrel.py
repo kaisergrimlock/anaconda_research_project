@@ -20,7 +20,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_nist"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "eng"
+CHART_TYPE = "lang"
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
 STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
@@ -29,7 +29,7 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["raw_crit", "eng", "eng_crit"]
+TARGET_LANGS: List[str] = ["eng", "eng_word", "vi", "vi_word"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -109,6 +109,7 @@ def build_nist_zero_keyset(raw_file: Path) -> tuple[pd.DataFrame, Set[str], str,
 
     # Filter: NIST==0 ONLY
     df_zero = df_raw[df_raw[gold_col] == 0]
+    df_zero = df_raw[df_raw[gold_col] == 0]
 
     if df_zero.empty:
         print(f"[WARN] RAW file {raw_file.name}: no rows with {gold_col}==0.")
@@ -131,11 +132,17 @@ label_map = {
     "ru": "Baseline + RuQP",
     "fr": "Baseline + FrQP",
     "er": "Baseline + ErQP",
-    "eng_word": "Baseline + EnWP",
-    "vi_word": "Baseline + ViWP",
+    "eng_word": "Baseline + EnQW",
+    "vi_word": "Baseline + ViQW",
     "raw_crit": "Baseline Crit",
     "eng_crit": "Baseline Crit + EnQP",
     "vi_crit": "Base Crit + ViQP",
+    "vi_syn": "Baseline + ViSynQW",
+    "eng_syn": "Baseline + EngSynQW",
+    "eng_mult": "Baseline + EnQP x 2",
+    "eng_mult_2": "Baseline + EnQP x 3",
+    "eng_mult_3": "Baseline + EnQP x 4",
+
 }
 
 

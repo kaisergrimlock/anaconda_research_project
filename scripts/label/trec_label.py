@@ -53,11 +53,11 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "fr"          # "raw", "vi", "enclosed", ...
-START_PART = 0
-END_PART = 0
+LANG = "ar"          # "raw", "vi", "enclosed", ...
+START_PART = 1
+END_PART = 6
 TREC_DL_YEAR = "2022"
-MODE = "replace"       # "append" or "replace"
+MODE = "append"       # "append" or "replace"
 
 # Models
 MODELS = ["openai.gpt-oss-20b-1:0"]

@@ -1,0 +1,4 @@
+Given this query: {query}
+Identify the most important keyword and provide a list of maximum 5 symnonyms or adjacent words separated by comma.
+Result: {{keyword: "", symnonyms: ""}}
+Example: {{keyword: "red", symnonyms: "scarlet, rouge"}}
