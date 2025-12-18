@@ -13,11 +13,11 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "ar"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "vi_corrected"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1           # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-TRECDL_YEAR = "2022"        # for folder naming only
+TRECDL_YEAR = "2021"        # for folder naming only
 
 INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")            # read these CSVs
 OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}/")    # write mirrored CSVs
@@ -243,6 +243,14 @@ def main():
 
     # Merge: cache -> +external -> +harvested
     qmap = merge_maps(cache_map, [external_map, harvested_map])
+
+    missing_in_cache = sorted(q for q in unique_queries if q not in cache_map)
+    if missing_in_cache:
+        print(f"\nQueries missing from cache ({MAP_FILE.name}): {len(missing_in_cache)}")
+        for q in missing_in_cache:
+            print(f"  - {q}")
+    else:
+        print(f"\nAll unique queries already exist in cache ({MAP_FILE.name}).")
 
     if IDENTITY_LANG:
         print(f"Mode: identity injection (no AWS Translate for '{TARGET_LANG}').")

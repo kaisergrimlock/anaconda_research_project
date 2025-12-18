@@ -25,7 +25,7 @@ from scripts.injector.helper import allow_huge_csv_fields
 # ===============================================================
 TREC_DL_YEAR = "2022"
 
-LANG = "vi"                 # target language for synonyms translation (eng/en => identity)
+LANG = "ru"                 # target language for synonyms translation (eng/en => identity)
 SYN_SOURCE_LANG = "en"       # only used when LANG is not identity
 
 SEED = 42

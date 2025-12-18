@@ -25,7 +25,7 @@ from scripts.injector.helper import allow_huge_csv_fields
 # Config
 # ===============================================================
 TREC_DL_YEAR = "2022"
-LANG = "eng"  # used only for cache naming
+LANG = "th"  # used only for cache naming
 
 MODELS = ["meta.llama3-8b-instruct-v1:0"]
 GLOB_PATTERN = "*.csv"

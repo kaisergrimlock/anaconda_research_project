@@ -11,7 +11,7 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "qwen3-32b-v1"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEAR / MODEL
@@ -20,7 +20,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_nist"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "lang"
+CHART_TYPE = "position"
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
 STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
@@ -29,7 +29,7 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "eng_word", "vi", "vi_word"]
+TARGET_LANGS: List[str] = ["eng", "eng_last", "eng_first"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -39,18 +39,6 @@ SCORES: List[int] = [0, 1, 2, 3]
 # Helpers
 # =========================
 def parse_lang_from_filename(path: Path) -> str:
-    """
-    Given a filename like:
-        gpt-oss-20b_trecdl_2022_eng_mult_labels.csv
-        gpt-oss-20b_trecdl_2022_eng_vi_between_labels.csv
-    return:
-        "eng_mult"
-        "eng_vi_between"
-
-    Pattern is assumed:
-        {MODEL}_trecdl_{YEAR}_{lang}_labels.csv
-    where {lang} may itself contain underscores.
-    """
     parts = path.stem.split("_")
     # Expect at least: [MODEL, 'trecdl', YEAR, <lang...>, 'labels']
     if len(parts) >= 5 and parts[1] == "trecdl":
