@@ -7,9 +7,9 @@ from typing import Dict, Tuple, Any
 import sys
 
 # ========= Config you can edit =========
-TREC_DL_YEAR = "2022"
-MODEL        = "qwen3-32b-v1"  # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG         = "raw"  # e.g. "raw", "eng", "vi", etc.
+TREC_DL_YEAR = "2021"
+MODEL        = "llama3-8b-instruct"  # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG         = "eng"  # e.g. "raw", "eng", "vi", etc.
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 
