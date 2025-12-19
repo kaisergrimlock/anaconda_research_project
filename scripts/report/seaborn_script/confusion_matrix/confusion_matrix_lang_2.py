@@ -29,9 +29,9 @@ from helpers.metrics_llm import (
 )
 
 # -------- Config --------
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "he"  # "raw","eng","vi","fr", etc.
+LANG  = "vi_corrected"  # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance
@@ -54,6 +54,13 @@ LABELS = [0, 1, 2, 3]
 
 # how many example disagreements to print (kept as-is; your function prints 1 per bucket)
 DISAGREE_EXAMPLES = 1
+
+OUT_MISSING_PART0 = (
+    Path("retrieved")
+    / f"trec_dl_{TREC_DL_YEAR}"
+    / LANG
+    / f"all_topics_trecdl_{TREC_DL_YEAR}_part0.csv"
+)
 
 
 def load_and_prepare() -> pd.DataFrame:
@@ -80,13 +87,6 @@ def load_and_prepare() -> pd.DataFrame:
 
 
 def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Separate rows with valid labels from rows with missing/invalid labels.
-
-    Valid rows:
-        - NIST and LLM lie within LABELS
-    Everything else is treated as invalid and written to a separate CSV.
-    """
     valid_mask = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
 
     valid_df   = df[valid_mask].copy()
@@ -96,11 +96,20 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     print("Valid rows:", valid_mask.sum())
     print("Invalid rows:", (~valid_mask).sum())
 
-    invalid_out = invalid_df.drop(columns=["NIST", "LLM", "llm_relevance"], errors="ignore")
+    # Keep your existing debug dump (optional)
+    invalid_out = invalid_df.drop(columns=["NIST", "LLM"], errors="ignore")
     write_df(invalid_out, OUT_INVALID_ROWS)
 
-    return valid_df, invalid_df
+    # Write ALL invalid rows as "part0" exactly as-is (no renaming, no new cols)
+    OUT_MISSING_PART0.parent.mkdir(parents=True, exist_ok=True)
+    invalid_df.drop(columns=["NIST", "LLM"], errors="ignore").to_csv(
+        OUT_MISSING_PART0,
+        index=False,
+        encoding="utf-8",
+    )
+    print(f"[Missing->Part0] Wrote {len(invalid_df)} rows to: {OUT_MISSING_PART0}")
 
+    return valid_df, invalid_df
 
 def latex_metrics_row(
     mae_4pt: float,
