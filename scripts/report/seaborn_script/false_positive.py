@@ -11,7 +11,7 @@ import pandas as pd
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b"  # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "qwen3-32b-v1"  # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the LLM label CSVs live
 LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL

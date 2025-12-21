@@ -8,3 +8,6 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20251218_172635,2025-12-18T18:09:13,openai.gpt-oss-20b-1:0,1699,661412,525205,1186617,0.203860,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\gpt-oss-20b_trecdl_2021_vi_corrected_last_labels.csv,(see logs index)
 20251218_180913,2025-12-18T18:14:44,meta.llama3-8b-instruct-v1:0,1699,576344,30900,607244,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\llama3-8b-instruct_trecdl_2021_vi_corrected_last_labels.csv,(see logs index)
 20251218_201423,2025-12-18T20:25:03,qwen.qwen3-32b-v1:0,1699,570673,29355,600028,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_eng_first_labels.csv,(see logs index)
+20251220_192629,2025-12-20T19:31:40,qwen.qwen3-32b-v1:0,1699,581526,29355,610881,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_sw_labels.csv,(see logs index)
+20251220_195657,2025-12-20T20:02:41,qwen.qwen3-32b-v1:0,1699,590985,29356,620341,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_uk_labels.csv,(see logs index)
+20251220_210002,2025-12-20T21:04:57,qwen.qwen3-32b-v1:0,1699,575159,29429,604588,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_vi_corrected_labels.csv,(see logs index)

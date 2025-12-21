@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # ========= Config you can edit =========
-TREC_DL_YEAR = "2022"
-MODEL        = "gpt-oss-20b"
+TREC_DL_YEAR = "2021"
+MODEL        = "gpt-oss-20b"  # e.g. "gpt-oss-20b", "qwen3-32b-v1", etc.
 
 # Languages to compare (matching filenames: ..._<lang>_<criterion>_labels.csv)
-LANGS        = ["raw", "eng", "vi"]
+LANGS        = ["raw", "eng", "vi_corrected", "he_corrected", "fr", ]
 
 # Which criterion to plot: "contextuality", "coverage", "exactness", or "topicality"
 CRITERION    = "contextuality"
