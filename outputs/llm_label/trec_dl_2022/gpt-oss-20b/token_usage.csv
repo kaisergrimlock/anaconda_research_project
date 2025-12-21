@@ -40,3 +40,4 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20251218_205101,2025-12-18T21:29:22,openai.gpt-oss-20b-1:0,3067,1189078,880013,2069091,0.347239,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_vi_corrected_first_labels.csv,(see logs index)
 20251220_004120,2025-12-20T01:10:23,openai.gpt-oss-20b-1:0,3067,1181813,868748,2050561,0.343351,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_zh_labels.csv,(see logs index)
 20251220_214423,2025-12-20T22:18:34,openai.gpt-oss-20b-1:0,3067,1181813,861008,2042821,0.341029,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_zh_labels.csv,(see logs index)
+20251221_161714,2025-12-21T16:51:52,openai.gpt-oss-20b-1:0,3067,1186875,860087,2046962,0.341107,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_tl_labels.csv,(see logs index)
