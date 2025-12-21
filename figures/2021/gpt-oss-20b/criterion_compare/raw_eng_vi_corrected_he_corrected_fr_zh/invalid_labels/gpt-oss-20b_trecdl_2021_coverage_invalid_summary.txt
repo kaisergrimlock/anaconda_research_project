@@ -1,0 +1,14 @@
+Model=gpt-oss-20b  Year=2021  Criterion=coverage
+Total invalid rows: 73
+
+Invalid rows by language:
+  vi_corrected: 40
+  eng: 9
+  raw: 9
+  fr: 6
+  zh: 6
+  he_corrected: 3
+
+Invalid rows by reason:
+  empty: 73
+

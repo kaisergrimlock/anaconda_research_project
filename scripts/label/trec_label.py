@@ -53,7 +53,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "tl"          # "raw", "vi", "enclosed", ...
+LANG = "ko"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"

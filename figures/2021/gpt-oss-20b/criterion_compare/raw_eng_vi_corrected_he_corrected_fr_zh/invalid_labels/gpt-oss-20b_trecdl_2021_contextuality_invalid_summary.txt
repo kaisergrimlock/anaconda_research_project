@@ -1,0 +1,14 @@
+Model=gpt-oss-20b  Year=2021  Criterion=contextuality
+Total invalid rows: 594
+
+Invalid rows by language:
+  zh: 570
+  raw: 7
+  vi_corrected: 6
+  eng: 6
+  fr: 3
+  he_corrected: 2
+
+Invalid rows by reason:
+  empty: 594
+
