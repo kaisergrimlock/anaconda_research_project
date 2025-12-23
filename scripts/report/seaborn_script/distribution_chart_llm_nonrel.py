@@ -10,7 +10,7 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
@@ -29,7 +29,7 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.-
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "fr", "de", "pt", "vi_corrected", "zh", "th", "tl"]
+TARGET_LANGS: List[str] = ["eng", "fr", "de", "zh", "ca", "vi_corrected", "th", "tl"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
