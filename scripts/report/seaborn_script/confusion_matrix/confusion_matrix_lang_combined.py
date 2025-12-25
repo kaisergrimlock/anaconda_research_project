@@ -31,8 +31,8 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEARS = ["2021", "2022"]   # <-- combined years
-MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "eng"  # "raw","eng","vi","fr", etc.
+MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG  = "th_word"  # "raw","eng","vi","fr", etc.
 
 LABELS = [0, 1, 2, 3]
 
@@ -115,6 +115,35 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     return valid_df, invalid_df
 
+def latex_metrics_row(
+    mae_4pt: float,
+    mae_2pt: float,
+    kappa_4pt: float,
+    kappa_2pt: float,
+) -> str:
+    """
+    Return a LaTeX table row fragment in exactly this style:
+
+    & \\num{...}  %MAE_4pt
+    & \\num{...}  %MAE_2pt
+    & \\num{...}  %kappa_4pt
+    & \\num{...}  %kappa_2pt \\\\
+    """
+    # Keep full precision (like your example). If you want rounding, change here.
+    return (
+        f"& \\num{{{mae_4pt}}}  %MAE_4pt\n"
+        f"& \\num{{{mae_2pt}}} %MAE_2pt\n"
+        f"& \\num{{{kappa_4pt}}}   %kappa_4pt\n"
+        f"& \\num{{{kappa_2pt}}} \\\\ %kappa_2pt \n"
+    )
+
+
+def save_latex_row(text: str, path: Path) -> None:
+    """Write LaTeX row fragment to disk (overwrites)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
 
 def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     """
@@ -130,7 +159,8 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     cm_pct = cm.div(cm.sum(axis=1).replace(0, 1), axis=0) * 100.0
 
-    mae = compute_mae(paired["NIST"], paired["LLM"])
+    mae_4pt = compute_mae(paired["NIST"], paired["LLM"])
+    kappa_4pt_weighted = compute_weighted_kappa_ordinal(cm)
     kappa_weighted = compute_weighted_kappa_ordinal(cm)
 
     alpha_4pt = compute_krippendorff_alpha_paired(
@@ -158,11 +188,14 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         level="nominal",
     )
 
+    kappa_2pt = compute_unweighted_kappa(cm_bin)
+    mae_2pt = compute_mae(paired_bin["NIST_bin"], paired_bin["LLM_bin"])
+
     write_confusion_outputs(cm, cm_pct, OUT_COUNTS, OUT_PCT)
 
     metrics_df = pd.DataFrame(
         [
-            {"metric": "mae",                    "value": float(mae)},
+            {"metric": "mae_4pt",                    "value": float(mae_4pt)},
             {"metric": "mae_binary_2pt",         "value": float(mae_binary)},
             {"metric": "kappa_weighted_4pt",     "value": float(kappa_weighted)},
             {"metric": "kappa_binary_2pt",       "value": float(kappa_binary)},
@@ -172,6 +205,15 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         ]
     )
     write_metrics(metrics_df, OUT_DIR / "metrics_llm_vs_nist.csv")
+
+    # 5) NEW: LaTeX row fragment
+    latex_row = latex_metrics_row(
+        mae_4pt=float(mae_4pt),
+        mae_2pt=float(mae_2pt),
+        kappa_4pt=float(kappa_4pt_weighted),
+        kappa_2pt=float(kappa_2pt),
+    )
+    print("\n[LaTeX row]\n" + latex_row)
 
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", linewidths=.5, cbar=True)

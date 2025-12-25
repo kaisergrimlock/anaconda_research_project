@@ -14,7 +14,7 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = ""          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "sw"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1            # how many times to inject EACH translated word
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)

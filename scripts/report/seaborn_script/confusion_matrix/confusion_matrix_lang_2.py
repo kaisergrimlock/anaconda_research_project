@@ -30,8 +30,8 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEAR = "2021"
-MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "sw"  # "raw","eng","vi","fr", etc.
+MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG  = "ar"  # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance
@@ -266,7 +266,7 @@ def main():
     df = load_and_prepare()
     paired, _invalid_df = split_valid_invalid(df)
 
-    print_false_positive_examples(paired)
+    #print_false_positive_examples(paired)
 
     if paired.empty:
         raise RuntimeError(

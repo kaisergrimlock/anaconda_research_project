@@ -11,10 +11,10 @@ import seaborn as sns
 
 # ========= Config =========
 TREC_DL_YEAR = "2021"
-MODEL = "gpt-oss-20b"
+MODEL = "qwen3-32b-v1"  # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
 
-LANGS = ["raw", "eng", "vi_corrected", "he_corrected", "fr", "zh"]
-CRITERION = "contextuality"
+LANGS = ["raw", "eng", "vi_corrected", "he_corrected"]
+CRITERION = "topicality"  # e.g. "contextuality", "coverage", "exactness", "topicality"
 
 VALID_LABELS = {0, 1, 2, 3}
 
