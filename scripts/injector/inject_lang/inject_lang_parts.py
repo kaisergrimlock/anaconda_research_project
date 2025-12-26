@@ -13,11 +13,11 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "vi_2"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "ar_corrected"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1           # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-TRECDL_YEAR = "2022"        # for folder naming only
+TRECDL_YEAR = "2021"        # for folder naming only
 
 INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")            # read these CSVs
 OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}/")    # write mirrored CSVs
@@ -76,7 +76,8 @@ def load_map(path: Path) -> Dict[str, str]:
     m: Dict[str, str] = {}
     if not path or not path.exists():
         return m
-    with path.open("r", newline="", encoding="utf-8") as fh:
+    # IMPORTANT: utf-8-sig strips BOM so "query" works even if file has BOM
+    with path.open("r", newline="", encoding="utf-8-sig") as fh:
         r = csv.DictReader(fh)
         for row in r:
             q = (row.get("query") or "").strip()
