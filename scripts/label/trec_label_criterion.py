@@ -63,10 +63,10 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "fr"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+LANG = "th"          # "raw", "vi", "sw_trans_p", "enclosed", ...
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
@@ -85,7 +85,9 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # qwen.qwen3-32b-v1:0
 # openai.gpt-oss-20b-1:0
 # meta.llama3-8b-instruct-v1:0
-MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -190,7 +192,6 @@ def iter_part_files(start: int, end: int):
         else:
             print(f"[WARN] Missing file: {p}")
 
-
 def parse_llm_text_to_score(text: str, model_id: str) -> str:
     """
     Parse score for all models.
@@ -201,7 +202,8 @@ def parse_llm_text_to_score(text: str, model_id: str) -> str:
     Fallbacks:
         - "Score: X"
         - "a score of X"
-      where X in [0-3]
+        - First standalone digit 0–3 appearing anywhere in the text
+          (e.g., "...overall 2 out of 4..." -> "2")
     """
     if text is None:
         return ""
@@ -222,9 +224,14 @@ def parse_llm_text_to_score(text: str, model_id: str) -> str:
     if m:
         return m.group(1)
 
+    # Fallback 3: first standalone digit 0–3 anywhere
+    # Uses word boundaries so we don't accidentally take the "1" from "10", etc.
+    m = re.search(r"\b([0-3])\b", text)
+    if m:
+        return m.group(1)
+
     print(f"[WARN] No score pattern found in output: {text[:100]!r}...")
     return ""
-
 
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
     """

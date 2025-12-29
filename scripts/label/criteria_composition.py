@@ -8,8 +8,8 @@ import sys
 
 # ========= Config you can edit =========
 TREC_DL_YEAR = "2021"
-MODEL        = "qwen3-32b-v1"  # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG         = "fr"  # e.g. "raw", "eng", "vi", etc.
+MODEL        = "gpt-oss-20b"  # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG         = "th_corrected"  # e.g. "raw", "eng", "vi", etc.
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 

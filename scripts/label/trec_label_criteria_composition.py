@@ -33,11 +33,13 @@ from scripts.log_helpers import timestamp_id
 # ===============================================================
 
 TREC_DL_YEAR = "2021"
-LANG = "eng_word"                      # e.g. raw/eng/vi/ru/...
+LANG = "ar_corrected"                      # e.g. raw/eng/vi/ru/...
 START_PART = 1
 END_PART = 6
 MODE = "replace"                  # replace|append
-MODELS = ["meta.llama3-8b-instruct-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
+MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 RELEVANCE_COL = "relevance"      # in criterion files
@@ -453,7 +455,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 
     run_id = timestamp_id()
 
-    out_dir = OUTPUT_ROOT_BASE / short / "temp"
+    out_dir = OUTPUT_ROOT_BASE / short
     logs_dir = LOG_ROOT_DIR / short
     out_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
