@@ -20,7 +20,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_llm"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "lang_brackets"
+CHART_TYPE = "word"
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
 STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
@@ -29,7 +29,7 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.-
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "eng_brackets", "fr", "fr_brackets", "ru", "ru_brackets", "th", "th_brackets", "vi", "vi_brackets", "sw", "sw_brackets"]
+TARGET_LANGS: List[str] = ["eng", "eng_word", "fr", "fr_word", "ru", "ru_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
