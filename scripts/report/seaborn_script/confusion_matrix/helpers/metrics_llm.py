@@ -168,10 +168,9 @@ def _krippendorff_alpha(
     De = float(
         (
             (row_marg[:, None] * row_marg[None, :] * D).sum()
-        ) / (N - 1.0)
+        ) / (N * (N - 1.0))
     )
     if De == 0:
-        # No expected disagreement (degenerate); define as perfect agreement
         return 1.0
 
     return 1.0 - Do / De

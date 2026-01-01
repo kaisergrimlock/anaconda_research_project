@@ -32,7 +32,7 @@ from helpers.metrics_llm import (
 # -------- Config --------
 TREC_DL_YEARS = ["2021", "2022"]   # <-- combined years
 MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "th_word"  # "raw","eng","vi","fr", etc.
+LANG  = "ru_crit"  # "raw","eng","vi","fr", etc.
 
 LABELS = [0, 1, 2, 3]
 
@@ -44,7 +44,7 @@ OUT_COUNTS       = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
 OUT_PCT          = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
 OUT_SVG          = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"
 OUT_INVALID_ROWS = OUT_DIR / "rows_with_missing_or_invalid_labels.csv"
-
+OUT_LATEX        = OUT_DIR / "metrics_llm_vs_nist_row.tex"
 
 def _llm_file_for_year(year: str) -> Path:
     return (
@@ -92,6 +92,7 @@ def load_and_prepare() -> pd.DataFrame:
     return df_all
 
 
+
 def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Separate rows with valid labels from rows with missing/invalid labels.
@@ -120,6 +121,7 @@ def latex_metrics_row(
     mae_2pt: float,
     kappa_4pt: float,
     kappa_2pt: float,
+    alpha_4pt: float,
 ) -> str:
     """
     Return a LaTeX table row fragment in exactly this style:
@@ -135,6 +137,7 @@ def latex_metrics_row(
         f"& \\num{{{mae_2pt}}} %MAE_2pt\n"
         f"& \\num{{{kappa_4pt}}}   %kappa_4pt\n"
         f"& \\num{{{kappa_2pt}}} \\\\ %kappa_2pt \n"
+        f"& \\num{{{alpha_4pt}}} \\\\ %alpha_4pt\n"
     )
 
 
@@ -212,8 +215,10 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         mae_2pt=float(mae_2pt),
         kappa_4pt=float(kappa_4pt_weighted),
         kappa_2pt=float(kappa_2pt),
+        alpha_4pt=float(alpha_4pt),
     )
     print("\n[LaTeX row]\n" + latex_row)
+    save_latex_row(latex_row, OUT_LATEX)
 
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt="d", linewidths=.5, cbar=True)
