@@ -45,3 +45,4 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260101_141817,2026-01-01T14:56:28,qwen.qwen3-32b-v1:0,3067,1053496,50445,1103941,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_he_labels.csv,(see logs index)
 20260101_204423,2026-01-01T21:01:38,qwen.qwen3-32b-v1:0,3067,1033473,50481,1083954,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_he_word_labels.csv,(see logs index)
 20260101_221945,2026-01-01T22:49:49,qwen.qwen3-32b-v1:0,3067,1040939,50427,1091366,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_ga_word_labels.csv,(see logs index)
+20260102_103443,2026-01-02T10:58:04,qwen.qwen3-32b-v1:0,3067,1060974,50446,1111420,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_ar_brackets_labels.csv,(see logs index)

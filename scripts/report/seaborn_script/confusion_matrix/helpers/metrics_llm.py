@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Sequence, Tuple, Dict, Any
 import numpy as np
 import pandas as pd
-
+import krippendorff
 
 def compute_mae(y_true: Sequence[int], y_pred: Sequence[int]) -> float:
     """Mean Absolute Error on integer / ordinal labels."""
@@ -78,120 +78,95 @@ def binarize_labels(s: pd.Series, threshold: int = 2) -> pd.Series:
 #   Krippendorff's alpha
 # =========================
 
-def _krippendorff_alpha(
+def krippendorff_alpha(
     ratings: np.ndarray,
     level: str = "ordinal",
+    *,
+    value_domain: list[int] | None = None,
 ) -> float:
     """
-    Krippendorff's alpha for 2+ raters, any number of units.
-    ratings: 2D array of shape (n_raters, n_units), with np.nan for missing.
-    level: "nominal" or "ordinal".
+    Wrapper around `krippendorff.alpha`.
+
+    ratings: array-like, shape (n_raters, n_units) OR (n_units,) for a single rater.
+             Use np.nan for missing.
+    level: "nominal" or "ordinal" (maps to krippendorff's level_of_measurement).
+    value_domain: fixed set of possible labels (recommended for stable ordinal scaling),
+                  e.g. [0,1,2,3] for TREC-DL.
     """
     arr = np.asarray(ratings, dtype=float)
-
     if arr.ndim == 1:
         arr = arr[np.newaxis, :]
 
-    # Collect all valid values to determine categories
-    valid = ~np.isnan(arr)
-    if not valid.any():
+    # Match your old behavior for fully-missing input
+    if np.isnan(arr).all():
         return float("nan")
 
-    values = np.unique(arr[valid])
-    k = len(values)
-    if k <= 1:
-        # All ratings identical – perfect agreement, but alpha formula is degenerate.
+    # Match your old behavior for degenerate 1-category case
+    valid_vals = arr[~np.isnan(arr)]
+    if valid_vals.size > 0 and np.unique(valid_vals).size <= 1:
         return 1.0
 
-    # Map category value -> index 0..k-1 (sorted by value)
-    value_to_idx = {v: i for i, v in enumerate(values)}
+    # Enforce stable domain for ordinal labels (recommended in your setup)
+    if value_domain is None and level == "ordinal":
+        # If you always use 0..3 labels, lock it in:
+        value_domain = [0, 1, 2, 3]
 
-    # Coincidence matrix O (k x k)
-    O = np.zeros((k, k), dtype=float)
-
-    n_raters, n_units = arr.shape
-
-    # Build coincidence matrix per Krippendorff:
-    # For each unit, count how often each category was used, then update O.
-    for u in range(n_units):
-        col = arr[:, u]
-        mask = ~np.isnan(col)
-        if mask.sum() <= 1:
-            # Need at least two valid ratings to contribute
-            continue
-        # indices of categories for this unit
-        idxs = [value_to_idx[v] for v in col[mask]]
-        counts = np.bincount(idxs, minlength=k)
-
-        # Add to coincidence matrix
-        # Diagonal: n_c * (n_c - 1)
-        # Off-diagonal: n_c * n_c'
-        for i in range(k):
-            if counts[i] == 0:
-                continue
-            O[i, i] += counts[i] * (counts[i] - 1)
-            for j in range(i + 1, k):
-                if counts[j] == 0:
-                    continue
-                increment = counts[i] * counts[j]
-                O[i, j] += increment
-                O[j, i] += increment
-
-    N = O.sum()
-    if N == 0:
+    try:
+        return float(
+            krippendorff.alpha(
+                reliability_data=arr,
+                level_of_measurement=level,   # "nominal" / "ordinal" / ...
+                value_domain=value_domain,
+            )
+        )
+    except Exception:
+        # Keep this conservative; if you prefer, log the exception details.
         return float("nan")
-
-    # Distance matrix D
-    D = np.zeros((k, k), dtype=float)
-    if level == "nominal":
-        for i in range(k):
-            for j in range(k):
-                D[i, j] = 0.0 if i == j else 1.0
-    elif level == "ordinal":
-        # Use positions (0..k-1) as the ordinal ranks of the sorted categories
-        positions = np.arange(k, dtype=float)
-        max_dist = (k - 1) ** 2
-        if max_dist == 0:
-            # Only one category – already handled above, but just in case
-            return 1.0
-        for i in range(k):
-            for j in range(k):
-                D[i, j] = ((positions[i] - positions[j]) ** 2) / max_dist
-    else:
-        raise ValueError(f"Unknown level='{level}', expected 'nominal' or 'ordinal'.")
-
-    # Observed disagreement
-    Do = float((O * D).sum() / N)
-
-    # Expected disagreement
-    row_marg = O.sum(axis=1)  # n_c
-    De = float(
-        (
-            (row_marg[:, None] * row_marg[None, :] * D).sum()
-        ) / (N * (N - 1.0))
-    )
-    if De == 0:
-        return 1.0
-
-    return 1.0 - Do / De
-
 
 def compute_krippendorff_alpha_paired(
     s_true: pd.Series,
     s_pred: pd.Series,
     level: str = "ordinal",
+    *,
+    value_domain: list[int] | None = None,
 ) -> float:
     """
-    Convenience wrapper for two-coder data:
-    s_true: Series of NIST labels
-    s_pred: Series of LLM labels
-    level: 'ordinal' or 'nominal'
-    """
-    a_true = pd.to_numeric(s_true, errors="coerce").to_numpy()
-    a_pred = pd.to_numeric(s_pred, errors="coerce").to_numpy()
-    ratings = np.vstack([a_true, a_pred])
-    return _krippendorff_alpha(ratings, level=level)
+    Two-coder Krippendorff's alpha using the `krippendorff` package.
 
+    s_true: NIST labels
+    s_pred: LLM labels
+    level: "ordinal" or "nominal"
+    value_domain: fixed possible labels (recommended for stable comparisons),
+                  e.g. [0,1,2,3] for 4-point relevance.
+    """
+    a_true = pd.to_numeric(s_true, errors="coerce").to_numpy(dtype=float)
+    a_pred = pd.to_numeric(s_pred, errors="coerce").to_numpy(dtype=float)
+
+    ratings = np.vstack([a_true, a_pred])
+
+    # Match your old behavior on all-missing
+    if np.isnan(ratings).all():
+        return float("nan")
+
+    # Match your old behavior on degenerate single-category case
+    valid_vals = ratings[~np.isnan(ratings)]
+    if valid_vals.size > 0 and np.unique(valid_vals).size <= 1:
+        return 1.0
+
+    # Lock domain for ordinal to keep distances comparable across slices
+    if value_domain is None and level == "ordinal":
+        value_domain = [0, 1, 2, 3]
+
+    try:
+        return float(
+            krippendorff.alpha(
+                reliability_data=ratings,
+                level_of_measurement=level,  # "nominal" / "ordinal" / ...
+                value_domain=value_domain,
+            )
+        )
+    except Exception:
+        return float("nan")
 
 # =========================
 #   Full metric bundle

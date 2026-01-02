@@ -33,8 +33,8 @@ STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{
 LABEL_BASE_DIR = Path("outputs") / "llm_label"
 
 # Column order you want (and ONLY these variants will be plotted by default)
-TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
-#TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
+#TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
+TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]

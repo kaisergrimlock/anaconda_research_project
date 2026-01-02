@@ -63,7 +63,7 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "sw"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+LANG = "ga"          # "raw", "vi", "sw_trans_p", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -85,9 +85,9 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # qwen.qwen3-32b-v1:0
 # openai.gpt-oss-20b-1:0
 # meta.llama3-8b-instruct-v1:0
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["openai.gpt-oss-20b-1:0"]
-MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
