@@ -34,12 +34,12 @@ def compute_weighted_kappa_ordinal(cm: pd.DataFrame) -> float:
 
 
 def compute_unweighted_kappa(cm: pd.DataFrame) -> float:
-    table = cm.to_numpy(dtype=float)
+    table = cm.to_numpy(dtype=float) #Turn the confusion matrix into a numpy array
     if table.sum() == 0:
-        return float("nan")
+        return float("nan") #Handle edge case of all-zero confusion matrix
+    # Compute unweighted Cohen's kappa
     res = cohens_kappa(table, wt=None, weights=None, return_results=True)
     return float(res.kappa)
-
 
 
 def binarize_labels(s: pd.Series, threshold: int = 2) -> pd.Series:
