@@ -31,8 +31,8 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEARS = ["2021", "2022"]   # <-- combined years
-MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "ru_crit"  # "raw","eng","vi","fr", etc.
+MODEL = "llama3-8b-instruct"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG  = "raw"  # "raw","eng","vi","fr", etc.
 
 LABELS = [0, 1, 2, 3]
 
