@@ -5,6 +5,8 @@ from typing import Sequence, Tuple, Dict, Any
 import numpy as np
 import pandas as pd
 import krippendorff
+from statsmodels.stats.inter_rater import cohens_kappa
+
 
 def compute_mae(y_true: Sequence[int], y_pred: Sequence[int]) -> float:
     """Mean Absolute Error on integer / ordinal labels."""
@@ -21,48 +23,23 @@ def compute_weighted_kappa_ordinal(cm: pd.DataFrame) -> float:
     Quadratic-weighted Cohen's kappa for ordinal labels.
     Assumes cm is square and rows/cols in the same order (e.g. 0..3).
     """
-    n = cm.to_numpy().sum()
-    if n == 0:
+    table = cm.to_numpy(dtype=float)
+    if table.sum() == 0:
         return float("nan")
-
-    labels = list(cm.index)
-    k = len(labels)
-
-    # quadratic weight matrix
-    W = np.zeros((k, k), dtype=float)
-    for i in range(k):
-        for j in range(k):
-            W[i, j] = ((i - j) ** 2) / ((k - 1) ** 2)
-
-    O = cm.to_numpy() / n
-
-    row_marg = cm.sum(axis=1).to_numpy() / n
-    col_marg = cm.sum(axis=0).to_numpy() / n
-    E = np.outer(row_marg, col_marg)
-
-    num = (W * O).sum()
-    den = (W * E).sum()
-    if den == 0:
-        return 1.0
-    return 1.0 - num / den
+    
+    k = table.shape[0]
+    scores = np.arange(k)
+    res = cohens_kappa(table, wt="quadratic", weights=scores, return_results=True)
+    return float(res.kappa)
 
 
 def compute_unweighted_kappa(cm: pd.DataFrame) -> float:
-    """
-    Standard Cohen's kappa from a confusion matrix.
-    Works for 2x2 (binary) or kxk.
-    """
-    n = cm.to_numpy().sum()
-    if n == 0:
+    table = cm.to_numpy(dtype=float)
+    if table.sum() == 0:
         return float("nan")
+    res = cohens_kappa(table, wt=None, weights=None, return_results=True)
+    return float(res.kappa)
 
-    po = np.trace(cm.to_numpy()) / n
-    row_marg = cm.sum(axis=1).to_numpy()
-    col_marg = cm.sum(axis=0).to_numpy()
-    pe = (row_marg * col_marg).sum() / (n * n)
-    if pe == 1.0:
-        return 1.0
-    return (po - pe) / (1.0 - pe)
 
 
 def binarize_labels(s: pd.Series, threshold: int = 2) -> pd.Series:
