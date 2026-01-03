@@ -28,38 +28,34 @@ TREC_DL_YEAR = "2022"
 # outputs/llm_label/trec_dl_2022/<MODEL>/<MODEL>_trecdl_2022_<LANG>_labels.csv
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 
-# Output: single table + single plot for all (model,lang)
+# Output directory (single table + plot for all model|lang groups)
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+# Output files
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
 OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
 
+# Tukey / data settings
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
 
-# Choose which languages to include
-# - list: only those langs
-# - "all": include all discovered langs
+# Languages to include ("all" or a list)
 LANGS: Union[str, List[str]] = ["raw", "eng", "vi", "ru", "sw", "ga"]  # or "all"
 
-# Metric to build per-qid samples for Tukey:
-# - "pos_rate": fraction of passages where LLM predicts "relevant" (LLM>0) per qid
-# - "mae_4pt": mean absolute error per qid
-METRIC = "pos_rate"
+# Metric for Tukey samples (computed per qid):
+# - "mean_diff": mean(LLM - NIST) per qid   (signed direction)
+# - "mae_4pt":   mean(|LLM - NIST|) per qid (magnitude)
+# - "disagree_rate": mean(LLM != NIST) per qid (0..1)
+METRIC = "mean_diff"
 
-# qid column candidates
+# qid column candidates (keep as list even if you only use "qid")
 QID_CANDIDATES = ["qid", "query_id", "topic_id"]
 
-# Separator used in group names (avoid confusion with model names)
+# Separator used in group names (IMPORTANT: this fixes your NameError)
 GROUP_SEP = "|"
-
-# Define what counts as "positive/relevant" in LLM labels:
-# - If you want {1,2,3} as positive (anything > 0), keep as-is.
-# - If you want {2,3} only, change to: lambda s: s >= 2
-LLM_POSITIVE_FN = lambda s: s > 0
 
 
 # =========================
@@ -127,8 +123,6 @@ def discover_model_files() -> Dict[str, List[Path]]:
 def load_labels_csv(path: Path) -> pd.DataFrame:
     """
     Load a labels CSV, coerce relevance columns, and keep only valid label pairs.
-    NOTE: We still validate BOTH columns exist and are within LABELS, even if
-    the chosen metric only uses LLM. This keeps your dataset consistent.
     """
     bump_field_limit()
     df = pd.read_csv(path)
@@ -147,31 +141,40 @@ def load_labels_csv(path: Path) -> pd.DataFrame:
 
 def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
     """
-    Returns df with columns: qid, value
-    one row per query => one Tukey sample.
+    Returns: columns [qid, value]
+    One row per query => replicates for Tukey.
+    Uses ALL valid rows (no filtering to NIST==0).
     """
     qid_col = detect_qid_column(df)
 
-    if metric == "mae_4pt":
+    if metric == "mean_diff":
+        base = df.assign(diff=(df["LLM"] - df["NIST"]))
         out = (
-            df.assign(abs_err=(df["NIST"] - df["LLM"]).abs())
-              .groupby(qid_col, as_index=False)["abs_err"]
-              .mean()
-              .rename(columns={qid_col: "qid", "abs_err": "value"})
-        )
-        return out
-
-    if metric == "pos_rate":
-        base = df.copy()
-        base["is_pos"] = LLM_POSITIVE_FN(base["LLM"]).astype(float)
-        out = (
-            base.groupby(qid_col, as_index=False)["is_pos"]
+            base.groupby(qid_col, as_index=False)["diff"]
                 .mean()
-                .rename(columns={qid_col: "qid", "is_pos": "value"})
+                .rename(columns={qid_col: "qid", "diff": "value"})
         )
         return out
 
-    raise ValueError("Unknown METRIC. Use 'pos_rate' or 'mae_4pt'.")
+    if metric == "mae_4pt":
+        base = df.assign(abs_err=(df["LLM"] - df["NIST"]).abs())
+        out = (
+            base.groupby(qid_col, as_index=False)["abs_err"]
+                .mean()
+                .rename(columns={qid_col: "qid", "abs_err": "value"})
+        )
+        return out
+
+    if metric == "disagree_rate":
+        base = df.assign(is_disagree=(df["LLM"] != df["NIST"]).astype(float))
+        out = (
+            base.groupby(qid_col, as_index=False)["is_disagree"]
+                .mean()
+                .rename(columns={qid_col: "qid", "is_disagree": "value"})
+        )
+        return out
+
+    raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
 
 
 def tukey_to_df(tukey) -> pd.DataFrame:
@@ -185,7 +188,9 @@ def tukey_to_df(tukey) -> pd.DataFrame:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
     if "reject" in df.columns:
-        df["reject"] = df["reject"].astype(str).str.lower().map({"true": True, "false": False})
+        df["reject"] = (
+            df["reject"].astype(str).str.lower().map({"true": True, "false": False})
+        )
 
     return df
 
@@ -211,8 +216,7 @@ def main() -> None:
     model_files = discover_model_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
 
-    # Build one long df across *all* (model, lang)
-    rows = []
+    rows: List[pd.DataFrame] = []
     skipped = 0
 
     for model, files in model_files.items():
@@ -240,7 +244,7 @@ def main() -> None:
 
     long_df = pd.concat(rows, ignore_index=True)
 
-    # Require >=2 samples per group for Tukey stability
+    # Require >=2 query samples per group
     counts = long_df["group"].value_counts()
     keep_groups = counts[counts >= 2].index
     long_df = long_df[long_df["group"].isin(keep_groups)].copy()
@@ -269,18 +273,42 @@ def main() -> None:
     )
     OUT_TUKEY_TEX.write_text(latex, encoding="utf-8")
 
-    # Plot (single graph). Color all "...|raw" tick labels red.
+    # Plot and color all "...|raw" tick labels red
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
 
+    # --- Color RAW labels ---
     for tick in ax.get_yticklabels():
-        label = tick.get_text()
-        if label.endswith(f"{GROUP_SEP}raw") or label == "raw":
+        if tick.get_text().endswith(f"{GROUP_SEP}raw"):
             tick.set_color("red")
+
+    # --- Color RAW CI bars ---
+    yticks = ax.get_yticks()
+    ylabels = [t.get_text() for t in ax.get_yticklabels()]
+
+    raw_y_positions = {
+        y for y, lab in zip(yticks, ylabels)
+        if lab.endswith(f"{GROUP_SEP}raw")
+    }
+
+    for line in ax.lines:
+        ydata = line.get_ydata()
+        if len(ydata) > 0:
+            y = float(ydata[0])
+            if any(abs(y - ry) < 1e-6 for ry in raw_y_positions):
+                line.set_color("red")
+                line.set_linewidth(2.5)
+
+    # --- Center axis at 0 ---
+    xmin, xmax = ax.get_xlim()
+    m = max(abs(xmin), abs(xmax))
+    ax.set_xlim(-m, m)
+    ax.axvline(0, linewidth=1)
 
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
     plt.close(fig)
+
 
     print(f"\n[OK] Wrote samples: {OUT_SAMPLES}")
     print(f"[OK] Wrote Tukey CSV: {OUT_TUKEY_CSV}")
