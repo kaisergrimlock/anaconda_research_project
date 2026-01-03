@@ -4,7 +4,7 @@ from __future__ import annotations
 import sys
 import re
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -23,38 +23,27 @@ from helpers.output_writer import write_df
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-
-# Root that contains:
-# outputs/llm_label/trec_dl_2022/<MODEL>/<MODEL>_trecdl_2022_<LANG>_labels.csv
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 
-# Output directory (single table + plot for all model|lang groups)
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Output files
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
 OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
 
-# Tukey / data settings
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
 
-# Languages to include ("all" or a list)
 LANGS: Union[str, List[str]] = ["raw", "eng", "vi", "ru", "sw", "ga"]  # or "all"
 
-# Metric for Tukey samples (computed per qid):
-# - "mean_diff": mean(LLM - NIST) per qid   (signed direction)
-# - "mae_4pt":   mean(|LLM - NIST|) per qid (magnitude)
-# - "disagree_rate": mean(LLM != NIST) per qid (0..1)
-METRIC = "mean_diff"
+# Row-level metric (computed per qid-pid row)
+METRIC = "mean_diff"  # "mean_diff" | "mae_4pt" | "disagree_rate"
 
-# qid column candidates (keep as list even if you only use "qid")
 QID_CANDIDATES = ["qid", "query_id", "topic_id"]
+PID_CANDIDATES = ["pid", "passage_id", "docid", "document_id"]
 
-# Separator used in group names (IMPORTANT: this fixes your NameError)
 GROUP_SEP = "|"
 
 
@@ -77,16 +66,17 @@ def detect_qid_column(df: pd.DataFrame) -> str:
     for c in QID_CANDIDATES:
         if c in df.columns:
             return c
-    raise ValueError(
-        f"Could not find qid column. Tried: {QID_CANDIDATES}. Found: {list(df.columns)}"
-    )
+    raise ValueError(f"Could not find qid column. Tried: {QID_CANDIDATES}. Found: {list(df.columns)}")
+
+
+def detect_pid_column(df: pd.DataFrame) -> Optional[str]:
+    for c in PID_CANDIDATES:
+        if c in df.columns:
+            return c
+    return None
 
 
 def parse_lang_from_filename(path: Path, model: str) -> str:
-    """
-    Expected:
-      <MODEL>_trecdl_<YEAR>_<LANG>_labels.csv
-    """
     name = path.name
     prefix = f"{model}_trecdl_{TREC_DL_YEAR}_"
     suffix = "_labels.csv"
@@ -99,9 +89,6 @@ def parse_lang_from_filename(path: Path, model: str) -> str:
 
 
 def discover_model_files() -> Dict[str, List[Path]]:
-    """
-    Returns model -> list of label CSVs.
-    """
     if not LABEL_ROOT.exists():
         raise FileNotFoundError(f"LABEL_ROOT not found: {LABEL_ROOT}")
 
@@ -121,16 +108,11 @@ def discover_model_files() -> Dict[str, List[Path]]:
 
 
 def load_labels_csv(path: Path) -> pd.DataFrame:
-    """
-    Load a labels CSV, coerce relevance columns, and keep only valid label pairs.
-    """
     bump_field_limit()
     df = pd.read_csv(path)
 
     if "relevance" not in df.columns or "llm_relevance" not in df.columns:
-        raise ValueError(
-            f"Expected 'relevance' and 'llm_relevance' in {path}, got: {list(df.columns)}"
-        )
+        raise ValueError(f"Expected 'relevance' and 'llm_relevance' in {path}, got: {list(df.columns)}")
 
     df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce")
     df["LLM"]  = pd.to_numeric(df["llm_relevance"], errors="coerce")
@@ -139,42 +121,40 @@ def load_labels_csv(path: Path) -> pd.DataFrame:
     return df[valid].copy()
 
 
-def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
+def per_row_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
     """
-    Returns: columns [qid, value]
-    One row per query => replicates for Tukey.
-    Uses ALL valid rows (no filtering to NIST==0).
+    One replicate per row (qid-pid pair if pid exists).
+    Returns columns:
+      - qid
+      - pid (if available)
+      - value
     """
     qid_col = detect_qid_column(df)
+    pid_col = detect_pid_column(df)  # may be None
+
+    base = df.copy()
 
     if metric == "mean_diff":
-        base = df.assign(diff=(df["LLM"] - df["NIST"]))
-        out = (
-            base.groupby(qid_col, as_index=False)["diff"]
-                .mean()
-                .rename(columns={qid_col: "qid", "diff": "value"})
-        )
-        return out
+        base["value"] = base["LLM"] - base["NIST"]
+    elif metric == "mae_4pt":
+        base["value"] = (base["LLM"] - base["NIST"]).abs()
+    elif metric == "disagree_rate":
+        base["value"] = (base["LLM"] != base["NIST"]).astype(float)
+    else:
+        raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
 
-    if metric == "mae_4pt":
-        base = df.assign(abs_err=(df["LLM"] - df["NIST"]).abs())
-        out = (
-            base.groupby(qid_col, as_index=False)["abs_err"]
-                .mean()
-                .rename(columns={qid_col: "qid", "abs_err": "value"})
-        )
-        return out
+    cols = [qid_col]
+    if pid_col is not None:
+        cols.append(pid_col)
+    cols.append("value")
 
-    if metric == "disagree_rate":
-        base = df.assign(is_disagree=(df["LLM"] != df["NIST"]).astype(float))
-        out = (
-            base.groupby(qid_col, as_index=False)["is_disagree"]
-                .mean()
-                .rename(columns={qid_col: "qid", "is_disagree": "value"})
-        )
-        return out
+    out = base[cols].rename(columns={qid_col: "qid"})
+    if pid_col is not None:
+        out = out.rename(columns={pid_col: "pid"})
+        # Ensure unique qid-pid pairs
+        out = out.drop_duplicates(subset=["qid", "pid"])
 
-    raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
+    return out
 
 
 def tukey_to_df(tukey) -> pd.DataFrame:
@@ -188,9 +168,7 @@ def tukey_to_df(tukey) -> pd.DataFrame:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
     if "reject" in df.columns:
-        df["reject"] = (
-            df["reject"].astype(str).str.lower().map({"true": True, "false": False})
-        )
+        df["reject"] = df["reject"].astype(str).str.lower().map({"true": True, "false": False})
 
     return df
 
@@ -227,14 +205,20 @@ def main() -> None:
 
             try:
                 df = load_labels_csv(f)
-                perq = per_qid_metric(df, METRIC)
-                if perq.empty:
+                perr = per_row_metric(df, METRIC)
+                if perr.empty:
                     continue
 
-                perq["model"] = model
-                perq["lang"] = lang
-                perq["group"] = perq["model"] + GROUP_SEP + perq["lang"]
-                rows.append(perq[["group", "model", "lang", "qid", "value"]])
+                perr["model"] = model
+                perr["lang"] = lang
+                perr["group"] = perr["model"] + GROUP_SEP + perr["lang"]
+
+                keep_cols = ["group", "model", "lang", "qid", "value"]
+                if "pid" in perr.columns:
+                    keep_cols.insert(3, "pid")
+
+                rows.append(perr[keep_cols])
+
             except Exception as e:
                 skipped += 1
                 print(f"[SKIP] {model} {lang} ({f.name}): {e}")
@@ -244,7 +228,7 @@ def main() -> None:
 
     long_df = pd.concat(rows, ignore_index=True)
 
-    # Require >=2 query samples per group
+    # Need >=2 samples per group
     counts = long_df["group"].value_counts()
     keep_groups = counts[counts >= 2].index
     long_df = long_df[long_df["group"].isin(keep_groups)].copy()
@@ -252,10 +236,8 @@ def main() -> None:
     if long_df["group"].nunique() < 2:
         raise RuntimeError("Not enough (model,lang) groups with >=2 samples to run Tukey.")
 
-    # Save the long samples used
     write_df(long_df, OUT_SAMPLES)
 
-    # One Tukey across all groups
     tukey = pairwise_tukeyhsd(
         endog=long_df["value"].to_numpy(),
         groups=long_df["group"].to_numpy(),
@@ -263,7 +245,6 @@ def main() -> None:
     )
     tukey_df = tukey_to_df(tukey)
 
-    # Outputs: one table + one plot
     write_df(tukey_df, OUT_TUKEY_CSV)
 
     latex = to_latex_table(
@@ -273,7 +254,6 @@ def main() -> None:
     )
     OUT_TUKEY_TEX.write_text(latex, encoding="utf-8")
 
-    # Plot and color all "...|raw" tick labels red
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
 
@@ -285,11 +265,7 @@ def main() -> None:
     # --- Color RAW CI bars ---
     yticks = ax.get_yticks()
     ylabels = [t.get_text() for t in ax.get_yticklabels()]
-
-    raw_y_positions = {
-        y for y, lab in zip(yticks, ylabels)
-        if lab.endswith(f"{GROUP_SEP}raw")
-    }
+    raw_y_positions = {y for y, lab in zip(yticks, ylabels) if lab.endswith(f"{GROUP_SEP}raw")}
 
     for line in ax.lines:
         ydata = line.get_ydata()
@@ -299,7 +275,7 @@ def main() -> None:
                 line.set_color("red")
                 line.set_linewidth(2.5)
 
-    # --- Center axis at 0 ---
+    # --- Center axis at 0 (nice for mean_diff) ---
     xmin, xmax = ax.get_xlim()
     m = max(abs(xmin), abs(xmax))
     ax.set_xlim(-m, m)
@@ -308,7 +284,6 @@ def main() -> None:
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
     plt.close(fig)
-
 
     print(f"\n[OK] Wrote samples: {OUT_SAMPLES}")
     print(f"[OK] Wrote Tukey CSV: {OUT_TUKEY_CSV}")
