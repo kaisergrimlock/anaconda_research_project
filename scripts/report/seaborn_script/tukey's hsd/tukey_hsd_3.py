@@ -1,13 +1,14 @@
-from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, List
-import re
 import sys
+import re
+from pathlib import Path
+from typing import Dict, List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-
+# =
+# File Location
+# = 
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[4]
 if str(PROJECT_ROOT) not in sys.path:
@@ -16,117 +17,88 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
 
+
 # =========================
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-
-# languages to include (exact list; no "all")
-LANGS: List[str] = ["eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
-LANG_SET = set(LANGS)
-
-# label universe
-LABELS = [0, 1, 2, 3]
-ALPHA = 0.05
-
-# group name format
-GROUP_SEP = "|"
-
-# metric for Tukey samples (computed per qid)
-# "mean_diff" | "mae_4pt" | "disagree_rate"
-METRIC = "mean_diff"
-
-# output paths
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
-
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
 OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
-OUT_SAMPLES = OUT_DIR / "tukey_samples_long.csv"
+OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
+GROUP_SEP = "|"
+
+# = 
+# Parameters
+# =
+ALPHA = 0.05
+LABELS = [0, 1, 2, 3]
+LANGS: List[str] = ["eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
+METRIC = "mean_diff"
 
 
-# =========================
-# IO + discovery
-# =========================
-def find_model_files() -> Dict[str, List[Path]]:
+def find_llm_files() -> Dict[str, List[Path]]:
     """
     Returns model -> list of label CSVs.
     Expected layout:
-      data/labels/trecdl/<MODEL>/<MODEL>_trecdl_<YEAR>_<LANG>_labels.csv
+      outputs/llm_label/trec_dl_2022/<MODEL>/<MODEL>_trecdl_2022_<LANG>_labels.csv
     """
     if not LABEL_ROOT.exists():
         raise FileNotFoundError(f"LABEL_ROOT not found: {LABEL_ROOT}")
+    model_files: Dict[str, List[Path]] = {}
+    for model_dir in LABEL_ROOT.iterdir():
+        if not model_dir.is_dir():
+            continue
+        model_name = model_dir.name
+        csv_files = list(model_dir.glob(f"{model_name}_trecdl_{TREC_DL_YEAR}_*_labels.csv"))
+        if csv_files:
+            model_files[model_name] = csv_files
+        if not csv_files:
+            print(f"Warning: no label CSVs found for model {model_name} in {model_dir}")
+    return model_files
 
-    out: Dict[str, List[Path]] = {}
-    for model_dir in sorted([p for p in LABEL_ROOT.iterdir() if p.is_dir()]):
-        model = model_dir.name
-        files = sorted(model_dir.glob(f"{model}_trecdl_{TREC_DL_YEAR}_*_labels.csv"))
-        if files:
-            out[model] = files
-
-    if not out:
-        raise RuntimeError(
-            f"No model label files found under {LABEL_ROOT}. "
-            f"Expected pattern: <MODEL>_trecdl_{TREC_DL_YEAR}_<LANG>_labels.csv"
-        )
-    return out
-
-
-def parse_lang_from_filename(path: Path, model: str) -> str:
+def get_lang_from_filename(file_path: Path, model: str) -> Optional[str]:
     """
-    Expected:
+    Extract <LANG> from:
       <MODEL>_trecdl_<YEAR>_<LANG>_labels.csv
     """
-    name = path.name
-    prefix = f"{model}_trecdl_{TREC_DL_YEAR}_"
-    suffix = "_labels.csv"
-    if name.startswith(prefix) and name.endswith(suffix):
-        return name[len(prefix) : -len(suffix)]
-    m = re.search(rf"_trecdl_{re.escape(TREC_DL_YEAR)}_(.+?)_labels\.csv$", name)
-    if m:
-        return m.group(1)
-    return "unknown"
+    fname = file_path.name  # <-- Path -> filename string
+    pattern = rf"^{re.escape(model)}_trecdl_\d{{4}}_(.+?)_labels\.csv$"
+    match = re.search(pattern, fname)
+    return match.group(1) if match else None
 
-
-def load_labels_csv(path: Path) -> pd.DataFrame:
+def load_labels(file_path: Path) -> pd.DataFrame:
     bump_field_limit()
-    df = pd.read_csv(path)
-
-    required = {"qid", "pid", "relevance", "llm_relevance"}
-    missing = [c for c in required if c not in df.columns]
-    if missing:
-        raise ValueError(
-            f"Missing required columns {missing} in {path}. "
-            f"Found: {list(df.columns)}"
-        )
-
-    df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce")
+    df = pd.read_csv(file_path)
+    requisite = {"qid", "pid", "relevance", "llm_relevance"}
+    for r in requisite:
+        if r not in df.columns:
+            raise ValueError(f"Missing required column '{r}' in {file_path}")
+    df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce") # If conversion fails, NaN
     df["LLM"] = pd.to_numeric(df["llm_relevance"], errors="coerce")
 
+    # Keep only rows with valid NIST and LLM labels
+    df = df.dropna(subset=["NIST", "LLM"])
+    df["NIST"] = df["NIST"].astype(int)
+    df["LLM"] = df["LLM"].astype(int)
     valid = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
     return df[valid].copy()
 
-
-# =========================
-# Metrics
-# =========================
-def detect_id_columns(df: pd.DataFrame) -> None:
-    missing = [c for c in ["qid", "pid"] if c not in df.columns]
-    if missing:
-        raise ValueError(
-            f"Missing required columns {missing}. Found columns: {list(df.columns)}"
-        )
-
-
 def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
-    detect_id_columns(df)
+    """
+    Turn a (qid,pid)-level label dataframe into (qid)-level samples:
+      qid, value
 
-    # Ensure unique (qid,pid) pairs
+    These 'value' samples are what Tukey HSD consumes.
+    """
+    # Ensure unique (qid,pid) pairs so duplicates don't distort per-qid averages
     base = df.drop_duplicates(subset=["qid", "pid"]).copy()
 
     if metric == "mean_diff":
+        # signed difference: positive means LLM > NIST on average
         base["diff"] = base["LLM"] - base["NIST"]
         return (
             base.groupby("qid", as_index=False)["diff"]
@@ -135,6 +107,7 @@ def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
         )
 
     if metric == "mae_4pt":
+        # mean absolute error per query
         base["abs_err"] = (base["LLM"] - base["NIST"]).abs()
         return (
             base.groupby("qid", as_index=False)["abs_err"]
@@ -143,6 +116,7 @@ def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
         )
 
     if metric == "disagree_rate":
+        # fraction of passages where LLM != NIST for each query
         base["is_disagree"] = (base["LLM"] != base["NIST"]).astype(float)
         return (
             base.groupby("qid", as_index=False)["is_disagree"]
@@ -152,37 +126,56 @@ def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
 
     raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
 
-
 # =========================
-# Tukey helpers
+# Step 6: Tukey helpers (formatting/output)
 # =========================
 def safe_slug(s: str) -> str:
+    """
+    Convert a string to a filesystem/latex-friendly slug.
+    Example: 'MAE 4pt' -> 'mae_4pt'
+    """
     s = s.strip().lower()
     s = re.sub(r"[^a-z0-9]+", "_", s)
     return s.strip("_")
 
 
 def tukey_to_df(tukey) -> pd.DataFrame:
-    table = tukey.summary().data
+    """
+    Convert statsmodels Tukey result into a DataFrame.
+
+    Tukey summary columns typically include:
+      group1, group2, meandiff, p-adj, lower, upper, reject
+    """
+    table = tukey.summary().data   # list-of-lists (header + rows)
     header = table[0]
     body = table[1:]
     df = pd.DataFrame(body, columns=header)
 
+    # Convert numeric columns from strings -> floats
     for c in ["meandiff", "p-adj", "lower", "upper"]:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
 
+    # Convert reject column into real booleans if present
     if "reject" in df.columns:
-        df["reject"] = df["reject"].astype(str).str.lower().map({"true": True, "false": False})
+        df["reject"] = (
+            df["reject"].astype(str).str.lower().map({"true": True, "false": False})
+        )
 
     return df
 
 
 def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
+    """
+    Render a DataFrame as a LaTeX table with controlled numeric formatting.
+    """
     fmt = df.copy()
+
+    # short numeric formatting (you can change precision here)
     for c in ["meandiff", "p-adj", "lower", "upper"]:
         if c in fmt.columns:
             fmt[c] = fmt[c].map(lambda x: f"{x:.6g}" if pd.notnull(x) else "")
+
     return fmt.to_latex(
         index=False,
         escape=False,
@@ -191,12 +184,11 @@ def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
         column_format="l l r r r r l",
     )
 
-
 # =========================
-# Main
+# Step 7: Main (data assembly)
 # =========================
 def main() -> None:
-    model_files = find_model_files()
+    model_files = find_llm_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
 
     rows: List[pd.DataFrame] = []
@@ -204,14 +196,13 @@ def main() -> None:
 
     for model, files in model_files.items():
         for f in files:
-            lang = parse_lang_from_filename(f, model)
+            lang = get_lang_from_filename(f, model)
 
             # strict language include list
-            if lang not in LANG_SET:
+            if lang not in LANGS:
                 continue
-
             try:
-                df = load_labels_csv(f)
+                df = load_labels(f)
                 perq = per_qid_metric(df, METRIC)
                 if perq.empty:
                     continue
@@ -219,6 +210,7 @@ def main() -> None:
                 perq["model"] = model
                 perq["lang"] = lang
                 perq["group"] = perq["model"] + GROUP_SEP + perq["lang"]
+
                 rows.append(perq[["group", "model", "lang", "qid", "value"]])
 
             except Exception as e:
@@ -246,17 +238,21 @@ def main() -> None:
     if dropped:
         print(f"[INFO] Dropped {len(dropped)} groups with <2 qid samples.")
 
-    # Run Tukey across all groups
+    # =========================
+    # Step 8: Run Tukey HSD
+    # =========================
     tukey = pairwise_tukeyhsd(
         endog=long_df["value"].to_numpy(),
         groups=long_df["group"].to_numpy(),
         alpha=ALPHA,
     )
+
     tukey_df = tukey_to_df(tukey)
 
-    # Save tables
+    # Save CSV
     write_df(tukey_df, OUT_TUKEY_CSV)
 
+    # Save LaTeX table
     latex = to_latex_table(
         tukey_df,
         caption=f"Tukey HSD across all (model,lang) groups for {METRIC}, FWER={ALPHA}.",
@@ -264,19 +260,23 @@ def main() -> None:
     )
     OUT_TUKEY_TEX.write_text(latex, encoding="utf-8")
 
-    # Plot: color all "...|raw" in red; center x at 0
+    # =========================
+    # Step 8b: Plot simultaneous confidence intervals
+    # =========================
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
 
-    # RAW labels red
+    # Color RAW labels red (if present)
     for tick in ax.get_yticklabels():
         if tick.get_text().endswith(f"{GROUP_SEP}raw"):
             tick.set_color("red")
 
-    # RAW CI bars red (match by y position)
+    # Color RAW CI bars red (match by y-position)
     yticks = ax.get_yticks()
     ylabels = [t.get_text() for t in ax.get_yticklabels()]
-    raw_y_positions = {y for y, lab in zip(yticks, ylabels) if lab.endswith(f"{GROUP_SEP}raw")}
+    raw_y_positions = {
+        y for y, lab in zip(yticks, ylabels) if lab.endswith(f"{GROUP_SEP}raw")
+    }
 
     for line in ax.lines:
         ydata = line.get_ydata()
@@ -296,13 +296,15 @@ def main() -> None:
     plt.savefig(OUT_SIMUL_SVG, format="svg")
     plt.close(fig)
 
+    # =========================
+    # Final logging
+    # =========================
     print(f"\n[OK] Wrote samples: {OUT_SAMPLES}")
     print(f"[OK] Wrote Tukey CSV: {OUT_TUKEY_CSV}")
     print(f"[OK] Wrote Tukey TeX: {OUT_TUKEY_TEX}")
     print(f"[OK] Wrote plot: {OUT_SIMUL_SVG}")
     if skipped:
         print(f"[INFO] Skipped {skipped} files due to errors (see logs above).")
-
 
 if __name__ == "__main__":
     main()
