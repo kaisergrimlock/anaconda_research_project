@@ -6,9 +6,11 @@ from typing import Dict, List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-# =
+from helpers.draw import color_tukey_by_taxonomy, center_x_axis_at_zero
+
+# =========================
 # File Location
-# = 
+# =========================
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[4]
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,13 +32,13 @@ OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
 OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
 GROUP_SEP = "|"
-
-# = 
+TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
+# ========================
 # Parameters
-# =
+# ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANGS: List[str] = ["eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
+LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
 METRIC = "mean_diff"
 
 
@@ -266,35 +268,21 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
 
-    # Color RAW labels red (if present)
-    for tick in ax.get_yticklabels():
-        if tick.get_text().endswith(f"{GROUP_SEP}raw"):
-            tick.set_color("red")
+    color_tukey_by_taxonomy(
+        fig,
+        ax,
+        taxonomy_csv=TAXONOMY_CSV,
+        group_sep=GROUP_SEP,
+        default_level=0,   # e.g. color "raw" or unknown langs consistently
+        linewidth=2.5,
+    )
 
-    # Color RAW CI bars red (match by y-position)
-    yticks = ax.get_yticks()
-    ylabels = [t.get_text() for t in ax.get_yticklabels()]
-    raw_y_positions = {
-        y for y, lab in zip(yticks, ylabels) if lab.endswith(f"{GROUP_SEP}raw")
-    }
-
-    for line in ax.lines:
-        ydata = line.get_ydata()
-        if len(ydata) > 0:
-            y = float(ydata[0])
-            if any(abs(y - ry) < 1e-6 for ry in raw_y_positions):
-                line.set_color("red")
-                line.set_linewidth(2.5)
-
-    # Center x-axis at 0 (symmetric)
-    xmin, xmax = ax.get_xlim()
-    m = max(abs(xmin), abs(xmax))
-    ax.set_xlim(-m, m)
-    ax.axvline(0, linewidth=1)
+    center_x_axis_at_zero(ax)
 
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
     plt.close(fig)
+
 
     # =========================
     # Final logging
