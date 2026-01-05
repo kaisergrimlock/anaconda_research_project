@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from helpers.draw import color_tukey_by_taxonomy, center_x_axis_at_zero
+from helpers.draw import color_tukey_by_taxonomy, center_x_axis_at_zero, taxonomy_legend
 
 # =========================
 # File Location
@@ -23,9 +23,9 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_crit"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -38,7 +38,7 @@ TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
+LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga", "raw_crit", "eng_crit", "fr_crit", "ru_crit", "ar_crit", "he_crit", "vi_crit", "th_crit", "sw_crit", "ga_crit"]
 METRIC = "mean_diff"
 
 
@@ -268,7 +268,7 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
 
-    color_tukey_by_taxonomy(
+    level_palette = color_tukey_by_taxonomy(
         fig,
         ax,
         taxonomy_csv=TAXONOMY_CSV,
@@ -276,8 +276,14 @@ def main() -> None:
         default_level=0,   # e.g. color "raw" or unknown langs consistently
         linewidth=2.5,
     )
-
+    taxonomy_legend(ax, level_to_rgba=level_palette, title="Taxonomy level", loc="upper left")
     center_x_axis_at_zero(ax)
+
+    # Axis labels and title
+    ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
+    ax.set_axisbelow(True)
+    ax.set_title(None)
+
 
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")

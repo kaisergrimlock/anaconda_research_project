@@ -38,6 +38,37 @@ def _build_level_palette(levels: set[int]):
     return level_to_rgba
 
 
+def taxonomy_legend(
+            ax: Axes,
+    *,
+    level_to_rgba: Dict[int, Tuple[float, float, float, float]],
+    title: str = "Taxonomy level",
+    loc: str = "lower right",
+) -> None:
+    """
+    Add a legend to ax mapping taxonomy levels to colors.
+    """
+    from matplotlib.patches import Patch
+
+    handles = []
+    for lvl, rgba in sorted(level_to_rgba.items()):
+        if lvl != 0:
+            label = f"Level {lvl}"
+        else:
+            label = "Baseline"
+        patch = Patch(color=rgba, label=label)
+        handles.append(patch)
+
+    ax.legend(
+        handles=handles,
+        title=title,
+        loc=loc,
+        framealpha=0.9,
+        edgecolor="black",
+        fontsize="small",
+        title_fontsize="medium",
+    ) 
+
 def color_tukey_by_taxonomy(
     fig: Figure,
     ax: Axes,
@@ -47,7 +78,7 @@ def color_tukey_by_taxonomy(
     default_level: Optional[int] = None,
     linewidth: float = 2.5,
     eps: float = 1e-6,
-) -> None:
+) -> dict[int, tuple[float, float, float, float]]:
     """
     After tukey.plot_simultaneous(ax=ax), color:
       - y tick labels
@@ -139,6 +170,8 @@ def color_tukey_by_taxonomy(
                     break
 
         coll.set_facecolors(facecolors)
+
+    return level_to_rgba
 
 
 def center_x_axis_at_zero(ax: Axes) -> None:
