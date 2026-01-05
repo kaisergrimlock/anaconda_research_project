@@ -2,14 +2,11 @@
 from __future__ import annotations
 
 import sys
-import re
 from pathlib import Path
-from typing import Dict, List, Union
 
-import numpy as np
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[4]
@@ -17,271 +14,275 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.csv_helpers import bump_field_limit
-from helpers.output_writer import write_df
+from helpers.output_writer import (
+    write_confusion_outputs,
+    write_metrics,
+    save_heatmap,
+    write_df,
+)
+from helpers.metrics_llm import (
+    compute_mae,
+    compute_weighted_kappa_ordinal,
+    compute_unweighted_kappa,
+    compute_krippendorff_alpha_paired,
+    binarize_labels,
+)
 
-# =========================
-# Config
-# =========================
-TREC_DL_YEAR = "2022"
+# -------- Config --------
+TREC_DL_YEAR = "2021"
+MODEL = "llama3-8b-instruct"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG = "raw"  # "raw","eng","vi","fr", etc.
 
-# Root that contains:
-# outputs/llm_label/trec_dl_2022/<MODEL>/<MODEL>_trecdl_2022_<LANG>_labels.csv
-LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
+# This CSV is now assumed to already contain:
+#   - relevance
+#   - llm_relevance
+LLM_FILE = (
+    Path("outputs/llm_label")
+    / f"trec_dl_{TREC_DL_YEAR}"
+    / MODEL
+    / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{LANG}_labels.csv"
+)
 
-# Output: single table + single plot for all (model,lang)
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs"
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+OUT_DIR = Path("figures") / TREC_DL_YEAR / MODEL / "confusion_matrix" / LANG
+OUT_COUNTS = OUT_DIR / "confusion_matrix_llm_vs_nist.csv"
+OUT_PCT = OUT_DIR / "confusion_matrix_llm_vs_nist_pct.csv"
+OUT_SVG = OUT_DIR / "confusion_matrix_llm_vs_nist.svg"
+OUT_INVALID_ROWS = OUT_DIR / "rows_with_missing_or_invalid_labels.csv"
+OUT_LATEX = OUT_DIR / "metrics_llm_vs_nist_row.tex"
 
-OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
-OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
-OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
-OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
-
-ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
 
-# Choose which languages to include
-# - list: only those langs
-# - "all": include all discovered langs
-LANGS: Union[str, List[str]] = ["raw", "eng", "vi", "ru"]  # or "all"
+# how many example disagreements to print (kept as-is; your function prints 1 per bucket)
+DISAGREE_EXAMPLES = 1
 
-# Metric to build per-qid samples for Tukey:
-# - "fp_rate": false positive rate per qid among NIST==0 passages
-# - "mae_4pt": mean absolute error per qid
-METRIC = "fp_rate"
-
-# qid column candidates
-QID_CANDIDATES = ["qid", "query_id", "topic_id"]
-
-# Separator used in group names (avoid confusion with model names)
-GROUP_SEP = "|"
+OUT_MISSING_PART0 = (
+    Path("retrieved")
+    / f"trec_dl_{TREC_DL_YEAR}"
+    / LANG
+    / f"all_topics_trecdl_{TREC_DL_YEAR}_part0.csv"
+)
 
 
-# =========================
-# Helpers
-# =========================
-def safe_slug(s: str) -> str:
-    s = s.strip().lower()
-    s = re.sub(r"[^a-z0-9]+", "_", s)
-    return s.strip("_")
-
-
-def want_lang(lang: str, langs) -> bool:
-    if langs == "all":
-        return True
-    return lang in set(map(str, langs))
-
-
-def detect_qid_column(df: pd.DataFrame) -> str:
-    for c in QID_CANDIDATES:
-        if c in df.columns:
-            return c
-    raise ValueError(
-        f"Could not find qid column. Tried: {QID_CANDIDATES}. Found: {list(df.columns)}"
-    )
-
-
-def parse_lang_from_filename(path: Path, model: str) -> str:
+def load_and_prepare() -> pd.DataFrame:
     """
-    Expected:
-      <MODEL>_trecdl_<YEAR>_<LANG>_labels.csv
+    Load the combined CSV that already contains both relevance and llm_relevance.
+    Coerce them to numeric and standardize column names (NIST, LLM).
     """
-    name = path.name
-    prefix = f"{model}_trecdl_{TREC_DL_YEAR}_"
-    suffix = "_labels.csv"
-    if name.startswith(prefix) and name.endswith(suffix):
-        return name[len(prefix) : -len(suffix)]
-    m = re.search(rf"_trecdl_{re.escape(TREC_DL_YEAR)}_(.+?)_labels\.csv$", name)
-    if m:
-        return m.group(1)
-    return "unknown"
-
-
-def discover_model_files() -> Dict[str, List[Path]]:
-    """
-    Returns model -> list of label CSVs.
-    """
-    if not LABEL_ROOT.exists():
-        raise FileNotFoundError(f"LABEL_ROOT not found: {LABEL_ROOT}")
-
-    out: Dict[str, List[Path]] = {}
-    for model_dir in sorted([p for p in LABEL_ROOT.iterdir() if p.is_dir()]):
-        model = model_dir.name
-        files = sorted(model_dir.glob(f"{model}_trecdl_{TREC_DL_YEAR}_*_labels.csv"))
-        if files:
-            out[model] = files
-
-    if not out:
-        raise RuntimeError(
-            f"No model label files found under {LABEL_ROOT}. "
-            f"Expected pattern: <MODEL>_trecdl_{TREC_DL_YEAR}_<LANG>_labels.csv"
-        )
-    return out
-
-
-def load_labels_csv(path: Path) -> pd.DataFrame:
     bump_field_limit()
-    df = pd.read_csv(path)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    df = pd.read_csv(LLM_FILE)
 
     if "relevance" not in df.columns or "llm_relevance" not in df.columns:
         raise ValueError(
-            f"Expected 'relevance' and 'llm_relevance' in {path}, got: {list(df.columns)}"
+            f"Expected columns 'relevance' and 'llm_relevance' in {LLM_FILE}, "
+            f"but got: {list(df.columns)}"
         )
 
+    # Coerce to numeric (in case they are strings); invalid parses become NaN
     df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce")
-    df["LLM"]  = pd.to_numeric(df["llm_relevance"], errors="coerce")
-
-    valid = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
-    return df[valid].copy()
-
-
-def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
-    """
-    Returns df with columns: qid, value
-    one row per query => one Tukey sample.
-    """
-    qid_col = detect_qid_column(df)
-
-    if metric == "mae_4pt":
-        out = (
-            df.assign(abs_err=(df["NIST"] - df["LLM"]).abs())
-              .groupby(qid_col, as_index=False)["abs_err"]
-              .mean()
-              .rename(columns={qid_col: "qid", "abs_err": "value"})
-        )
-        return out
-
-    if metric == "fp_rate":
-        # among NIST==0 passages, fraction with LLM>0
-        base = df[df["NIST"] == 0].copy()
-        if base.empty:
-            return pd.DataFrame(columns=["qid", "value"])
-        base["is_fp"] = (base["LLM"] > 0).astype(float)
-        out = (
-            base.groupby(qid_col, as_index=False)["is_fp"]
-                .mean()
-                .rename(columns={qid_col: "qid", "is_fp": "value"})
-        )
-        return out
-
-    raise ValueError(f"Unknown METRIC={metric}. Use 'fp_rate' or 'mae_4pt'.")
-
-
-def tukey_to_df(tukey) -> pd.DataFrame:
-    table = tukey.summary().data
-    header = table[0]
-    body = table[1:]
-    df = pd.DataFrame(body, columns=header)
-
-    for c in ["meandiff", "p-adj", "lower", "upper"]:
-        if c in df.columns:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-
-    if "reject" in df.columns:
-        df["reject"] = df["reject"].astype(str).str.lower().map({"true": True, "false": False})
+    df["LLM"] = pd.to_numeric(df["llm_relevance"], errors="coerce")
 
     return df
 
 
-def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
-    fmt = df.copy()
-    for c in ["meandiff", "p-adj", "lower", "upper"]:
-        if c in fmt.columns:
-            fmt[c] = fmt[c].map(lambda x: f"{x:.6g}" if pd.notnull(x) else "")
-    return fmt.to_latex(
+def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    valid_mask = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
+
+    valid_df = df[valid_mask].copy()
+    invalid_df = df[~valid_mask].copy()
+
+    print("Total rows:", len(df))
+    print("Valid rows:", valid_mask.sum())
+    print("Invalid rows:", (~valid_mask).sum())
+
+    # Keep your existing debug dump (optional)
+    invalid_out = invalid_df.drop(columns=["NIST", "LLM"], errors="ignore")
+    write_df(invalid_out, OUT_INVALID_ROWS)
+
+    # Write ALL invalid rows as "part0" exactly as-is (no renaming, no new cols)
+    OUT_MISSING_PART0.parent.mkdir(parents=True, exist_ok=True)
+    invalid_df.drop(columns=["NIST", "LLM"], errors="ignore").to_csv(
+        OUT_MISSING_PART0,
         index=False,
-        escape=False,
-        caption=caption,
-        label=label,
-        column_format="l l r r r r l",
+        encoding="utf-8",
+    )
+    print(f"[Missing->Part0] Wrote {len(invalid_df)} rows to: {OUT_MISSING_PART0}")
+
+    return valid_df, invalid_df
+
+
+def latex_metrics_row(
+    mae_4pt: float,
+    mae_2pt: float,
+    kappa_4pt: float,
+    kappa_2pt: float,
+) -> str:
+    """
+    Return a LaTeX table row fragment in exactly this style:
+
+    & \\num{...}  %MAE_4pt
+    & \\num{...}  %MAE_2pt
+    & \\num{...}  %kappa_4pt
+    & \\num{...}  %kappa_2pt \\\\
+    """
+    # Keep full precision (like your example). If you want rounding, change here.
+    return (
+        f"& \\num{{{mae_4pt}}}  %MAE_4pt\n"
+        f"& \\num{{{mae_2pt}}} %MAE_2pt\n"
+        f"& \\num{{{kappa_4pt}}}   %kappa_4pt\n"
+        f"& \\num{{{kappa_2pt}}} \\\\ %kappa_2pt \n"
     )
 
 
-# =========================
-# Main
-# =========================
+def save_latex_row(text: str, path: Path) -> None:
+    """Write LaTeX row fragment to disk (overwrites)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
+    """
+    Given a DataFrame with columns NIST and LLM (already validated),
+    compute the confusion matrix and metrics, then write outputs + heatmap + LaTeX row.
+    """
+    # 1) Confusion matrix (4-point)
+    cm = pd.crosstab(
+        index=pd.Categorical(paired["NIST"], categories=LABELS, ordered=True),
+        columns=pd.Categorical(paired["LLM"], categories=LABELS, ordered=True),
+        dropna=False,
+    )
+    cm.index.name = "NIST"
+    cm.columns.name = "LLM"
+
+    cm_pct = cm.div(cm.sum(axis=1).replace(0, 1), axis=0) * 100.0
+
+    # 2) Metrics (4-point / graded)
+    mae_4pt = compute_mae(paired["NIST"], paired["LLM"])
+    kappa_4pt_weighted = compute_weighted_kappa_ordinal(cm)
+
+    # Krippendorff's alpha (4-point, ordinal) (kept for CSV outputs)
+    alpha_4pt = compute_krippendorff_alpha_paired(
+        paired["NIST"],
+        paired["LLM"],
+        level="ordinal",
+    )
+
+    # Binary version: collapse labels into [0, 1]
+    paired_bin = paired.copy()
+    paired_bin["NIST_bin"] = binarize_labels(paired_bin["NIST"])
+    paired_bin["LLM_bin"] = binarize_labels(paired_bin["LLM"])
+
+    cm_bin = pd.crosstab(
+        index=pd.Categorical(paired_bin["NIST_bin"], categories=[0, 1], ordered=True),
+        columns=pd.Categorical(paired_bin["LLM_bin"], categories=[0, 1], ordered=True),
+        dropna=False,
+    )
+
+    kappa_2pt = compute_unweighted_kappa(cm_bin)
+    mae_2pt = compute_mae(paired_bin["NIST_bin"], paired_bin["LLM_bin"])
+
+    # Krippendorff's alpha (binary, treat as nominal) (kept for CSV outputs)
+    alpha_2pt = compute_krippendorff_alpha_paired(
+        paired_bin["NIST_bin"],
+        paired_bin["LLM_bin"],
+        level="nominal",
+    )
+
+    # 3) Write confusion outputs
+    write_confusion_outputs(cm, cm_pct, OUT_COUNTS, OUT_PCT)
+
+    # 4) Metrics CSV (kept)
+    metrics_df = pd.DataFrame(
+        [
+            {"metric": "mae_4pt", "value": float(mae_4pt)},
+            {"metric": "mae_binary_2pt", "value": float(mae_2pt)},
+            {"metric": "kappa_weighted_4pt", "value": float(kappa_4pt_weighted)},
+            {"metric": "kappa_binary_2pt", "value": float(kappa_2pt)},
+            {"metric": "alpha_ordinal_4pt", "value": float(alpha_4pt)},
+            {"metric": "alpha_binary_nominal_2pt", "value": float(alpha_2pt)},
+            {"metric": "pairs", "value": float(len(paired))},
+        ]
+    )
+    write_metrics(metrics_df, OUT_DIR / "metrics_llm_vs_nist.csv")
+
+    # 5) LaTeX row fragment
+    latex_row = latex_metrics_row(
+        mae_4pt=float(mae_4pt),
+        mae_2pt=float(mae_2pt),
+        kappa_4pt=float(kappa_4pt_weighted),
+        kappa_2pt=float(kappa_2pt),
+    )
+    print("\n[LaTeX row]\n" + latex_row)
+    save_latex_row(latex_row, OUT_LATEX)
+
+    # 6) Heatmap
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt="d", linewidths=0.5, cbar=True)
+    plt.title(f"Confusion Matrix: NIST vs LLM — {MODEL} {TREC_DL_YEAR} {LANG}")
+    plt.ylabel("NIST label")
+    plt.xlabel("LLM label")
+
+    save_heatmap(plt, OUT_SVG, dpi=200, tight=True, show=True)
+
+
+def print_false_positive_examples(paired: pd.DataFrame) -> None:
+    """
+    Print 1 example for each case where:
+      - NIST (relevance) == 0
+      - LLM (llm_relevance) == 1, 2, or 3
+    Uses only valid pairs (paired).
+    """
+    fp = paired[(paired["NIST"] == 0) & (paired["LLM"].isin([1, 2, 3]))].copy()
+
+    if fp.empty:
+        print("[FP] No false positives found (NIST==0 but LLM in {1,2,3}).")
+        return
+
+    cols_prefer = [
+        "qid",
+        "docid",
+        "pid",
+        "query_id",
+        "passage_id",
+        "relevance",
+        "llm_relevance",
+        "NIST",
+        "LLM",
+        "query",
+        "passage",
+    ]
+
+    for llm_label in [1, 2, 3]:
+        bucket = fp[fp["LLM"] == llm_label]
+        if bucket.empty:
+            print(f"[FP] No examples where NIST=0 and LLM={llm_label}.")
+            continue
+
+        row = bucket.sample(n=1, random_state=42).iloc[0]
+        cols = [c for c in cols_prefer if c in bucket.columns]
+
+        print(f"[FP] Example where NIST=0 and LLM={llm_label}:")
+        if cols:
+            kv = ", ".join([f"{c}={repr(row[c])}" for c in cols])
+            print("  -", kv)
+        else:
+            print("  -", row.to_dict())
+
+
 def main() -> None:
-    model_files = discover_model_files()
-    print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
+    df = load_and_prepare()
+    paired, _invalid_df = split_valid_invalid(df)
 
-    # Build one long df across *all* (model, lang)
-    rows = []
-    skipped = 0
+    # print_false_positive_examples(paired)
 
-    for model, files in model_files.items():
-        for f in files:
-            lang = parse_lang_from_filename(f, model)
-            if not want_lang(lang, LANGS):
-                continue
+    if paired.empty:
+        raise RuntimeError(
+            "No valid (NIST, LLM) label pairs found after filtering. "
+            f"Check {OUT_INVALID_ROWS} for details."
+        )
 
-            try:
-                df = load_labels_csv(f)
-                perq = per_qid_metric(df, METRIC)
-                if perq.empty:
-                    continue
-
-                perq["model"] = model
-                perq["lang"] = lang
-                perq["group"] = perq["model"] + GROUP_SEP + perq["lang"]
-                rows.append(perq[["group", "model", "lang", "qid", "value"]])
-            except Exception as e:
-                skipped += 1
-                print(f"[SKIP] {model} {lang} ({f.name}): {e}")
-
-    if not rows:
-        raise RuntimeError(f"No samples produced. Check LANGS={LANGS} and LABEL_ROOT={LABEL_ROOT}")
-
-    long_df = pd.concat(rows, ignore_index=True)
-
-    # Require >=2 samples per group for Tukey stability
-    counts = long_df["group"].value_counts()
-    keep_groups = counts[counts >= 2].index
-    long_df = long_df[long_df["group"].isin(keep_groups)].copy()
-
-    if long_df["group"].nunique() < 2:
-        raise RuntimeError("Not enough (model,lang) groups with >=2 samples to run Tukey.")
-
-    # Save the long samples used
-    write_df(long_df, OUT_SAMPLES)
-
-    # One Tukey across all groups
-    tukey = pairwise_tukeyhsd(
-        endog=long_df["value"].to_numpy(),
-        groups=long_df["group"].to_numpy(),
-        alpha=ALPHA,
-    )
-    tukey_df = tukey_to_df(tukey)
-
-    # Outputs: one table + one plot
-    write_df(tukey_df, OUT_TUKEY_CSV)
-
-    latex = to_latex_table(
-        tukey_df,
-        caption=f"Tukey HSD across all (model,lang) groups for {METRIC}, FWER={ALPHA}.",
-        label=f"tab:tukey_all_models_all_langs_{safe_slug(METRIC)}",
-    )
-    OUT_TUKEY_TEX.write_text(latex, encoding="utf-8")
-
-    fig, ax = plt.subplots(figsize=(10, 8))
-    tukey.plot_simultaneous(ax=ax)
-
-    # Color y-tick labels for all groups that are "...|raw"
-    for tick in ax.get_yticklabels():
-        label = tick.get_text()
-        if label.endswith(f"{GROUP_SEP}raw") or label == "raw":
-            tick.set_color("red")
-
-    plt.tight_layout()
-    plt.savefig(OUT_SIMUL_SVG, format="svg")
-    plt.close(fig)
-
-
-    print(f"\n[OK] Wrote samples: {OUT_SAMPLES}")
-    print(f"[OK] Wrote Tukey CSV: {OUT_TUKEY_CSV}")
-    print(f"[OK] Wrote Tukey TeX: {OUT_TUKEY_TEX}")
-    print(f"[OK] Wrote plot: {OUT_SIMUL_SVG}")
-    if skipped:
-        print(f"[INFO] Skipped {skipped} files due to errors (see logs above).")
+    compute_and_save_confusion_and_metrics(paired)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 import os
 import csv
 import json
@@ -12,53 +13,52 @@ from pyserini.search import get_topics, get_qrels
 # ----------------------------
 # Config
 # ----------------------------
-os.environ['PYSERINI_CACHE'] = r'D:\PyseriniCache'
-Path(r'D:\PyseriniCache').mkdir(parents=True, exist_ok=True)
+os.environ["PYSERINI_CACHE"] = r"D:\PyseriniCache"
+Path(r"D:\PyseriniCache").mkdir(parents=True, exist_ok=True)
 
-TRECDL_YEAR = '2022'       # '2019', '2020', '2022', or '2023'
-LEVEL       = 'passage'    # 'passage' or 'document'
+TRECDL_YEAR = "2021"       # '2019', '2020', '2021', '2022', or '2023'
+LEVEL       = "passage"    # 'passage' or 'document'
 FETCH_TEXT  = True
 CHUNK_SIZE  = 500          # rows per output CSV chunk
 
 # Mode: dump judged qrels ('qrels') OR retrieve top-K and annotate with qrels ('topk')
-MODE     = 'topk'         # 'qrels' or 'topk'
-K_DEPTH  = 10            # number of docs per query when MODE == 'topk'
+MODE     = "topk"          # 'qrels' or 'topk'
+K_DEPTH  = 30              # number of docs per query when MODE == 'topk'
 
 # Optional: force a subset of qids; otherwise take the first N judged
 FORCE_QIDS: Iterable[Any] | None = None
 N_QUERIES = 100000000
 
 # ---- Output location ----
-OUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")
-COMBINED_CSV = OUT_DIR / f"trecdl_{LEVEL}_{TRECDL_YEAR}_judged_only.csv"
+OUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged_new")
 
 # ----------------------------
 # Helpers
 # ----------------------------
 def topic_key_for(year: str, level: str) -> str:
-    if year == '2023':
-        return 'dl23'
-    if year == '2022':
-        return 'dl22'
+    # DL21+ topics keys are dl21/dl22/dl23 (no passage/doc suffix)
+    if year in ("2021", "2022", "2023"):
+        return f"dl{year[2:]}"  # "2021" -> "dl21"
     mapping = {
-        '2019': {'passage': 'dl19-passage', 'document': 'dl19-doc'},
-        '2020': {'passage': 'dl20-passage', 'document': 'dl20-doc'},
+        "2019": {"passage": "dl19-passage", "document": "dl19-doc"},
+        "2020": {"passage": "dl20-passage", "document": "dl20-doc"},
     }
     return mapping[year][level]
 
 def qrels_key_for(year: str, level: str) -> str:
     return {
-        '2019': {'passage': 'dl19-passage', 'document': 'dl19-doc'},
-        '2020': {'passage': 'dl20-passage', 'document': 'dl20-doc'},
-        '2022': {'passage': 'dl22-passage', 'document': 'dl22-doc'},
-        '2023': {'passage': 'dl23-passage', 'document': 'dl23-doc'},
+        "2019": {"passage": "dl19-passage", "document": "dl19-doc"},
+        "2020": {"passage": "dl20-passage", "document": "dl20-doc"},
+        "2021": {"passage": "dl21-passage", "document": "dl21-doc"},
+        "2022": {"passage": "dl22-passage", "document": "dl22-doc"},
+        "2023": {"passage": "dl23-passage", "document": "dl23-doc"},
     }[year][level]
 
 def index_name_for(year: str, level: str) -> str:
-    if year in ('2019', '2020'):
-        return 'msmarco-v1-passage' if level == 'passage' else 'msmarco-v1-doc'
-    # DL'22 and DL'23 use MS MARCO v2 (docs use v2.1 segmented)
-    return 'msmarco-v2-passage' if level == 'passage' else 'msmarco-v2.1-doc-segmented'
+    # DL19/DL20 use MS MARCO v1; DL21+ use MS MARCO v2
+    if year in ("2019", "2020"):
+        return "msmarco-v1-passage" if level == "passage" else "msmarco-v1-doc"
+    return "msmarco-v2-passage" if level == "passage" else "msmarco-v2.1-doc-segmented"
 
 def qid_sort_key(x: Any):
     sx = str(x)
@@ -66,8 +66,8 @@ def qid_sort_key(x: Any):
 
 def topic_text(rec: Any) -> str:
     if isinstance(rec, dict):
-        return rec.get('title') or rec.get('text') or rec.get('query') or str(rec)
-    for attr in ('title', 'text', 'query'):
+        return rec.get("title") or rec.get("text") or rec.get("query") or str(rec)
+    for attr in ("title", "text", "query"):
         if hasattr(rec, attr):
             v = getattr(rec, attr)
             if v:
@@ -92,21 +92,24 @@ def qrels_for(qrels_by_qid: Dict[Any, Dict[str, Any]], qid_any: Any) -> Dict[str
 def alt_docid_forms(docid: str, level: str) -> List[str]:
     """Return both prefixed and bare MS MARCO forms for robust matching."""
     s = str(docid).strip()
-    if level == 'passage':
-        if s.startswith('msmarco_passage_'):
-            return [s, s.replace('msmarco_passage_', '', 1)]
-        return [s, f'msmarco_passage_{s}']
-    else:  # document
-        if s.startswith('msmarco_doc_'):
-            return [s, s.replace('msmarco_doc_', '', 1)]
-        return [s, f'msmarco_doc_{s}']
+    if level == "passage":
+        if s.startswith("msmarco_passage_"):
+            return [s, s.replace("msmarco_passage_", "", 1)]
+        return [s, f"msmarco_passage_{s}"]
+    else:
+        if s.startswith("msmarco_doc_"):
+            return [s, s.replace("msmarco_doc_", "", 1)]
+        return [s, f"msmarco_doc_{s}"]
 
 def as_int_grade(g: Any) -> int:
     """Normalize qrels grade to int (handles '0','1','2','3' as strings)."""
     try:
         return int(g)
     except Exception:
-        return 1 if str(g).strip().isdigit() and int(str(g).strip()) > 0 else 0
+        s = str(g).strip()
+        if s.isdigit():
+            return int(s)
+        return 0
 
 def extract_text_from_doc(doc) -> str:
     """Return plain passage/doc text (not the whole JSON)."""
@@ -192,10 +195,12 @@ def grade_for_doc(qrels_for_qid: Dict[str, Any], docid: str, level: str) -> int:
         return as_int_grade(qrels_for_qid[s])
     return 0
 
-def pick_qids_to_run(all_topics: Dict[Any, Any],
-                     qrels_by_qid: Dict[Any, Dict[str, Any]],
-                     force_qids: Iterable[Any] | None,
-                     n_queries: int) -> List[Any]:
+def pick_qids_to_run(
+    all_topics: Dict[Any, Any],
+    qrels_by_qid: Dict[Any, Dict[str, Any]],
+    force_qids: Iterable[Any] | None,
+    n_queries: int,
+) -> List[Any]:
     """Choose at least n_queries judged topics (or all if fewer)."""
     judged = [qid for qid in all_topics.keys() if len(qrels_for(qrels_by_qid, qid)) > 0]
     judged_sorted = sorted(judged, key=qid_sort_key)
@@ -224,9 +229,9 @@ if __name__ == "__main__":
     index_name = index_name_for(TRECDL_YEAR, LEVEL)
 
     # Light sanity check
-    if LEVEL == 'passage' and 'passage' not in index_name:
+    if LEVEL == "passage" and "passage" not in index_name:
         raise RuntimeError(f"LEVEL={LEVEL} must match index={index_name}")
-    if LEVEL == 'document' and 'doc' not in index_name:
+    if LEVEL == "document" and "doc" not in index_name:
         raise RuntimeError(f"LEVEL={LEVEL} must match index={index_name}")
 
     topics = get_topics(tkey)
@@ -236,25 +241,25 @@ if __name__ == "__main__":
         all_topics=topics,
         qrels_by_qid=qrels,
         force_qids=FORCE_QIDS,
-        n_queries=N_QUERIES
+        n_queries=N_QUERIES,
     )
 
-    print(f"Run name   : all_topics_trec_dl{TRECDL_YEAR}")
     print(f"Output dir : {OUT_DIR}")
     print(f"Topics key : {tkey}")
     print(f"Qrels key  : {qrels_key}")
     print(f"Index      : {index_name}")
     print(f"Mode       : {MODE} (K={K_DEPTH if MODE=='topk' else 'n/a'})")
-    print(f"Running {len(qids_to_run)} queries: {sorted(map(str, qids_to_run), key=qid_sort_key)}")
+    print(f"Running {len(qids_to_run)} queries.")
 
     searcher = LuceneSearcher.from_prebuilt_index(index_name)
     searcher.set_bm25(k1=0.82, b=0.68)
 
+    # ✅ New CSV schema: qid,query,pid,passage,relevance
     rolling = RollingCsvWriter(
         out_dir=OUT_DIR,
-        prefix=f"all_topics_trecdl_{TRECDL_YEAR}_part",
-        header=["qid", "query", "pid_qrels", "pid_resolved", "passage", "relevance"],
-        chunk_size=CHUNK_SIZE
+        prefix=f"trecdl_{LEVEL}_{TRECDL_YEAR}_part",
+        header=["qid", "query", "pid", "passage", "relevance"],
+        chunk_size=CHUNK_SIZE,
     )
 
     total_rows = 0
@@ -264,71 +269,46 @@ if __name__ == "__main__":
             query_text = topic_text(topics[qid_key])
             qrels_for_qid = qrels_for(qrels, qid_key)  # dict[docid] -> grade
 
-            print("\n" + "="*80)
-            print(f"qid        : {qid_key} (type={type(qid_key).__name__})")
-            print(f"Query      : {query_text}")
-
-            if MODE == 'qrels':
-                total_judged = len(qrels_for_qid)
-                found, missing = 0, 0
-                print(f"Total judged in qrels for qid: {total_judged}")
-
+            if MODE == "qrels":
+                # Dump judged qrels only (pid comes from qrels, resolved to index id if possible)
                 for did, grade in qrels_for_qid.items():
                     pid_qrels = str(did).strip()
-                    pid_resolved, doc = (None, None)
 
                     if FETCH_TEXT:
                         pid_resolved, doc = fetch_doc_by_any_form(searcher, pid_qrels, LEVEL)
-                        if doc is not None:
-                            found += 1
-                            text = extract_text_from_doc(doc)
-                        else:
-                            missing += 1
-                            text = ""
+                        pid_out = pid_resolved or pid_qrels
+                        text = extract_text_from_doc(doc) if doc is not None else ""
                     else:
                         pid_resolved, _ = fetch_doc_by_any_form(searcher, pid_qrels, LEVEL)
-                        found += 1 if pid_resolved else 0
-                        missing += 0 if pid_resolved else 1
+                        pid_out = pid_resolved or pid_qrels
                         text = ""
 
-                    # Always write the original qrels pid; resolved id is for debugging.
                     rolling.write([
                         str(qid_key),
                         query_text,
-                        pid_qrels,
-                        pid_resolved or "",
+                        pid_out,
                         normalize_csv_cell(text),
-                        as_int_grade(grade)
+                        as_int_grade(grade),
                     ])
                     total_rows += 1
 
-                print(f"Found in index: {found} / {total_judged} | Missing: {missing}")
-
             else:
                 # MODE == 'topk': retrieve top-K and annotate with qrels (grade=0 if unjudged)
-                print(f"Retrieving top-{K_DEPTH} from index...")
                 hits = searcher.search(query_text, k=K_DEPTH)
-
                 for h in hits:
-                    pid_resolved = h.docid
-                    doc = searcher.doc(pid_resolved) if FETCH_TEXT else None
+                    pid_out = str(h.docid).strip()
+
+                    doc = searcher.doc(pid_out) if FETCH_TEXT else None
                     text = extract_text_from_doc(doc) if doc is not None else ""
 
-                    # Compute qrels grade if any, and recover a matching qrels id form
-                    grade = grade_for_doc(qrels_for_qid, pid_resolved, LEVEL)
-                    pid_qrels_match = ""
-                    for form in alt_docid_forms(pid_resolved, LEVEL):
-                        if form in qrels_for_qid:
-                            pid_qrels_match = form
-                            break
+                    grade = grade_for_doc(qrels_for_qid, pid_out, LEVEL)
 
                     rolling.write([
                         str(qid_key),
                         query_text,
-                        pid_qrels_match,            # empty if unjudged
-                        pid_resolved,
+                        pid_out,
                         normalize_csv_cell(text),
-                        grade                       # 0 if unjudged
+                        grade,  # 0 if unjudged
                     ])
                     total_rows += 1
 

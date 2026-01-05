@@ -112,3 +112,4 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260101_193007,2026-01-01T19:30:57,openai.gpt-oss-20b-1:0,2,838,10558,11396,0.003226,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ga_labels.csv,(see logs index)
 20260101_194631,2026-01-01T20:18:39,openai.gpt-oss-20b-1:0,1699,664356,555526,1219882,0.213163,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ga_word_labels.csv,(see logs index)
 20260101_204310,2026-01-01T20:43:49,openai.gpt-oss-20b-1:0,2,831,10425,11256,0.003186,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ru_labels.csv,(see logs index)
+20260105_131452,2026-01-05T14:33:07,openai.gpt-oss-20b-1:0,1000,408907,292920,701827,0.116499,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_raw_labels.csv,(see logs index)
