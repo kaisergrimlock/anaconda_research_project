@@ -65,7 +65,7 @@ MODE = "replace"       # "append" or "replace"
 MODELS = ['openai.gpt-oss-20b-1:0']
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
-INFERENCE_CONFIG = {"maxTokens": 5000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 10000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -133,7 +133,6 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
     t = threading.Thread(target=_listen, name="stop-key-listener", daemon=True)
     t.start()
     return t
-
 
 def _label_single_part_file_blocking(
     part_csv: Path,

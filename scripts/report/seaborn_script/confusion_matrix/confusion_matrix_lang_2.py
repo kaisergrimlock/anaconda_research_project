@@ -30,7 +30,7 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEAR = "2021"
-MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+MODEL = "llama3-8b-instruct"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
 LANG = "raw"  # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
@@ -97,17 +97,36 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     print("Invalid rows:", (~valid_mask).sum())
 
     # Keep your existing debug dump (optional)
-    invalid_out = invalid_df.drop(columns=["NIST", "LLM"], errors="ignore")
-    write_df(invalid_out, OUT_INVALID_ROWS)
+    # Keep debug columns so we can see WHY it was marked invalid
+    debug_cols = []
+    for c in ["qid", "pid", "relevance", "llm_relevance", "NIST", "LLM"]:
+        if c in invalid_df.columns:
+            debug_cols.append(c)
+
+    # Add a reason column to make it obvious
+    invalid_dbg = invalid_df.copy()
+    invalid_dbg["reason"] = ""
+    invalid_dbg.loc[invalid_dbg["NIST"].isna(), "reason"] += "NIST_NaN;"
+    invalid_dbg.loc[~invalid_dbg["NIST"].isin(LABELS) & invalid_dbg["NIST"].notna(), "reason"] += "NIST_out_of_range;"
+    invalid_dbg.loc[invalid_dbg["LLM"].isna(), "reason"] += "LLM_NaN;"
+    invalid_dbg.loc[~invalid_dbg["LLM"].isin(LABELS) & invalid_dbg["LLM"].notna(), "reason"] += "LLM_out_of_range;"
+
+    write_df(invalid_dbg[debug_cols + ["reason"]], OUT_INVALID_ROWS)
+
 
     # Write ALL invalid rows as "part0" exactly as-is (no renaming, no new cols)
+    # Write ONLY rows where llm_relevance is NaN after coercion ("LLM" column)
     OUT_MISSING_PART0.parent.mkdir(parents=True, exist_ok=True)
-    invalid_df.drop(columns=["NIST", "LLM"], errors="ignore").to_csv(
+
+    missing_llm_df = df[df["LLM"].isna()].copy()
+
+    missing_llm_df.drop(columns=["NIST", "LLM"], errors="ignore").to_csv(
         OUT_MISSING_PART0,
         index=False,
         encoding="utf-8",
     )
-    print(f"[Missing->Part0] Wrote {len(invalid_df)} rows to: {OUT_MISSING_PART0}")
+    print(f"[Missing->Part0] Wrote {len(missing_llm_df)} rows (LLM is NaN) to: {OUT_MISSING_PART0}")
+
 
     return valid_df, invalid_df
 

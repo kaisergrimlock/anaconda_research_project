@@ -171,8 +171,8 @@ def pick_passage_for_lang(row: Dict[str, str], lang: str) -> str:
 
 def write_combined_dynamic(
     *,
-    per_file_labels: List[str],
-    header_out: List[str],
+    per_file_labels: list[str],
+    header_out: list[str],
     model_short: str,
     lang: str,
     year: str,
@@ -185,7 +185,8 @@ def write_combined_dynamic(
     - mode="append": always append incoming rows.
     - mode="replace": replace existing rows by key (qid + pid-like), append unseen keys.
 
-    Assumes each per-file CSV has exactly header_out.
+    FIX:
+      In replace mode, do NOT overwrite an existing non-blank llm_relevance with a blank/NaN-like value.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
@@ -193,7 +194,7 @@ def write_combined_dynamic(
     # -----------------------------
     # Key columns: qid + pid-like
     # -----------------------------
-    def pick_pid_col(header: List[str]) -> str:
+    def pick_pid_col(header: list[str]) -> str:
         candidates = ["pid", "pid_qrels", "pid_resolved", "docid", "passage_id", "doc_id"]
         for c in candidates:
             if c in header:
@@ -212,28 +213,38 @@ def write_combined_dynamic(
 
     llm_idx = header_out.index("llm_relevance") if "llm_relevance" in header_out else None
 
-    def norm_row_len(r: List[str]) -> List[str]:
+    def norm_row_len(r: list[str]) -> list[str]:
         if len(r) < len(header_out):
             return r + [""] * (len(header_out) - len(r))
         if len(r) > len(header_out):
-            return r[:len(header_out)]
+            return r[: len(header_out)]
         return r
 
-    def make_key(r: List[str]) -> str:
+    def make_key(r: list[str]) -> str:
         r = norm_row_len(r)
         return f"{(r[qid_i] or '').strip()}|{(r[pid_i] or '').strip()}"
 
-    def llm_val(r: List[str]) -> str:
+    def llm_val(r: list[str]) -> str:
         if llm_idx is None:
             return ""
         r = norm_row_len(r)
         return (r[llm_idx] or "").strip()
 
+    def is_blank_or_nan_like(v: str) -> bool:
+        s = (v or "").strip()
+        if s == "":
+            return True
+        return s.lower() in {"nan", "none", "null"}
+
+    def should_preserve_old_llm(old: str, new: str) -> bool:
+        old_s = (old or "").strip()
+        new_s = (new or "").strip()
+        return (old_s != "") and is_blank_or_nan_like(new_s)
+
     # -----------------------------------
     # Load incoming rows as key -> row
-    # (last one wins if duplicated)
     # -----------------------------------
-    incoming: Dict[str, List[str]] = {}
+    incoming: dict[str, list[str]] = {}
 
     for p in per_file_labels:
         pth = Path(p)
@@ -287,8 +298,7 @@ def write_combined_dynamic(
         return combined_path
 
     # -----------------------------
-    # Replace mode: stream + replace by (qid|pid)
-    # Print which *line* was replaced.
+    # Replace mode
     # -----------------------------
     if mode != "replace":
         raise ValueError(f"Unknown mode: {mode}")
@@ -306,18 +316,19 @@ def write_combined_dynamic(
     replaced = 0
     kept = 0
     appended_new = 0
+    preserved_old = 0
     used_keys: set[str] = set()
 
-    with combined_path.open("r", encoding="utf-8", newline="") as f_in, \
-         tmp_path.open("w", encoding="utf-8", newline="") as f_out:
+    with combined_path.open("r", encoding="utf-8", newline="") as f_in, tmp_path.open(
+        "w", encoding="utf-8", newline=""
+    ) as f_out:
         reader = csv.reader(f_in)
         writer = csv.writer(f_out)
 
         _ = next(reader, None)  # skip header
         writer.writerow(header_out)
 
-        # CSV "line number" in file (1 = header). First data row is line 2.
-        line_no = 1
+        line_no = 1  # header is line 1
 
         for old_row in reader:
             line_no += 1
@@ -325,26 +336,37 @@ def write_combined_dynamic(
             k = make_key(old_row)
 
             if k in incoming:
-                new_row = incoming[k]
+                new_row = norm_row_len(incoming[k])
                 used_keys.add(k)
-                replaced += 1
 
                 if llm_idx is not None:
-                    print(
-                        f"[REPLACE] line={line_no} key={k} "
-                        f"llm_relevance: {llm_val(old_row)!r} -> {llm_val(new_row)!r}"
-                    )
+                    old_llm = llm_val(old_row)
+                    new_llm = llm_val(new_row)
+
+                    if should_preserve_old_llm(old_llm, new_llm):
+                        new_row[llm_idx] = old_llm
+                        preserved_old += 1
+                        print(
+                            f"[REPLACE-PRESERVE] line={line_no} key={k} "
+                            f"llm_relevance: {old_llm!r} -> {new_llm!r} (kept {old_llm!r})"
+                        )
+                    else:
+                        print(
+                            f"[REPLACE] line={line_no} key={k} "
+                            f"llm_relevance: {old_llm!r} -> {new_llm!r}"
+                        )
                 else:
                     print(f"[REPLACE] line={line_no} key={k}")
 
+                replaced += 1
                 writer.writerow(new_row)
             else:
                 kept += 1
                 writer.writerow(old_row)
 
-        # Append brand-new keys (not found in existing file)
         for k, r in incoming.items():
             if k not in used_keys:
+                r = norm_row_len(r)
                 appended_new += 1
                 writer.writerow(r)
                 if llm_idx is not None:
@@ -356,6 +378,7 @@ def write_combined_dynamic(
 
     print(
         f"[DONE replace] replaced={replaced} kept={kept} appended_new={appended_new} "
+        f"preserved_old_llm={preserved_old} "
         f"key_cols=('qid','{pid_col}') file={combined_path}"
     )
     return combined_path
