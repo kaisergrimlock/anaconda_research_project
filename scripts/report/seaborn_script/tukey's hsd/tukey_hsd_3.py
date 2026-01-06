@@ -25,7 +25,7 @@ from helpers.output_writer import write_df
 # =========================
 TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_crit"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_new"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -38,7 +38,8 @@ TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga", "raw_crit", "eng_crit", "fr_crit", "ru_crit", "ar_crit", "he_crit", "vi_crit", "th_crit", "sw_crit", "ga_crit"]
+LANGS: List[str] = ["raw", "eng", "vi", "th", "sw"]  # if empty, allow all langs found
+#LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
 METRIC = "mean_diff"
 
 
