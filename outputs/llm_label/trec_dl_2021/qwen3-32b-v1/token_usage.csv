@@ -58,3 +58,6 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260105_203738,2026-01-05T21:02:06,qwen.qwen3-32b-v1:0,850,319496,16150,335646,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_th_labels.csv,(see logs index)
 20260105_214247,2026-01-05T21:51:44,qwen.qwen3-32b-v1:0,850,333752,16150,349902,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_leet_labels.csv,(see logs index)
 20260105_215136,2026-01-05T22:04:34,qwen.qwen3-32b-v1:0,850,315083,16150,331233,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_sw_labels.csv,(see logs index)
+20260107_130819,2026-01-07T13:13:48,qwen.qwen3-32b-v1:0,850,307970,16150,324120,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_eng_word_labels.csv,(see logs index)
+20260107_132059,2026-01-07T13:26:02,qwen.qwen3-32b-v1:0,850,312675,16170,328845,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_vi_word_labels.csv,(see logs index)
+20260107_134805,2026-01-07T13:53:49,qwen.qwen3-32b-v1:0,850,328920,16150,345070,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_th_word_labels.csv,(see logs index)

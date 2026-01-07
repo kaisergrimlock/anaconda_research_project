@@ -13,7 +13,7 @@ from helper import allow_huge_csv_fields
 # Config (edit as needed)
 # ==============================
 REGION = "ap-southeast-2"   # AWS region
-TARGET_LANG = "leet"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
+TARGET_LANG = "he_corrected"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no translation
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1           # how many times to inject the translated query
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
@@ -72,19 +72,28 @@ def inject_n(text: str, snippet: str, n: int, prob: float) -> str:
 
 # ---------- Mapping (cache) I/O ----------
 def load_map(path: Path) -> Dict[str, str]:
-    """Load query->translated map from CSV if exists (expects headers: query, translated)."""
     m: Dict[str, str] = {}
     if not path or not path.exists():
         return m
-    # IMPORTANT: utf-8-sig strips BOM so "query" works even if file has BOM
+
     with path.open("r", newline="", encoding="utf-8-sig") as fh:
         r = csv.DictReader(fh)
-        for row in r:
-            q = (row.get("query") or "").strip()
-            t = (row.get("translated") or "").strip()
-            if q:
-                m[q] = t
+        print("MAP fieldnames:", r.fieldnames)
+
+        for i, row in enumerate(r, 1):
+            try:
+                q = (row.get("query") or "").strip()
+                t = (row.get("translated") or "").strip()
+                if q:
+                    m[q] = t
+            except Exception as e:
+                print(f"ERROR parsing row {i}: {e}")
+                print("Row dict:", row)
+                raise
+
+        print("Rows iterated:", i if 'i' in locals() else 0)
     return m
+
 
 def save_map(path: Path, m: Dict[str, str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -224,6 +233,8 @@ def main():
 
     # Load main cache
     cache_map = load_map(MAP_FILE)
+    print("MAP_FILE resolved to:", MAP_FILE.resolve())
+    print("MAP_FILE exists:", MAP_FILE.exists())
     print(f"Cache has {len(cache_map)} translated entr{'y' if len(cache_map)==1 else 'ies'} (file: {MAP_FILE.name})")
 
     # Load optional external map

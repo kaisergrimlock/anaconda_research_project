@@ -58,3 +58,5 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260105_200451,2026-01-05T20:10:46,meta.llama3-8b-instruct-v1:0,850,313305,17000,330305,0.000000,outputs\llm_label\trec_dl_2021\llama3-8b-instruct\llama3-8b-instruct_trecdl_2021_ar_labels.csv,(see logs index)
 20260105_202036,2026-01-05T20:26:29,meta.llama3-8b-instruct-v1:0,850,329570,17000,346570,0.000000,outputs\llm_label\trec_dl_2021\llama3-8b-instruct\llama3-8b-instruct_trecdl_2021_he_labels.csv,(see logs index)
 20260105_203026,2026-01-05T20:36:46,meta.llama3-8b-instruct-v1:0,850,329877,17000,346877,0.000000,outputs\llm_label\trec_dl_2021\llama3-8b-instruct\llama3-8b-instruct_trecdl_2021_leet_labels.csv,(see logs index)
+20260107_153053,2026-01-07T15:37:25,meta.llama3-8b-instruct-v1:0,2549,886335,47900,934235,0.000000,outputs\llm_label\trec_dl_2021\llama3-8b-instruct\llama3-8b-instruct_trecdl_2021_vi_first_labels.csv,(see logs index)
+20260108_010014,2026-01-08T01:06:58,meta.llama3-8b-instruct-v1:0,2549,886530,47900,934430,0.000000,outputs\llm_label\trec_dl_2021\llama3-8b-instruct\llama3-8b-instruct_trecdl_2021_vi_corrected_labels.csv,(see logs index)

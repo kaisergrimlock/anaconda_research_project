@@ -23,13 +23,13 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_new"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_corrected"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
-OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups.svg"
+OUT_SIMUL_SVG = OUT_DIR / "tukey_hsd_plot_simultaneous_all_groups_1.svg"
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
 GROUP_SEP = "|"
 TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
@@ -38,7 +38,9 @@ TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANGS: List[str] = ["raw", "eng", "vi", "th", "sw"]  # if empty, allow all langs found
+LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "ko", "ko_corrected"]  # if empty, allow all langs found
+#LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets"]  # if empty, allow all langs found
+#LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "raw_word", "eng_word", "ru_word", "vi_word", "th_word", "sw_word", "ga_word"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "ar", "vi", "th", "sw", "ga"]
 METRIC = "mean_diff"
 

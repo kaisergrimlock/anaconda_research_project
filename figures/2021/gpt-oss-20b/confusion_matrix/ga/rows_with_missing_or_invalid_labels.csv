@@ -1,1 +1,2 @@
-qid,query,pid,passage,relevance,query_ga,passage_injected,llm_relevance
+qid,pid,relevance,llm_relevance,NIST,LLM,reason
+845121,msmarco_passage_03_739061665,0,,0,,LLM_NaN;

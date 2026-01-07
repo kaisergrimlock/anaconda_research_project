@@ -10,7 +10,7 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
@@ -20,7 +20,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]           # .../<project_root>/outputs/..
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "nonrel_llm"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "word"
+CHART_TYPE = "corrected"
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_grouped"
 STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{TREC_DL_YEAR}_{CHART_TYPE}_stacked"
 
@@ -29,7 +29,8 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.-
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: List[str] = ["eng", "eng_word", "fr", "fr_word", "ru", "ru_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word"]
+TARGET_LANGS: Optional[List[str]] = ["vi", "th", "th_corrected", "vi_corrected", "ar", "ar_corrected", "he", "he_corrected"]
+#TARGET_LANGS: List[str] = ["eng", "eng_word", "fr", "fr_word", "ru", "ru_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word"]
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -145,6 +146,8 @@ label_map = {
     "raw_crit": "Baseline Crit",
     "eng_crit": "Baseline Crit + EnQP",
     "vi_crit": "Base Crit + ViQP",
+    "eng_last": "Baseline + EnQP (Last)",
+    "eng_first": "Baseline + EnQP (First)",
 }
 
 # =========================
