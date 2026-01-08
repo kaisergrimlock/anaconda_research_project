@@ -23,7 +23,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]  # .../<project_root>/outputs/...
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / "2021_2022" / MODEL / "nonrel_llm"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "lang"
+CHART_TYPE = "word"
 
 YEARS_TAG = "_".join(TREC_DL_YEARS)
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{CHART_TYPE}_grouped"
@@ -33,9 +33,10 @@ STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{
 LABEL_BASE_DIR = Path("outputs") / "llm_label"
 
 # Column order you want (and ONLY these variants will be plotted by default)
-TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
+#TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
 #TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
-
+TARGET_LANGS: List[str] = ["eng", "vi", "th", "ru", "fr", "sw", "ga", "ar",
+                           "eng_word", "vi_word", "th_word", "ru_word", "fr_word", "sw_word", "ga_word", "ar_word",]
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
 

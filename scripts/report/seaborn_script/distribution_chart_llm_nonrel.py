@@ -345,7 +345,7 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     ax.set_xticks(x_base)
     ax.set_ylabel("Score Distribution")
     ax.set_ylim(0, 1.05)
-    ax.set_title(title, fontsize=12)
+    #ax.set_title(title, fontsize=12)
 
     ax.legend(
         title="Variant",
@@ -445,7 +445,7 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     ax.set_xticklabels(pretty_labels, rotation=45, ha="right", fontsize=9)
     ax.set_ylabel("Relevance Label Score Distribution")
     ax.set_ylim(0, 1.05)
-    ax.set_title(title, fontsize=12)
+    #ax.set_title(title, fontsize=12)
 
     ax.legend(
         title="Relevance Scores",

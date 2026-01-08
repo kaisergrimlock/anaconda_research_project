@@ -14,7 +14,7 @@ import seaborn as sns
 # =========================
 # Take 2 years (or more if you want)
 TREC_DL_YEARS: List[str] = ["2021", "2022"]
-MODEL = "qwen3-32b-v1"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "llama3-8b-instruct"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEARS[0] / MODEL
@@ -23,7 +23,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]  # .../<project_root>/outputs/...
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / "2021_2022" / MODEL / "nonrel_nist"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "lang"
+CHART_TYPE = "word"
 
 YEARS_TAG = "_".join(TREC_DL_YEARS)
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{CHART_TYPE}_grouped"
@@ -34,7 +34,9 @@ LABEL_BASE_DIR = Path("outputs") / "llm_label"
 
 # Column order you want (and ONLY these variants will be plotted by default)
 #TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
-TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
+#TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
+TARGET_LANGS: List[str] = ["eng", "eng_word", "ar", "ar_word", "ru", "ru_word", "fr", "fr_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word",]
+
 
 # Relevance scores used by the models
 SCORES: List[int] = [0, 1, 2, 3]
@@ -59,6 +61,8 @@ label_map = {
     "fr_word": "Baseline + FrWP",
     "sw_word": "Baseline + SwWP",
     "ga_word": "Baseline + GaWP",
+    "ar_word": "Baseline + ArWP",
+    "ar": "Baseline + ArQP",
     "raw_crit": "Baseline Crit",
     "eng_crit": "Baseline Crit + EnQP",
     "vi_crit": "Base Crit + ViQP",
@@ -339,7 +343,7 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     ax.set_xticks(x_base)
     ax.set_ylabel("Score Distribution")
     ax.set_ylim(0, 1.05)
-    ax.set_title(title, fontsize=12)
+    #ax.set_title(title, fontsize=12)
 
     ax.legend(
         title="Variant",
@@ -423,7 +427,7 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     ax.set_xticklabels(pretty_labels, rotation=45, ha="right", fontsize=9)
     ax.set_ylabel("Relevance Label Score Distribution")
     ax.set_ylim(0, 1.05)
-    ax.set_title(title, fontsize=12)
+    #ax.set_title(title, fontsize=12)
 
     ax.legend(
         title="Relevance Scores",
@@ -477,6 +481,9 @@ if __name__ == "__main__":
             out_path=STACKED_FIG_PATH.with_suffix(".png"),
         )
         print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH.with_suffix('.png')}")
+
+        plot_stacked_distribution(df_labels, title=title, out_path=STACKED_FIG_PATH.with_suffix(".pdf"))
+        print(f"[OK] Saved stacked figure to {STACKED_FIG_PATH.with_suffix('.pdf')}")
 
         plot_stacked_distribution(
             df_labels,
