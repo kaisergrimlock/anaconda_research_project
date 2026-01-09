@@ -4,11 +4,12 @@ from __future__ import annotations
 import asyncio
 import csv
 import json
+import math
 import sys
 import threading
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from botocore.config import Config
 
@@ -36,8 +37,13 @@ from scripts.log_helpers import (
 
 # ===== Bedrock helper (ONLY Bedrock stuff) =====
 from scripts.bedrock_client import (
+    BedrockResult,
     make_bedrock_runtime_client,
-    converse_prompt,
+    build_converse_kwargs,
+    extract_text_from_resp,
+    extract_reasoning_from_resp,
+    parse_llm_text_to_score,
+    usage_from_resp,
 )
 
 # ===== config =====
@@ -62,10 +68,17 @@ MODE = "replace"       # "append" or "replace"
 # Models
 #"meta.llama3-8b-instruct-v1:0"
 #"qwen.qwen3-32b-v1:0"
-MODELS = ['openai.gpt-oss-20b-1:0']
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ['openai.gpt-oss-20b-1:0']
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
-INFERENCE_CONFIG = {"maxTokens": 5000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
+MODEL_MAX_TOKENS = {
+    "meta.llama3-8b-instruct-v1:0": 2048,
+}
+
+# Logprobs (set LOGPROBS_TOP_K=0 to disable request)
+LOGPROBS_TOP_K = 1
+ADDITIONAL_MODEL_FIELDS = {"logprobs": LOGPROBS_TOP_K} if LOGPROBS_TOP_K else {}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -134,6 +147,324 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
     t.start()
     return t
 
+
+def normalize_header_with_llm_at_end(header_in: List[str]) -> List[str]:
+    if "llm_relevance" not in header_in:
+        return header_in + ["llm_relevance"]
+    if header_in and header_in[-1] == "llm_relevance":
+        return header_in
+    header_out = [c for c in header_in if c != "llm_relevance"]
+    header_out.append("llm_relevance")
+    return header_out
+
+def _extract_from_logprobs_obj(logprobs: Any) -> List[float]:
+    if isinstance(logprobs, dict):
+        token_list = logprobs.get("tokenLogprobs")
+        if isinstance(token_list, list):
+            return [float(x) for x in token_list if _is_number(x)]
+        content_list = logprobs.get("content")
+        if isinstance(content_list, list):
+            out: List[float] = []
+            for item in content_list:
+                if isinstance(item, dict) and _is_number(item.get("logprob")):
+                    out.append(float(item.get("logprob")))
+            return out
+        logprob_list = logprobs.get("logprobs")
+        if isinstance(logprob_list, list):
+            return [float(x) for x in logprob_list if _is_number(x)]
+    if isinstance(logprobs, list):
+        if logprobs and isinstance(logprobs[0], dict):
+            return [float(item.get("logprob")) for item in logprobs if _is_number(item.get("logprob"))]
+        return [float(x) for x in logprobs if _is_number(x)]
+    return []
+
+
+def _is_number(val: Any) -> bool:
+    try:
+        float(val)
+        return True
+    except Exception:
+        return False
+
+
+def extract_token_logprobs(resp: Dict[str, Any]) -> List[float]:
+    if "logprobs" in resp:
+        out = _extract_from_logprobs_obj(resp.get("logprobs"))
+        if out:
+            return out
+
+    output = resp.get("output", {}) or {}
+    if "logprobs" in output:
+        out = _extract_from_logprobs_obj(output.get("logprobs"))
+        if out:
+            return out
+
+    message = output.get("message", {}) or {}
+    if "logprobs" in message:
+        out = _extract_from_logprobs_obj(message.get("logprobs"))
+        if out:
+            return out
+
+    content = message.get("content", []) or []
+    for item in content:
+        if isinstance(item, dict) and "logprobs" in item:
+            out = _extract_from_logprobs_obj(item.get("logprobs"))
+            if out:
+                return out
+
+    return []
+
+
+def summarize_logprobs(token_logprobs: List[float]) -> Tuple[str, str, str]:
+    if not token_logprobs:
+        return "", "", ""
+    logprob_sum = float(sum(token_logprobs))
+    logprob_avg = logprob_sum / float(len(token_logprobs))
+    try:
+        prob = math.exp(logprob_sum)
+    except OverflowError:
+        prob = 0.0 if logprob_sum < 0 else float("inf")
+    return (
+        f"{logprob_sum:.6f}",
+        f"{logprob_avg:.6f}",
+        f"{prob:.6e}",
+    )
+
+
+def converse_prompt_with_logprobs(
+    bedrock_runtime_client,
+    *,
+    model_id: str,
+    prompt: str,
+    inference_config: Dict[str, Any],
+) -> BedrockResult:
+    effective_config = dict(inference_config)
+    max_cap = MODEL_MAX_TOKENS.get(model_id)
+    if max_cap and int(effective_config.get("maxTokens", 0) or 0) > max_cap:
+        effective_config["maxTokens"] = max_cap
+
+    kwargs = build_converse_kwargs(model_id, prompt, effective_config)
+    if ADDITIONAL_MODEL_FIELDS:
+        kwargs["additionalModelRequestFields"] = ADDITIONAL_MODEL_FIELDS
+
+    try:
+        resp = bedrock_runtime_client.converse(**kwargs)
+    except Exception as exc:
+        msg = str(exc)
+        if "extraneous key [logprobs]" in msg and "additionalModelRequestFields" in kwargs:
+            print(f"[WARN] {model_id}: logprobs not supported; retrying without logprobs.")
+            kwargs.pop("additionalModelRequestFields", None)
+            resp = bedrock_runtime_client.converse(**kwargs)
+        else:
+            raise
+
+    text = extract_text_from_resp(model_id, resp) or ""
+    reasoning = extract_reasoning_from_resp(model_id, resp) or ""
+    score = parse_llm_text_to_score(text)
+
+    in_tok, out_tok = usage_from_resp(resp)
+
+    return BedrockResult(
+        text=text,
+        reasoning=reasoning,
+        score=score,
+        input_tokens=in_tok,
+        output_tokens=out_tok,
+        raw_response=resp,
+    )
+
+
+def write_combined_logprob_dynamic(
+    *,
+    per_file_logprobs: List[str],
+    header_out: List[str],
+    model_short: str,
+    lang: str,
+    year: str,
+    mode: str,
+    out_dir: Path,
+) -> Path:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_logprob.csv"
+
+    def pick_pid_col(header: List[str]) -> str:
+        candidates = ["pid", "pid_qrels", "pid_resolved", "docid", "passage_id", "doc_id"]
+        for c in candidates:
+            if c in header:
+                return c
+        raise ValueError(
+            f"Cannot do replace by qid+pid: no pid column found in header. "
+            f"Need one of {candidates}. Header={header}"
+        )
+
+    if "qid" not in header_out:
+        raise ValueError(f"Cannot do replace by qid+pid: missing 'qid' in header_out={header_out}")
+
+    pid_col = pick_pid_col(header_out)
+    qid_i = header_out.index("qid")
+    pid_i = header_out.index(pid_col)
+
+    prob_idx = header_out.index("llm_probability") if "llm_probability" in header_out else None
+
+    def norm_row_len(r: List[str]) -> List[str]:
+        if len(r) < len(header_out):
+            return r + [""] * (len(header_out) - len(r))
+        if len(r) > len(header_out):
+            return r[: len(header_out)]
+        return r
+
+    def make_key(r: List[str]) -> str:
+        r = norm_row_len(r)
+        return f"{(r[qid_i] or '').strip()}|{(r[pid_i] or '').strip()}"
+
+    def prob_val(r: List[str]) -> str:
+        if prob_idx is None:
+            return ""
+        r = norm_row_len(r)
+        return (r[prob_idx] or "").strip()
+
+    def is_blank_or_nan_like(v: str) -> bool:
+        s = (v or "").strip()
+        if s == "":
+            return True
+        return s.lower() in {"nan", "none", "null"}
+
+    def should_preserve_old_prob(old: str, new: str) -> bool:
+        old_s = (old or "").strip()
+        new_s = (new or "").strip()
+        return (old_s != "") and is_blank_or_nan_like(new_s)
+
+    incoming: Dict[str, List[str]] = {}
+
+    for p in per_file_logprobs:
+        pth = Path(p)
+        with pth.open("r", encoding="utf-8", newline="") as f_in:
+            reader = csv.reader(f_in)
+            in_header = next(reader, None)
+            if in_header is None:
+                continue
+
+            if list(in_header) != list(header_out):
+                raise ValueError(
+                    f"Inconsistent header in {pth}.\n"
+                    f"  got: {in_header}\n"
+                    f"  exp: {header_out}"
+                )
+
+            for r in reader:
+                r = norm_row_len(r)
+                incoming[make_key(r)] = r
+
+    if not combined_path.exists():
+        with combined_path.open("w", encoding="utf-8", newline="") as f_out:
+            w = csv.writer(f_out)
+            w.writerow(header_out)
+            for r in incoming.values():
+                w.writerow(r)
+        print(f"[WRITE] Created new logprob file with {len(incoming)} rows: {combined_path}")
+        return combined_path
+
+    if mode == "append":
+        existing_header = _inspect_header(combined_path)
+        if existing_header != header_out:
+            raise ValueError(
+                f"Combined file header mismatch.\n"
+                f"  got: {existing_header}\n"
+                f"  exp: {header_out}"
+            )
+
+        with combined_path.open("a", encoding="utf-8", newline="") as f_out:
+            w = csv.writer(f_out)
+            for r in incoming.values():
+                w.writerow(r)
+
+        print(f"[APPEND] Appended {len(incoming)} rows to: {combined_path}")
+        return combined_path
+
+    if mode != "replace":
+        raise ValueError(f"Unknown mode: {mode}")
+
+    existing_header = _inspect_header(combined_path)
+    if existing_header != header_out:
+        raise ValueError(
+            f"Combined file header mismatch.\n"
+            f"  got: {existing_header}\n"
+            f"  exp: {header_out}"
+        )
+
+    tmp_path = combined_path.with_suffix(".tmp.csv")
+
+    replaced = 0
+    kept = 0
+    appended_new = 0
+    preserved_old = 0
+    used_keys: set[str] = set()
+
+    with combined_path.open("r", encoding="utf-8", newline="") as f_in, tmp_path.open(
+        "w", encoding="utf-8", newline=""
+    ) as f_out:
+        reader = csv.reader(f_in)
+        writer = csv.writer(f_out)
+
+        _ = next(reader, None)
+        writer.writerow(header_out)
+
+        line_no = 1
+
+        for old_row in reader:
+            line_no += 1
+            old_row = norm_row_len(old_row)
+            k = make_key(old_row)
+
+            if k in incoming:
+                new_row = norm_row_len(incoming[k])
+                used_keys.add(k)
+
+                if prob_idx is not None:
+                    old_prob = prob_val(old_row)
+                    new_prob = prob_val(new_row)
+
+                    if should_preserve_old_prob(old_prob, new_prob):
+                        new_row[prob_idx] = old_prob
+                        preserved_old += 1
+                        print(
+                            f"[REPLACE-PRESERVE] line={line_no} key={k} "
+                            f"llm_probability: {old_prob!r} -> {new_prob!r} (kept {old_prob!r})"
+                        )
+                    else:
+                        print(
+                            f"[REPLACE] line={line_no} key={k} "
+                            f"llm_probability: {old_prob!r} -> {new_prob!r}"
+                        )
+                else:
+                    print(f"[REPLACE] line={line_no} key={k}")
+
+                replaced += 1
+                writer.writerow(new_row)
+            else:
+                kept += 1
+                writer.writerow(old_row)
+
+        for k, r in incoming.items():
+            if k not in used_keys:
+                r = norm_row_len(r)
+                appended_new += 1
+                writer.writerow(r)
+                if prob_idx is not None:
+                    print(f"[ADD] key={k} llm_probability={prob_val(r)!r} (not previously in file)")
+                else:
+                    print(f"[ADD] key={k} (not previously in file)")
+
+    tmp_path.replace(combined_path)
+
+    print(
+        f"[DONE replace] replaced={replaced} kept={kept} appended_new={appended_new} "
+        f"preserved_old_prob={preserved_old} "
+        f"key_cols=('qid','{pid_col}') file={combined_path}"
+    )
+    return combined_path
+
+
 def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
@@ -161,15 +492,17 @@ def _label_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
-    # ===== Output header = input header + llm_relevance =====
+    # ===== Output header = input header + llm_relevance (kept at end) =====
     if "llm_relevance" in header_in:
         print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
-        header_out = header_in
-    else:
-        header_out = header_in + ["llm_relevance"]
+    header_out = normalize_header_with_llm_at_end(header_in)
+
+    logprob_header = list(header_out) + ["llm_logprob_sum", "llm_logprob_avg", "llm_probability"]
 
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
+    logprob_path = per_file_out_dir / f"{part_csv.stem}_logprob_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
+    ensure_csv_with_header(logprob_path, logprob_header)
 
     # ===== Bedrock client via helper =====
     bedrock = make_bedrock_runtime_client(cfg)
@@ -230,9 +563,10 @@ def _label_single_part_file_blocking(
         reasoning = ""
         score = ""
         in_tok = out_tok = 0
+        logprob_sum = logprob_avg = probability = ""
 
         try:
-            result = converse_prompt(
+            result = converse_prompt_with_logprobs(
                 bedrock,
                 model_id=model_id,
                 prompt=prompt,
@@ -245,6 +579,9 @@ def _label_single_part_file_blocking(
             out_tok = int(result.output_tokens or 0)
             total_in += in_tok
             total_out += out_tok
+
+            token_logprobs = extract_token_logprobs(result.raw_response)
+            logprob_sum, logprob_avg, probability = summarize_logprobs(token_logprobs)
         except KeyboardInterrupt:
             print(f"[INTERRUPTED] {part_csv.name} at row {idx}")
             break
@@ -255,16 +592,14 @@ def _label_single_part_file_blocking(
             )
 
         # Build output row in the same order as header_in, then add llm_relevance
-        row_values = [row_out_map.get(col, "") for col in header_in]
-        if "llm_relevance" in header_in:
-            if len(row_values) == len(header_out):
-                row_values[-1] = score
-            else:
-                row_values.append(score)
-        else:
-            row_values.append(score)
+        row_out_map["llm_relevance"] = score
+        row_values = [row_out_map.get(col, "") for col in header_out]
 
         append_row_csv(labels_path, header_out, row_values)
+
+        logprob_values = list(row_values)
+        logprob_values.extend([logprob_sum, logprob_avg, probability])
+        append_row_csv(logprob_path, logprob_header, logprob_values)
 
         logs.append(
             {
@@ -278,6 +613,9 @@ def _label_single_part_file_blocking(
                 "passage_prompt_used": "passage_injected" if LANG != "raw" else "passage",
                 "query_prompt_used": "query",
                 "llm_relevance": score,
+                "llm_logprob_sum": logprob_sum,
+                "llm_logprob_avg": logprob_avg,
+                "llm_probability": probability,
             }
         )
 
@@ -305,8 +643,10 @@ def _label_single_part_file_blocking(
         "input_tokens": total_in,
         "output_tokens": total_out,
         "labels_csv": str(labels_path),
+        "logprob_csv": str(logprob_path),
         "log_json": str(per_file_log),
         "header_out": header_out,
+        "logprob_header": logprob_header,
     }
 
 
@@ -382,6 +722,23 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         out_dir=MODEL_OUT_DIR,
     )
 
+    logprob_header_set = {tuple(r["logprob_header"]) for r in results}
+    if len(logprob_header_set) != 1:
+        print(f"[FATAL] Inconsistent logprob headers across parts: {logprob_header_set}")
+        sys.exit(4)
+    logprob_header = list(next(iter(logprob_header_set)))
+    per_file_logprobs = [r["logprob_csv"] for r in results]
+
+    combined_logprob_path = write_combined_logprob_dynamic(
+        per_file_logprobs=per_file_logprobs,
+        header_out=logprob_header,
+        model_short=short,
+        lang=LANG,
+        year=TREC_DL_YEAR,
+        mode=mode,
+        out_dir=MODEL_OUT_DIR,
+    )
+
     total_in = sum(r["input_tokens"] for r in results)
     total_out = sum(r["output_tokens"] for r in results)
     num_rows = sum(r["rows"] for r in results)
@@ -413,6 +770,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
     )
 
     print(f"[DONE] Model: {model_id} | Rows: {num_rows} | Combined: {combined_path}")
+    print(f"[LOGPROB] Combined logprob CSV: {combined_logprob_path}")
     print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
     try:
