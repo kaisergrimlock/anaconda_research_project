@@ -1,45 +1,30 @@
 from pathlib import Path
 
 import pandas as pd
-import tiktoken
 from transformers import AutoTokenizer
-enc = tiktoken.get_encoding("o200k_harmony")
-assert enc.decode(enc.encode("hello world")) == "hello world"
 
 
 # Config
-LANG = "fr"
-YEAR = "2022"
-OUTPUT_DIR = Path("outputs") / "token"
+LANG = "th"
+YEAR = "2021"
+OUTPUT_DIR = Path("outputs") / "token" / "qwen"
 OUTPUT_CSV = OUTPUT_DIR / f"passage_tokens_{YEAR}_{LANG}.csv"
 PART_MIN = 1
 PART_MAX = 6
-TOKENIZER_NAME = "gpt-oss-120b"  # options: "gpt-oss-120b", "meta-llama/Meta-Llama-3-8B"
+TOKENIZER_NAME = "Qwen/Qwen3-32B"
 
 
-if TOKENIZER_NAME == "gpt-oss-120b":
-    enc = tiktoken.encoding_for_model("gpt-oss-120b")
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
 
-    def count_tokens(text: str) -> int:
-        return len(enc.encode(text))
 
-    def debug_tokens(text: str) -> None:
-        token_ids = enc.encode(text)
-        print("token_ids:", token_ids)
-        print("tokens:", [enc.decode([t]) for t in token_ids])
-else:
-    tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME, use_fast=True)
+def count_tokens(text: str) -> int:
+    return len(tokenizer.encode(text, add_special_tokens=False))
 
-    def count_tokens(text: str) -> int:
-        return len(tokenizer.encode(text, add_special_tokens=False))
 
-    def debug_tokens(text: str) -> None:
-        token_ids = tokenizer.encode(text, add_special_tokens=False)
-        print("token_ids:", token_ids)
-        print("tokens:", tokenizer.convert_ids_to_tokens(token_ids))
-
-text = "hello world"
-debug_tokens(text)
+def debug_tokens(text: str) -> None:
+    token_ids = tokenizer.encode(text, add_special_tokens=False)
+    print("token_ids:", token_ids)
+    print("tokens:", tokenizer.convert_ids_to_tokens(token_ids))
 
 
 def load_passages_df(year, lang, base_dir="retrieved"):
@@ -67,6 +52,9 @@ def load_passages_df(year, lang, base_dir="retrieved"):
     combined = pd.concat(frames, ignore_index=True)
     return combined
 
+
+text = "hello world"
+debug_tokens(text)
 
 df = load_passages_df(YEAR, LANG)
 df["orig_token"] = df["passage"].apply(count_tokens)
