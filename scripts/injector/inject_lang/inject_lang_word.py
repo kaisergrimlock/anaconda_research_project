@@ -18,7 +18,7 @@ TARGET_LANG = "eng"          # e.g., 'vi' for Vietnamese; 'eng'/'en' => no trans
 SEED = 42                   # set None for non-deterministic injection
 INJECT_COUNT = 1            # how many times to inject EACH translated word
 INJECT_PROB = 1.0           # probability per injection attempt (0..1)
-TRECDL_YEAR = "2021"        # for folder naming only
+TRECDL_YEAR = "2022"        # for folder naming only
 
 INPUT_DIR  = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/judged")                 # read these CSVs
 OUTPUT_DIR = Path(f"retrieved/trec_dl_{TRECDL_YEAR}/{TARGET_LANG}_word/")    # write mirrored CSVs

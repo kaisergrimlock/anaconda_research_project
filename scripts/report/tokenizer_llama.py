@@ -1,13 +1,16 @@
 from pathlib import Path
+from huggingface_hub import login
+#login("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")
+
 
 import pandas as pd
 from transformers import AutoTokenizer
 
 
 # Config
-LANG = "fr_word"
+LANG = "he_first"
 YEAR = "2022"
-OUTPUT_DIR = Path("outputs") / "token"
+OUTPUT_DIR = Path("outputs") / "token" / "llama"
 OUTPUT_CSV = OUTPUT_DIR / f"passage_tokens_{YEAR}_{LANG}.csv"
 PART_MIN = 1
 PART_MAX = 6

@@ -5,8 +5,8 @@ from transformers import AutoTokenizer
 
 
 # Config
-LANG = "th"
-YEAR = "2021"
+LANG = "he"
+YEAR = "2022"
 OUTPUT_DIR = Path("outputs") / "token" / "qwen"
 OUTPUT_CSV = OUTPUT_DIR / f"passage_tokens_{YEAR}_{LANG}.csv"
 PART_MIN = 1
