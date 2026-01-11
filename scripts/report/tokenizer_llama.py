@@ -1,6 +1,5 @@
 from pathlib import Path
 from huggingface_hub import login
-#login("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")
 
 
 import pandas as pd
