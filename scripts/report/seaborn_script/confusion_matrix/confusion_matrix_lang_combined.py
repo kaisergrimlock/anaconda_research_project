@@ -31,8 +31,8 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEARS = ["2021", "2022"]   # <-- combined years
-MODEL = "llama3-8b-instruct"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "raw"  # "raw","eng","vi","fr", etc.
+MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG  = "raw_crit"  # "raw","eng","vi","fr", etc.
 
 LABELS = [0, 1, 2, 3]
 
@@ -136,7 +136,7 @@ def latex_metrics_row(
         f"& \\num{{{mae_4pt}}}  %MAE_4pt\n"
         f"& \\num{{{mae_2pt}}} %MAE_2pt\n"
         f"& \\num{{{kappa_4pt}}}   %kappa_4pt\n"
-        f"& \\num{{{kappa_2pt}}} \\\\ %kappa_2pt \n"
+        f"& \\num{{{kappa_2pt}}} %kappa_2pt \n"
         f"& \\num{{{alpha_4pt}}} \\\\ %alpha_4pt\n"
     )
 

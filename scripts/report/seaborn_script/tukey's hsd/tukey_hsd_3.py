@@ -25,7 +25,7 @@ from helpers.output_writer import write_df
 # =========================
 TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_word"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_langs_cross"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -41,7 +41,7 @@ ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "ko", "ko_corrected"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets"]  # if empty, allow all langs found
-LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_word", "ru_word", "vi_word", "th_word", "sw_word", "ga_word"]  # if empty, allow all langs found
+LANGS: List[str] = ["raw", "eng", "eng_vi", "eng", "vi_th", "vi"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first"]
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga"]  # if empty, allow all langs found
 #LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "ko", "ko_corrected"]  # if empty, allow all langs found
