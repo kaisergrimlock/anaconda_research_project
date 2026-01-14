@@ -63,7 +63,7 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "ar"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+LANG = "ga"          # "raw", "vi", "sw_trans_p", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -71,9 +71,9 @@ MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
-#CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
+CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
 #CRITERION_KEYS = ["contextuality"] 
-CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
+#CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
 
 # Input part files
 if LANG == "raw":
@@ -86,8 +86,8 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # qwen.qwen3-32b-v1:0
 # openai.gpt-oss-20b-1:0
 # meta.llama3-8b-instruct-v1:0
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
@@ -552,61 +552,206 @@ def write_combined_dynamic(
     out_dir: Path,
 ) -> Path:
     """
-    Simple combiner that:
-      - writes header_out to a single combined CSV
-      - appends all rows from per_file_labels
-      - does NOT enforce any specific 'qid'/'pid_qrels' schema.
+    Merge per-file label CSVs into one combined CSV.
+
+    - mode="append": always append incoming rows.
+    - mode="replace": replace existing rows by key (qid + pid-like), append unseen keys.
+    - In replace mode, do NOT overwrite an existing non-blank criterion value
+      with a blank/NaN-like value.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_{CRITERION_KEY}_labels.csv"
 
-    if mode == "replace" or not combined_path.exists():
-        # Fresh file: write header and all rows
+    # -----------------------------
+    # Key columns: qid + pid-like
+    # -----------------------------
+    def pick_pid_col(header: list[str]) -> str:
+        candidates = ["pid", "pid_qrels", "pid_resolved", "docid", "passage_id", "doc_id"]
+        for c in candidates:
+            if c in header:
+                return c
+        raise ValueError(
+            f"Cannot do replace by qid+pid: no pid column found in header. "
+            f"Need one of {candidates}. Header={header}"
+        )
+
+    if "qid" not in header_out:
+        raise ValueError(f"Cannot do replace by qid+pid: missing 'qid' in header_out={header_out}")
+
+    pid_col = pick_pid_col(header_out)
+    qid_i = header_out.index("qid")
+    pid_i = header_out.index(pid_col)
+
+    crit_idx = header_out.index(CRITERION_COL) if CRITERION_COL in header_out else None
+
+    def norm_row_len(r: list[str]) -> list[str]:
+        if len(r) < len(header_out):
+            return r + [""] * (len(header_out) - len(r))
+        if len(r) > len(header_out):
+            return r[: len(header_out)]
+        return r
+
+    def make_key(r: list[str]) -> str:
+        r = norm_row_len(r)
+        return f"{(r[qid_i] or '').strip()}|{(r[pid_i] or '').strip()}"
+
+    def crit_val(r: list[str]) -> str:
+        if crit_idx is None:
+            return ""
+        r = norm_row_len(r)
+        return (r[crit_idx] or "").strip()
+
+    def is_blank_or_nan_like(v: str) -> bool:
+        s = (v or "").strip()
+        if s == "":
+            return True
+        return s.lower() in {"nan", "none", "null"}
+
+    def should_preserve_old(old: str, new: str) -> bool:
+        old_s = (old or "").strip()
+        new_s = (new or "").strip()
+        return (old_s != "") and is_blank_or_nan_like(new_s)
+
+    # -----------------------------------
+    # Load incoming rows as key -> row
+    # -----------------------------------
+    incoming: dict[str, list[str]] = {}
+
+    for p in per_file_labels:
+        pth = Path(p)
+        with pth.open("r", encoding="utf-8", newline="") as f_in:
+            reader = csv.reader(f_in)
+            in_header = next(reader, None)
+            if in_header is None:
+                continue
+
+            if list(in_header) != list(header_out):
+                raise ValueError(
+                    f"Inconsistent header in {pth}.\n"
+                    f"  got: {in_header}\n"
+                    f"  exp: {header_out}"
+                )
+
+            for r in reader:
+                r = norm_row_len(r)
+                incoming[make_key(r)] = r
+
+    # -----------------------------
+    # If file doesn't exist, write fresh
+    # -----------------------------
+    if not combined_path.exists():
         with combined_path.open("w", encoding="utf-8", newline="") as f_out:
-            writer = csv.writer(f_out)
-            writer.writerow(header_out)
-            for p in per_file_labels:
-                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
-                    reader = csv.reader(f_in)
-                    in_header = next(reader, None)
-                    if in_header is None:
-                        continue
-                    if in_header != header_out:
-                        print(
-                            f"[FATAL] Inconsistent header in {p}.\n"
-                            f"  got: {in_header}\n"
-                            f"  exp: {header_out}"
-                        )
-                        sys.exit(4)
-                    for row in reader:
-                        writer.writerow(row)
-    else:
-        # Append mode: check header once, then append rows
-        with combined_path.open("r", encoding="utf-8", newline="") as f_ex:
-            existing_header = next(csv.reader(f_ex), None)
+            w = csv.writer(f_out)
+            w.writerow(header_out)
+            for r in incoming.values():
+                w.writerow(r)
+        print(f"[WRITE] Created new combined file with {len(incoming)} rows: {combined_path}")
+        return combined_path
+
+    # -----------------------------
+    # Append mode
+    # -----------------------------
+    if mode == "append":
+        existing_header = _inspect_header(combined_path)
         if existing_header != header_out:
-            print(
-                f"[FATAL] Combined file header mismatch.\n"
+            raise ValueError(
+                f"Combined file header mismatch.\n"
                 f"  got: {existing_header}\n"
                 f"  exp: {header_out}"
             )
-            sys.exit(4)
 
         with combined_path.open("a", encoding="utf-8", newline="") as f_out:
-            writer = csv.writer(f_out)
-            for p in per_file_labels:
-                with Path(p).open("r", encoding="utf-8", newline="") as f_in:
-                    reader = csv.reader(f_in)
-                    in_header = next(reader, None)
-                    if in_header != header_out:
+            w = csv.writer(f_out)
+            for r in incoming.values():
+                w.writerow(r)
+
+        print(f"[APPEND] Appended {len(incoming)} rows to: {combined_path}")
+        return combined_path
+
+    # -----------------------------
+    # Replace mode
+    # -----------------------------
+    if mode != "replace":
+        raise ValueError(f"Unknown mode: {mode}")
+
+    existing_header = _inspect_header(combined_path)
+    if existing_header != header_out:
+        raise ValueError(
+            f"Combined file header mismatch.\n"
+            f"  got: {existing_header}\n"
+            f"  exp: {header_out}"
+        )
+
+    tmp_path = combined_path.with_suffix(".tmp.csv")
+
+    replaced = 0
+    kept = 0
+    appended_new = 0
+    preserved_old = 0
+    used_keys: set[str] = set()
+
+    with combined_path.open("r", encoding="utf-8", newline="") as f_in, tmp_path.open(
+        "w", encoding="utf-8", newline=""
+    ) as f_out:
+        reader = csv.reader(f_in)
+        writer = csv.writer(f_out)
+
+        _ = next(reader, None)  # skip header
+        writer.writerow(header_out)
+
+        line_no = 1  # header is line 1
+
+        for old_row in reader:
+            line_no += 1
+            old_row = norm_row_len(old_row)
+            k = make_key(old_row)
+
+            if k in incoming:
+                new_row = norm_row_len(incoming[k])
+                used_keys.add(k)
+
+                if crit_idx is not None:
+                    old_val = crit_val(old_row)
+                    new_val = crit_val(new_row)
+
+                    if should_preserve_old(old_val, new_val):
+                        new_row[crit_idx] = old_val
+                        preserved_old += 1
                         print(
-                            f"[FATAL] Inconsistent header in {p}.\n"
-                            f"  got: {in_header}\n"
-                            f"  exp: {header_out}"
+                            f"[REPLACE-PRESERVE] line={line_no} key={k} "
+                            f"{CRITERION_COL}: {old_val!r} -> {new_val!r} (kept {old_val!r})"
                         )
-                        sys.exit(4)
-                    for row in reader:
-                        writer.writerow(row)
+                    else:
+                        print(
+                            f"[REPLACE] line={line_no} key={k} "
+                            f"{CRITERION_COL}: {old_val!r} -> {new_val!r}"
+                        )
+                else:
+                    print(f"[REPLACE] line={line_no} key={k}")
+
+                replaced += 1
+                writer.writerow(new_row)
+            else:
+                kept += 1
+                writer.writerow(old_row)
+
+        for k, r in incoming.items():
+            if k not in used_keys:
+                r = norm_row_len(r)
+                appended_new += 1
+                writer.writerow(r)
+                if crit_idx is not None:
+                    print(f"[ADD] key={k} {CRITERION_COL}={crit_val(r)!r} (not previously in file)")
+                else:
+                    print(f"[ADD] key={k} (not previously in file)")
+
+    tmp_path.replace(combined_path)
+
+    print(
+        f"[DONE replace] replaced={replaced} kept={kept} appended_new={appended_new} "
+        f"preserved_old={preserved_old} "
+        f"key_cols=('qid','{pid_col}') file={combined_path}"
+    )
 
     return combined_path
 
