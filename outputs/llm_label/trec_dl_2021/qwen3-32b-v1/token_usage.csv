@@ -84,3 +84,4 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260114_180357,2026-01-14T18:09:30,qwen.qwen3-32b-v1:0,2549,837842,45505,883347,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_fr_first_labels.csv,(see logs index)
 20260115_010702,2026-01-15T01:13:07,qwen.qwen3-32b-v1:0,2549,846466,45505,891971,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_ga_labels.csv,(see logs index)
 20260115_011243,2026-01-15T01:13:31,qwen.qwen3-32b-v1:0,8,2787,152,2939,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_he_first_labels.csv,(see logs index)
+20260115_030521,2026-01-15T03:05:50,qwen.qwen3-32b-v1:0,3,1021,57,1078,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_eng_first_labels.csv,(see logs index)

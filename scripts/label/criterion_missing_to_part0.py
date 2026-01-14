@@ -10,11 +10,11 @@ import pandas as pd
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
-MODEL = "llama3-8b-instruct"
+TREC_DL_YEAR = "2021"
+MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "topicality"
+CRITERION = "contextuality"
 
 # Language filter (required). Only these languages will be processed.
 LANGS: list[str] = ["eng"]
