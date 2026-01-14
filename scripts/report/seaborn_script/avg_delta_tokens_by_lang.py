@@ -14,10 +14,10 @@ THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]   # adjust if script lives elsewhere
 
 YEAR = "2022"
-LANGS = ["vi", "eng", "fr", "ru", "ga", "ar", "sw", "th"]
+LANGS = ["vi", "eng", "vi_word", "eng_word", "th", "th_word"]
 AUTO_DISCOVER = True
 SKIP_MISSING = True
-MODEL = "qwen"  # options: "qwen", "llama", "gpt"
+MODEL = "gpt"  # options: "qwen", "llama", "gpt"
 TAXONOMY_CSV = PROJECT_ROOT / "scripts" / "report" / "seaborn_script" / "lang.csv"
 
 INPUT_ROOT = PROJECT_ROOT / "outputs" / "token" / MODEL

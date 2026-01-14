@@ -14,7 +14,7 @@ from transformers import AutoTokenizer
 YEAR = "2021"
 
 # Run one or many langs at once:
-LANGS: List[str] = ["ga_first", "ru_first", "he_first", "eng_first", "vi_first", "fr_first", "ar_first", "sw_first", "th_first"]
+LANGS: List[str] = ["eng_word", "vi_word", "th_word"]
 
 # If you still want the old behavior, set LANGS = ["ga_first"]
 PART_MIN = 1
