@@ -1,0 +1,88 @@
+\begin{table}
+\caption{Tukey HSD across all (model,lang) groups for mean_diff, FWER=0.05.}
+\label{tab:tukey_all_models_all_langs_mean_diff}
+\begin{tabular}{l l r r r r l}
+\toprule
+group1 & group2 & meandiff & p-adj & lower & upper & reject \\
+\midrule
+gpt-oss-20b|ko & gpt-oss-20b|th & 0.0679 & 0.6376 & -0.0374 & 0.1731 & False \\
+gpt-oss-20b|ko & gpt-oss-20b|th_corrected & -0.0255 & 1 & -0.1416 & 0.0905 & False \\
+gpt-oss-20b|ko & gpt-oss-20b|vi & 0.0534 & 0.903 & -0.0519 & 0.1586 & False \\
+gpt-oss-20b|ko & gpt-oss-20b|vi_corrected & 0.0601 & 0.7995 & -0.0451 & 0.1654 & False \\
+gpt-oss-20b|ko & llama3-8b-instruct|th & 0.185 & 0 & 0.0798 & 0.2902 & True \\
+gpt-oss-20b|ko & llama3-8b-instruct|th_corrected & 0.1883 & 0 & 0.0831 & 0.2936 & True \\
+gpt-oss-20b|ko & llama3-8b-instruct|vi & 0.1481 & 0.0002 & 0.0429 & 0.2534 & True \\
+gpt-oss-20b|ko & llama3-8b-instruct|vi_corrected & 0.1457 & 0.0003 & 0.0405 & 0.251 & True \\
+gpt-oss-20b|ko & qwen3-32b-v1|th & 0.2698 & 0 & 0.1645 & 0.375 & True \\
+gpt-oss-20b|ko & qwen3-32b-v1|th_corrected & 0.2243 & 0 & 0.1083 & 0.3403 & True \\
+gpt-oss-20b|ko & qwen3-32b-v1|vi & 0.2355 & 0 & 0.1303 & 0.3407 & True \\
+gpt-oss-20b|ko & qwen3-32b-v1|vi_corrected & 0.2055 & 0 & 0.0895 & 0.3215 & True \\
+gpt-oss-20b|th & gpt-oss-20b|th_corrected & -0.0934 & 0.143 & -0.1986 & 0.0118 & False \\
+gpt-oss-20b|th & gpt-oss-20b|vi & -0.0145 & 1 & -0.1076 & 0.0786 & False \\
+gpt-oss-20b|th & gpt-oss-20b|vi_corrected & -0.0077 & 1 & -0.1008 & 0.0854 & False \\
+gpt-oss-20b|th & llama3-8b-instruct|th & 0.1171 & 0.0022 & 0.024 & 0.2102 & True \\
+gpt-oss-20b|th & llama3-8b-instruct|th_corrected & 0.1204 & 0.0013 & 0.0273 & 0.2136 & True \\
+gpt-oss-20b|th & llama3-8b-instruct|vi & 0.0802 & 0.1777 & -0.0129 & 0.1734 & False \\
+gpt-oss-20b|th & llama3-8b-instruct|vi_corrected & 0.0779 & 0.2161 & -0.0153 & 0.171 & False \\
+gpt-oss-20b|th & qwen3-32b-v1|th & 0.2019 & 0 & 0.1088 & 0.295 & True \\
+gpt-oss-20b|th & qwen3-32b-v1|th_corrected & 0.1564 & 0.0001 & 0.0513 & 0.2615 & True \\
+gpt-oss-20b|th & qwen3-32b-v1|vi & 0.1676 & 0 & 0.0745 & 0.2607 & True \\
+gpt-oss-20b|th & qwen3-32b-v1|vi_corrected & 0.1376 & 0.001 & 0.0325 & 0.2428 & True \\
+gpt-oss-20b|th_corrected & gpt-oss-20b|vi & 0.0789 & 0.3843 & -0.0263 & 0.1841 & False \\
+gpt-oss-20b|th_corrected & gpt-oss-20b|vi_corrected & 0.0857 & 0.2529 & -0.0195 & 0.1909 & False \\
+gpt-oss-20b|th_corrected & llama3-8b-instruct|th & 0.2105 & 0 & 0.1054 & 0.3157 & True \\
+gpt-oss-20b|th_corrected & llama3-8b-instruct|th_corrected & 0.2139 & 0 & 0.1087 & 0.3191 & True \\
+gpt-oss-20b|th_corrected & llama3-8b-instruct|vi & 0.1737 & 0 & 0.0685 & 0.2789 & True \\
+gpt-oss-20b|th_corrected & llama3-8b-instruct|vi_corrected & 0.1713 & 0 & 0.0661 & 0.2765 & True \\
+gpt-oss-20b|th_corrected & qwen3-32b-v1|th & 0.2953 & 0 & 0.1901 & 0.4005 & True \\
+gpt-oss-20b|th_corrected & qwen3-32b-v1|th_corrected & 0.2498 & 0 & 0.1339 & 0.3658 & True \\
+gpt-oss-20b|th_corrected & qwen3-32b-v1|vi & 0.2611 & 0 & 0.1559 & 0.3662 & True \\
+gpt-oss-20b|th_corrected & qwen3-32b-v1|vi_corrected & 0.2311 & 0 & 0.1151 & 0.347 & True \\
+gpt-oss-20b|vi & gpt-oss-20b|vi_corrected & 0.0068 & 1 & -0.0863 & 0.0999 & False \\
+gpt-oss-20b|vi & llama3-8b-instruct|th & 0.1316 & 0.0002 & 0.0385 & 0.2247 & True \\
+gpt-oss-20b|vi & llama3-8b-instruct|th_corrected & 0.135 & 0.0001 & 0.0419 & 0.2281 & True \\
+gpt-oss-20b|vi & llama3-8b-instruct|vi & 0.0948 & 0.0416 & 0.0016 & 0.1879 & True \\
+gpt-oss-20b|vi & llama3-8b-instruct|vi_corrected & 0.0924 & 0.0541 & -0.0007 & 0.1855 & False \\
+gpt-oss-20b|vi & qwen3-32b-v1|th & 0.2164 & 0 & 0.1233 & 0.3095 & True \\
+gpt-oss-20b|vi & qwen3-32b-v1|th_corrected & 0.1709 & 0 & 0.0658 & 0.2761 & True \\
+gpt-oss-20b|vi & qwen3-32b-v1|vi & 0.1822 & 0 & 0.089 & 0.2753 & True \\
+gpt-oss-20b|vi & qwen3-32b-v1|vi_corrected & 0.1522 & 0.0001 & 0.047 & 0.2573 & True \\
+gpt-oss-20b|vi_corrected & llama3-8b-instruct|th & 0.1248 & 0.0006 & 0.0318 & 0.2179 & True \\
+gpt-oss-20b|vi_corrected & llama3-8b-instruct|th_corrected & 0.1282 & 0.0004 & 0.0351 & 0.2213 & True \\
+gpt-oss-20b|vi_corrected & llama3-8b-instruct|vi & 0.088 & 0.0862 & -0.0051 & 0.1811 & False \\
+gpt-oss-20b|vi_corrected & llama3-8b-instruct|vi_corrected & 0.0856 & 0.1088 & -0.0075 & 0.1787 & False \\
+gpt-oss-20b|vi_corrected & qwen3-32b-v1|th & 0.2096 & 0 & 0.1165 & 0.3027 & True \\
+gpt-oss-20b|vi_corrected & qwen3-32b-v1|th_corrected & 0.1641 & 0 & 0.059 & 0.2693 & True \\
+gpt-oss-20b|vi_corrected & qwen3-32b-v1|vi & 0.1754 & 0 & 0.0823 & 0.2685 & True \\
+gpt-oss-20b|vi_corrected & qwen3-32b-v1|vi_corrected & 0.1454 & 0.0003 & 0.0403 & 0.2505 & True \\
+llama3-8b-instruct|th & llama3-8b-instruct|th_corrected & 0.0033 & 1 & -0.0898 & 0.0964 & False \\
+llama3-8b-instruct|th & llama3-8b-instruct|vi & -0.0369 & 0.9851 & -0.13 & 0.0562 & False \\
+llama3-8b-instruct|th & llama3-8b-instruct|vi_corrected & -0.0392 & 0.975 & -0.1323 & 0.0538 & False \\
+llama3-8b-instruct|th & qwen3-32b-v1|th & 0.0848 & 0.1178 & -0.0083 & 0.1779 & False \\
+llama3-8b-instruct|th & qwen3-32b-v1|th_corrected & 0.0393 & 0.9909 & -0.0658 & 0.1444 & False \\
+llama3-8b-instruct|th & qwen3-32b-v1|vi & 0.0505 & 0.8512 & -0.0426 & 0.1436 & False \\
+llama3-8b-instruct|th & qwen3-32b-v1|vi_corrected & 0.0205 & 1 & -0.0846 & 0.1257 & False \\
+llama3-8b-instruct|th_corrected & llama3-8b-instruct|vi & -0.0402 & 0.9697 & -0.1333 & 0.0529 & False \\
+llama3-8b-instruct|th_corrected & llama3-8b-instruct|vi_corrected & -0.0426 & 0.953 & -0.1357 & 0.0505 & False \\
+llama3-8b-instruct|th_corrected & qwen3-32b-v1|th & 0.0814 & 0.1599 & -0.0117 & 0.1745 & False \\
+llama3-8b-instruct|th_corrected & qwen3-32b-v1|th_corrected & 0.036 & 0.9959 & -0.0692 & 0.1411 & False \\
+llama3-8b-instruct|th_corrected & qwen3-32b-v1|vi & 0.0472 & 0.9033 & -0.0459 & 0.1403 & False \\
+llama3-8b-instruct|th_corrected & qwen3-32b-v1|vi_corrected & 0.0172 & 1 & -0.0879 & 0.1223 & False \\
+llama3-8b-instruct|vi & llama3-8b-instruct|vi_corrected & -0.0024 & 1 & -0.0955 & 0.0907 & False \\
+llama3-8b-instruct|vi & qwen3-32b-v1|th & 0.1216 & 0.0011 & 0.0285 & 0.2147 & True \\
+llama3-8b-instruct|vi & qwen3-32b-v1|th_corrected & 0.0762 & 0.4435 & -0.029 & 0.1813 & False \\
+llama3-8b-instruct|vi & qwen3-32b-v1|vi & 0.0874 & 0.0913 & -0.0057 & 0.1805 & False \\
+llama3-8b-instruct|vi & qwen3-32b-v1|vi_corrected & 0.0574 & 0.8457 & -0.0477 & 0.1625 & False \\
+llama3-8b-instruct|vi_corrected & qwen3-32b-v1|th & 0.124 & 0.0007 & 0.0309 & 0.2171 & True \\
+llama3-8b-instruct|vi_corrected & qwen3-32b-v1|th_corrected & 0.0786 & 0.3908 & -0.0266 & 0.1837 & False \\
+llama3-8b-instruct|vi_corrected & qwen3-32b-v1|vi & 0.0898 & 0.0715 & -0.0033 & 0.1829 & False \\
+llama3-8b-instruct|vi_corrected & qwen3-32b-v1|vi_corrected & 0.0598 & 0.8051 & -0.0453 & 0.1649 & False \\
+qwen3-32b-v1|th & qwen3-32b-v1|th_corrected & -0.0455 & 0.9694 & -0.1506 & 0.0597 & False \\
+qwen3-32b-v1|th & qwen3-32b-v1|vi & -0.0342 & 0.9922 & -0.1273 & 0.0589 & False \\
+qwen3-32b-v1|th & qwen3-32b-v1|vi_corrected & -0.0642 & 0.717 & -0.1693 & 0.0409 & False \\
+qwen3-32b-v1|th_corrected & qwen3-32b-v1|vi & 0.0112 & 1 & -0.0939 & 0.1163 & False \\
+qwen3-32b-v1|th_corrected & qwen3-32b-v1|vi_corrected & -0.0188 & 1 & -0.1347 & 0.0971 & False \\
+qwen3-32b-v1|vi & qwen3-32b-v1|vi_corrected & -0.03 & 0.9993 & -0.1351 & 0.0751 & False \\
+\bottomrule
+\end{tabular}
+\end{table}

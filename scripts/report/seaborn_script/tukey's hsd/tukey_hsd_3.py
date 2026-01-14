@@ -23,9 +23,9 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_first"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_last"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -43,8 +43,8 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets", "th_brackets"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_vi", "eng", "vi_th", "vi"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_mult", "vi_mult"]
+#LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last"]
 LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first"]
-
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
 
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga"]  # if empty, allow all langs found
@@ -99,42 +99,31 @@ def load_labels(file_path: Path) -> pd.DataFrame:
     valid = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
     return df[valid].copy()
 
-def per_qid_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
+def per_row_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
     """
-    Turn a (qid,pid)-level label dataframe into (qid)-level samples:
-      qid, value
+    Turn a (qid,pid)-level label dataframe into per-row samples:
+      qid, pid, value
 
     These 'value' samples are what Tukey HSD consumes.
     """
-    # Ensure unique (qid,pid) pairs so duplicates don't distort per-qid averages
-    base = df.drop_duplicates(subset=["qid", "pid"]).copy()
+    # Keep only valid, unique (qid,pid) pairs so duplicates or missing IDs
+    # don't distort per-row samples.
+    base = df.dropna(subset=["qid", "pid"]).drop_duplicates(subset=["qid", "pid"]).copy()
 
     if metric == "mean_diff":
-        # signed difference: positive means LLM > NIST on average
-        base["diff"] = base["LLM"] - base["NIST"]
-        return (
-            base.groupby("qid", as_index=False)["diff"]
-            .mean()
-            .rename(columns={"diff": "value"})
-        )
+        # signed difference: positive means LLM > NIST
+        base["value"] = base["LLM"] - base["NIST"]
+        return base[["qid", "pid", "value"]]
 
     if metric == "mae_4pt":
-        # mean absolute error per query
-        base["abs_err"] = (base["LLM"] - base["NIST"]).abs()
-        return (
-            base.groupby("qid", as_index=False)["abs_err"]
-            .mean()
-            .rename(columns={"abs_err": "value"})
-        )
+        # absolute error per row
+        base["value"] = (base["LLM"] - base["NIST"]).abs()
+        return base[["qid", "pid", "value"]]
 
     if metric == "disagree_rate":
-        # fraction of passages where LLM != NIST for each query
-        base["is_disagree"] = (base["LLM"] != base["NIST"]).astype(float)
-        return (
-            base.groupby("qid", as_index=False)["is_disagree"]
-            .mean()
-            .rename(columns={"is_disagree": "value"})
-        )
+        # 1 if LLM != NIST for the row, else 0
+        base["value"] = (base["LLM"] != base["NIST"]).astype(float)
+        return base[["qid", "pid", "value"]]
 
     raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
 
@@ -215,15 +204,21 @@ def main() -> None:
                 continue
             try:
                 df = load_labels(f)
-                perq = per_qid_metric(df, METRIC)
-                if perq.empty:
+                pair_count = (
+                    df.dropna(subset=["qid", "pid"])
+                    .drop_duplicates(subset=["qid", "pid"])
+                    .shape[0]
+                )
+                print(f"[INFO] {model} {lang}: {pair_count} valid (qid,pid) pairs")
+                perrow = per_row_metric(df, METRIC)
+                if perrow.empty:
                     continue
 
-                perq["model"] = model
-                perq["lang"] = lang
-                perq["group"] = perq["model"] + GROUP_SEP + perq["lang"]
+                perrow["model"] = model
+                perrow["lang"] = lang
+                perrow["group"] = perrow["model"] + GROUP_SEP + perrow["lang"]
 
-                rows.append(perq[["group", "model", "lang", "qid", "value"]])
+                rows.append(perrow[["group", "model", "lang", "qid", "pid", "value"]])
 
             except Exception as e:
                 skipped += 1
@@ -236,7 +231,7 @@ def main() -> None:
 
     long_df = pd.concat(rows, ignore_index=True)
 
-    # Require >=2 query samples per group
+    # Require >=2 row samples per group
     counts = long_df["group"].value_counts()
     keep_groups = counts[counts >= 2].index
     dropped = [g for g in counts.index if g not in set(keep_groups)]

@@ -12,12 +12,12 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "qwen3-32b-v1"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
 LANGS: list[str] = ["raw", "eng", "ar", "ru", "fr", "vi", "th", "ga", "sw"]
-CRITERIA: list[str] = ["contextuality"]
+CRITERIA: list[str] = ["topicality", "exactness", "contextuality", "coverage"]
 
 VALID_LABELS = {0, 1, 2, 3}
 
@@ -42,8 +42,6 @@ FIG_DIR = PROJECT_ROOT / "figures" / TREC_DL_YEAR / MODEL / "criterion_mean_ci"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 FIG_BASE = FIG_DIR / f"{MODEL}_trecdl_{TREC_DL_YEAR}_criterion_mean_ci"
-FIG_PATH_PNG = FIG_BASE.with_suffix(".png")
-FIG_PATH_SVG = FIG_BASE.with_suffix(".svg")
 SUMMARY_CSV = FIG_BASE.with_suffix(".csv")
 
 
@@ -239,32 +237,18 @@ def summarize_ci(langs: list[str], criteria: list[str]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def plot_ci(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]) -> None:
+def plot_ci_per_criterion(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]) -> None:
     sns.set(style="whitegrid")
-    fig, ax = plt.subplots(figsize=(10, 4))
+    colors = sns.color_palette("tab10", len(langs))
 
-    x_base = np.arange(len(criteria), dtype=float)
-    n_langs = len(langs)
-    if n_langs <= 1:
-        offsets = np.array([0.0])
-    else:
-        dodge = 0.35
-        offsets = np.linspace(-dodge, dodge, n_langs)
+    for criterion in criteria:
+        fig, ax = plt.subplots(figsize=(8, 4))
+        x_base = np.arange(len(langs), dtype=float)
 
-    colors = sns.color_palette("tab10", n_langs)
-
-    for li, lang in enumerate(langs):
-        sub = summary_df[summary_df["language"] == lang]
-        if sub.empty:
-            continue
-
-        xs: list[float] = []
-        ys: list[float] = []
-        yerr_lo: list[float] = []
-        yerr_hi: list[float] = []
-
-        for ci, criterion in enumerate(criteria):
-            row = sub[sub["criterion"] == criterion]
+        for li, lang in enumerate(langs):
+            row = summary_df[
+                (summary_df["language"] == lang) & (summary_df["criterion"] == criterion)
+            ]
             if row.empty:
                 continue
 
@@ -273,55 +257,120 @@ def plot_ci(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]) -> 
             lo = float(r["lo"])
             hi = float(r["hi"])
 
-            xs.append(float(x_base[ci] + offsets[li]))
-            ys.append(mean)
-            yerr_lo.append(mean - lo)
-            yerr_hi.append(hi - mean)
+            ax.errorbar(
+                [x_base[li]],
+                [mean],
+                yerr=[[mean - lo], [hi - mean]],
+                fmt="o",
+                capsize=3,
+                elinewidth=1.2,
+                markersize=4,
+                color=colors[li],
+            )
 
-        if not xs:
-            continue
-
-        ax.errorbar(
-            xs,
-            ys,
-            yerr=[yerr_lo, yerr_hi],
-            fmt="o",
-            capsize=3,
-            elinewidth=1.2,
-            markersize=4,
-            color=colors[li],
-            label=lang,
+        ax.set_xticks(x_base)
+        ax.set_xticklabels(langs, rotation=0)
+        ax.set_xlabel("Language")
+        ax.set_ylabel("Mean score")
+        ax.set_title(
+            f"{criterion.capitalize()} mean score by language (95% CI)\n"
+            f"{MODEL}, trec_dl_{TREC_DL_YEAR}"
         )
 
-    ax.set_xticks(x_base)
-    ax.set_xticklabels([c.capitalize() for c in criteria], rotation=0)
-    ax.set_xlabel("Criterion")
-    ax.set_ylabel("Mean score")
-    ax.set_title(
-        f"Mean criterion score by language (95% CI)\n{MODEL}, trec_dl_{TREC_DL_YEAR}"
-    )
+        if VALID_LABELS == {0, 1, 2, 3}:
+            ax.set_ylim(-0.1, 3.1)
 
-    if VALID_LABELS == {0, 1, 2, 3}:
-        ax.set_ylim(-0.1, 3.1)
+        ax.set_axisbelow(True)
+        ax.grid(axis="y", color="0.9")
+        ax.grid(axis="x", visible=False)
 
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color="0.9")
-    ax.grid(axis="x", visible=False)
+        plt.tight_layout()
 
-    ax.legend(
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.2),
-        ncol=max(1, min(6, n_langs)),
-        frameon=False,
-    )
+        fig_base = FIG_DIR / f"{MODEL}_trecdl_{TREC_DL_YEAR}_{criterion}_mean_ci"
+        fig_path_png = fig_base.with_suffix(".png")
+        fig_path_svg = fig_base.with_suffix(".svg")
+
+        plt.savefig(fig_path_png, dpi=300)
+        plt.savefig(fig_path_svg)
+        plt.close()
+
+        print(f"[DONE] Saved PNG {fig_path_png}")
+        print(f"[DONE] Saved SVG {fig_path_svg}")
+
+
+def plot_ci_grid(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]) -> None:
+    sns.set(style="whitegrid")
+    colors = sns.color_palette("tab10", len(langs))
+
+    n = len(criteria)
+    ncols = 2 if n > 1 else 1
+    nrows = int(np.ceil(n / ncols))
+
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(8 * ncols, 3.6 * nrows))
+    if not isinstance(axes, np.ndarray):
+        axes = np.array([axes])
+    axes = axes.flatten()
+
+    for ax_i, criterion in enumerate(criteria):
+        ax = axes[ax_i]
+        x_base = np.arange(len(langs), dtype=float)
+
+        for li, lang in enumerate(langs):
+            row = summary_df[
+                (summary_df["language"] == lang) & (summary_df["criterion"] == criterion)
+            ]
+            if row.empty:
+                continue
+
+            r = row.iloc[0]
+            mean = float(r["mean"])
+            lo = float(r["lo"])
+            hi = float(r["hi"])
+
+            ax.errorbar(
+                [x_base[li]],
+                [mean],
+                yerr=[[mean - lo], [hi - mean]],
+                fmt="o",
+                capsize=3,
+                elinewidth=1.2,
+                markersize=4,
+                color=colors[li],
+            )
+
+        ax.set_xticks(x_base)
+        ax.set_xticklabels(langs, rotation=0)
+        ax.set_xlabel("Language")
+        ax.set_ylabel("Mean score")
+        ax.set_title(criterion.capitalize())
+
+        if VALID_LABELS == {0, 1, 2, 3}:
+            ax.set_ylim(-0.1, 3.1)
+
+        ax.set_axisbelow(True)
+        ax.grid(axis="y", color="0.9")
+        ax.grid(axis="x", visible=False)
+
+    for j in range(n, len(axes)):
+        axes[j].axis("off")
 
     plt.tight_layout()
-    plt.savefig(FIG_PATH_PNG, dpi=300)
-    plt.savefig(FIG_PATH_SVG)
+    fig_path_png = FIG_BASE.with_name(f"{FIG_BASE.name}_grid").with_suffix(".png")
+    fig_path_svg = FIG_BASE.with_name(f"{FIG_BASE.name}_grid").with_suffix(".svg")
+    fig_path_pdf = FIG_BASE.with_name(f"{FIG_BASE.name}_grid_no_title").with_suffix(".pdf")
+    plt.savefig(fig_path_pdf, bbox_inches="tight")
+
+    fig.suptitle(
+        f"Mean criterion score by language (95% CI)\n{MODEL}, trec_dl_{TREC_DL_YEAR}",
+        y=1.02,
+    )
+    plt.savefig(fig_path_png, dpi=300, bbox_inches="tight")
+    plt.savefig(fig_path_svg, bbox_inches="tight")
     plt.close()
 
-    print(f"[DONE] Saved PNG {FIG_PATH_PNG}")
-    print(f"[DONE] Saved SVG {FIG_PATH_SVG}")
+    print(f"[DONE] Saved PNG {fig_path_png}")
+    print(f"[DONE] Saved SVG {fig_path_svg}")
+    print(f"[DONE] Saved PDF {fig_path_pdf}")
 
 
 def main() -> None:
@@ -348,7 +397,8 @@ def main() -> None:
     summary_df.to_csv(SUMMARY_CSV, index=False, encoding="utf-8")
     print(f"[INFO] Wrote summary CSV {SUMMARY_CSV}")
 
-    plot_ci(summary_df, langs, criteria)
+    plot_ci_per_criterion(summary_df, langs, criteria)
+    plot_ci_grid(summary_df, langs, criteria)
 
 
 if __name__ == "__main__":

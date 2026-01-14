@@ -5,7 +5,7 @@ import seaborn as sns
 
 # ====== Load the CSV ======
 LANG = "ga"  # Change as needed: "raw", "vi", "fr", ...
-YEAR = "2023"
+YEAR = "2021"
 df = pd.read_csv (f"outputs/baseline/{YEAR}/{LANG}/confusion_matrix_llm_vs_nist_pct.csv", index_col=0)
 
 # ====== Plot setup ======
