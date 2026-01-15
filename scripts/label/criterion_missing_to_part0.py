@@ -17,7 +17,7 @@ MODEL = "gpt-oss-20b"
 CRITERION = "contextuality"
 
 # Language filter (required). Only these languages will be processed.
-LANGS: list[str] = ["eng"]
+LANGS: list[str] = ["eng", "vi", "ru", "sw", "ga", "ar"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

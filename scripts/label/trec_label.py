@@ -53,19 +53,19 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng_first"          # "raw", "vi", "enclosed", ...
+LANG = "eng_last"          # "raw", "vi", "enclosed", ...
 START_PART = 0
 END_PART = 0
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Models
 #"meta.llama3-8b-instruct-v1:0"
 #"qwen.qwen3-32b-v1:0"
-#MODELS = ['openai.gpt-oss-20b-1:0']
-MODELS = ["meta.llama3-8b-instruct-v1:0"]
+MODELS = ['openai.gpt-oss-20b-1:0']
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
-INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 128000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])

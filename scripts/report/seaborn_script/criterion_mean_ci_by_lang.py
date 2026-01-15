@@ -12,8 +12,8 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
-MODEL = "qwen3-32b-v1"
+TREC_DL_YEAR = "2022"
+MODEL = "gpt-oss-20b"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
 LANGS: list[str] = ["raw", "eng", "ar", "ru", "fr", "vi", "th", "ga", "sw"]

@@ -72,8 +72,8 @@ MODE = "replace"       # "append" or "replace"
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
 #CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
-#CRITERION_KEYS = ["contextuality"] 
-CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
+CRITERION_KEYS = ["contextuality"] 
+#CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
 
 # Input part files
 if LANG == "raw":
