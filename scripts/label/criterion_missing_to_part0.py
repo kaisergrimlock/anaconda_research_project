@@ -11,13 +11,13 @@ import pandas as pd
 # Config
 # =========================
 TREC_DL_YEAR = "2021"
-MODEL = "gpt-oss-20b"
+MODEL = "qwen3-32b-v1"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
 CRITERION = "contextuality"
 
 # Language filter (required). Only these languages will be processed.
-LANGS: list[str] = ["eng", "vi", "ru", "sw", "ga", "ar"]
+LANGS: list[str] = ["eng", "vi", "fr", "ar", "ru", "sw", "ga", "ar"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

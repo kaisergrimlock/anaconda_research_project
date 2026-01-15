@@ -25,7 +25,7 @@ from helpers.output_writer import write_df
 # =========================
 TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_first"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_crit"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"

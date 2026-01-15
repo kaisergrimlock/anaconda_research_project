@@ -12,12 +12,12 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
-LANGS: list[str] = ["raw", "eng", "ar", "ru", "fr", "vi", "th", "ga", "sw"]
-CRITERIA: list[str] = ["topicality", "exactness", "contextuality", "coverage"]
+LANGS: list[str] = ["raw", "eng", "ar", "ru", "fr", "vi", "th"]
+CRITERIA: list[str] = ["topicality", "contextuality", "coverage"]
 
 VALID_LABELS = {0, 1, 2, 3}
 
@@ -237,11 +237,33 @@ def summarize_ci(langs: list[str], criteria: list[str]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def apply_auto_ylim(ax: plt.Axes, lo_vals: np.ndarray, hi_vals: np.ndarray) -> None:
+    if lo_vals.size == 0 or hi_vals.size == 0:
+        return
+
+    y_min = float(np.nanmin(lo_vals))
+    y_max = float(np.nanmax(hi_vals))
+    if not np.isfinite(y_min) or not np.isfinite(y_max):
+        return
+
+    span = y_max - y_min
+    min_span = 0.2
+    if span < min_span:
+        center = (y_min + y_max) / 2.0
+        y_min = center - min_span / 2.0
+        y_max = center + min_span / 2.0
+        span = y_max - y_min
+
+    padding = max(span * 0.1, 0.05)
+    ax.set_ylim(y_min - padding, y_max + padding)
+
+
 def plot_ci_per_criterion(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]) -> None:
     sns.set(style="whitegrid")
     colors = sns.color_palette("tab10", len(langs))
 
     for criterion in criteria:
+        subset = summary_df[summary_df["criterion"] == criterion]
         fig, ax = plt.subplots(figsize=(8, 4))
         x_base = np.arange(len(langs), dtype=float)
 
@@ -277,8 +299,11 @@ def plot_ci_per_criterion(summary_df: pd.DataFrame, langs: list[str], criteria: 
             f"{MODEL}, trec_dl_{TREC_DL_YEAR}"
         )
 
-        if VALID_LABELS == {0, 1, 2, 3}:
-            ax.set_ylim(-0.1, 3.1)
+        apply_auto_ylim(
+            ax,
+            subset["lo"].to_numpy(dtype=float),
+            subset["hi"].to_numpy(dtype=float),
+        )
 
         ax.set_axisbelow(True)
         ax.grid(axis="y", color="0.9")
@@ -313,6 +338,7 @@ def plot_ci_grid(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]
 
     for ax_i, criterion in enumerate(criteria):
         ax = axes[ax_i]
+        subset = summary_df[summary_df["criterion"] == criterion]
         x_base = np.arange(len(langs), dtype=float)
 
         for li, lang in enumerate(langs):
@@ -344,8 +370,11 @@ def plot_ci_grid(summary_df: pd.DataFrame, langs: list[str], criteria: list[str]
         ax.set_ylabel("Mean score")
         ax.set_title(criterion.capitalize())
 
-        if VALID_LABELS == {0, 1, 2, 3}:
-            ax.set_ylim(-0.1, 3.1)
+        apply_auto_ylim(
+            ax,
+            subset["lo"].to_numpy(dtype=float),
+            subset["hi"].to_numpy(dtype=float),
+        )
 
         ax.set_axisbelow(True)
         ax.grid(axis="y", color="0.9")
