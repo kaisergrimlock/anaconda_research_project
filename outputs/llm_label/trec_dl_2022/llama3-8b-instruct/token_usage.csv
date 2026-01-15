@@ -97,3 +97,7 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260114_175455,2026-01-14T18:01:13,meta.llama3-8b-instruct-v1:0,3067,949614,53020,1002634,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_ga_brackets_labels.csv,(see logs index)
 20260114_180113,2026-01-14T18:07:53,meta.llama3-8b-instruct-v1:0,3067,939683,53024,992707,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_fr_brackets_labels.csv,(see logs index)
 20260115_133335,2026-01-15T13:33:50,meta.llama3-8b-instruct-v1:0,6,0,0,0,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_th_labels.csv,(see logs index)
+20260115_141336,2026-01-15T14:14:00,meta.llama3-8b-instruct-v1:0,9,0,0,0,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_raw_labels.csv,(see logs index)
+20260115_141415,2026-01-15T14:14:44,meta.llama3-8b-instruct-v1:0,9,3155,40,3195,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_raw_labels.csv,(see logs index)
+20260115_142844,2026-01-15T14:29:00,meta.llama3-8b-instruct-v1:0,5,1149,28,1177,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_eng_first_labels.csv,(see logs index)
+20260115_142903,2026-01-15T14:29:18,meta.llama3-8b-instruct-v1:0,5,1149,28,1177,0.000000,outputs\llm_label\trec_dl_2022\llama3-8b-instruct\llama3-8b-instruct_trecdl_2022_eng_first_labels.csv,(see logs index)
