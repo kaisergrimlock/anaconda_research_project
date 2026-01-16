@@ -54,7 +54,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANGS = ["vi_first", "th_first", "eng_first", "ru_first", "he_first", "ar_first", "sw_first", "ga_first", "fr_first"]  # e.g. ["raw", "vi_first", "enclosed", ...]
+LANGS = ["hi", "hi_first", "hi_last"]  # e.g. ["raw", "vi_first", "enclosed", ...]
 #LANGS = ["vi_brackets", "th_brackets", "eng_brackets", "ru_brackets", "he_brackets", "ar_brackets", "sw_brackets", "ga_brackets", "fr_brackets"]
 START_PART = 1
 END_PART = 6
@@ -64,7 +64,7 @@ MODE = "replace"  # "append" or "replace"
 # Models
 # "meta.llama3-8b-instruct-v1:0"
 # "qwen.qwen3-32b-v1:0"
-MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 

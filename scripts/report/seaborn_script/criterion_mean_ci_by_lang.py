@@ -13,10 +13,10 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "qwen3-32b-v1"
+MODEL = "gpt-oss-20b"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
-LANGS: list[str] = ["raw", "eng", "ru", "fr", "vi", "th", "sw", "ga"]
+LANGS: list[str] = ["raw", "eng", "ru", "fr", "vi", "th", "sw", "ga", "zh"]
 CRITERIA: list[str] = ["topicality", "coverage", "exactness", "contextuality"]
 
 VALID_LABELS = {0, 1, 2, 3}
