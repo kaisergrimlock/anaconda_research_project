@@ -12,12 +12,12 @@ import seaborn as sns
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
-MODEL = "gpt-oss-20b"
+TREC_DL_YEAR = "2022"
+MODEL = "qwen3-32b-v1"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
-LANGS: list[str] = ["raw", "eng", "ar", "ru", "fr", "vi", "th"]
-CRITERIA: list[str] = ["topicality", "contextuality", "coverage"]
+LANGS: list[str] = ["raw", "eng", "ru", "fr", "vi", "th", "sw", "ga"]
+CRITERIA: list[str] = ["topicality", "coverage", "exactness", "contextuality"]
 
 VALID_LABELS = {0, 1, 2, 3}
 
@@ -124,8 +124,15 @@ def build_common_valid_keys(langs: list[str], criteria: list[str]) -> set[str]:
                 missing_files.append(str(exc))
                 continue
 
+            total_rows = len(df)
             scores = pd.to_numeric(df[criterion], errors="coerce")
             valid_mask = scores.isin(VALID_LABELS)
+            valid_rows = int(valid_mask.sum())
+            print(
+                "[INFO] Loaded "
+                f"lang={lang!r}, criterion={criterion!r}: "
+                f"total_rows={total_rows}, valid_rows={valid_rows}"
+            )
 
             keys = (
                 df["qid"].astype(str).str.strip()
@@ -137,14 +144,26 @@ def build_common_valid_keys(langs: list[str], criteria: list[str]) -> set[str]:
             if common_keys is None:
                 common_keys = valid_keys
             else:
+                prev_size = len(common_keys)
                 common_keys = common_keys.intersection(valid_keys)
-
-            if not common_keys:
-                return set()
+                if not common_keys:
+                    raise ValueError(
+                        "No shared valid (qid,pid) keys across all files. "
+                        f"Intersection became empty at lang={lang!r}, "
+                        f"criterion={criterion!r}. "
+                        f"Current file valid keys={len(valid_keys)}, "
+                        f"previous intersection size={prev_size}."
+                    )
 
     if missing_files:
         for path in missing_files:
             print(f"[WARN] Missing file, skipping: {path}")
+
+    if common_keys is None:
+        raise ValueError(
+            "No files were loaded for intersection. "
+            f"Missing files: {missing_files or 'none'}"
+        )
 
     return common_keys or set()
 

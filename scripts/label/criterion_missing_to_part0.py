@@ -11,13 +11,13 @@ import pandas as pd
 # Config
 # =========================
 TREC_DL_YEAR = "2021"
-MODEL = "qwen3-32b-v1"
+MODEL = "llama3-8b-instruct"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "contextuality"
+CRITERION = "coverage"
 
 # Language filter (required). Only these languages will be processed.
-LANGS: list[str] = ["eng", "vi", "fr", "ar", "ru", "sw", "ga", "ar"]
+LANGS: list[str] = ["eng", "vi", "fr", "ar", "ru", "sw", "ga", "ar", "th"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"
