@@ -191,6 +191,42 @@ def write_combined_dynamic(
     out_dir.mkdir(parents=True, exist_ok=True)
     combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_labels.csv"
 
+    def same_columns(a: list[str], b: list[str]) -> bool:
+        return len(a) == len(b) and set(a) == set(b)
+
+    header_used = list(header_out)
+    reorder_incoming: Optional[list[int]] = None
+    incoming_to_used: Optional[list[tuple[int, int]]] = None
+    missing_from_incoming_idx: list[int] = []
+
+    if combined_path.exists():
+        existing_header = _inspect_header(combined_path)
+        if existing_header != header_out:
+            if same_columns(existing_header, header_out):
+                header_used = existing_header
+                reorder_incoming = [header_out.index(c) for c in header_used]
+                print(
+                    "[WARN] Combined header order differs; will align incoming rows to existing header."
+                )
+            elif mode == "replace" and set(existing_header).issuperset(header_out):
+                header_used = existing_header
+                incoming_idx = {c: i for i, c in enumerate(header_out)}
+                incoming_to_used = [
+                    (header_used.index(c), incoming_idx[c]) for c in header_out if c in incoming_idx
+                ]
+                missing_from_incoming_idx = [
+                    i for i, c in enumerate(header_used) if c not in incoming_idx
+                ]
+                print(
+                    "[WARN] Combined header has extra columns; will align incoming rows and preserve existing values."
+                )
+            else:
+                raise ValueError(
+                    f"Combined file header mismatch.\n"
+                    f"  got: {existing_header}\n"
+                    f"  exp: {header_out}"
+                )
+
     # -----------------------------
     # Key columns: qid + pid-like
     # -----------------------------
@@ -207,18 +243,21 @@ def write_combined_dynamic(
     if "qid" not in header_out:
         raise ValueError(f"Cannot do replace by qid+pid: missing 'qid' in header_out={header_out}")
 
-    pid_col = pick_pid_col(header_out)
-    qid_i = header_out.index("qid")
-    pid_i = header_out.index(pid_col)
+    pid_col = pick_pid_col(header_used)
+    qid_i = header_used.index("qid")
+    pid_i = header_used.index(pid_col)
 
-    llm_idx = header_out.index("llm_relevance") if "llm_relevance" in header_out else None
+    llm_idx = header_used.index("llm_relevance") if "llm_relevance" in header_used else None
+
+    def norm_row_len_to(r: list[str], n: int) -> list[str]:
+        if len(r) < n:
+            return r + [""] * (n - len(r))
+        if len(r) > n:
+            return r[:n]
+        return r
 
     def norm_row_len(r: list[str]) -> list[str]:
-        if len(r) < len(header_out):
-            return r + [""] * (len(header_out) - len(r))
-        if len(r) > len(header_out):
-            return r[: len(header_out)]
-        return r
+        return norm_row_len_to(r, len(header_used))
 
     def make_key(r: list[str]) -> str:
         r = norm_row_len(r)
@@ -262,6 +301,15 @@ def write_combined_dynamic(
                 )
 
             for r in reader:
+                r = norm_row_len_to(r, len(header_out))
+                if reorder_incoming:
+                    r = [r[i] for i in reorder_incoming]
+                if incoming_to_used:
+                    aligned = [""] * len(header_used)
+                    for used_i, in_i in incoming_to_used:
+                        if in_i < len(r):
+                            aligned[used_i] = r[in_i]
+                    r = aligned
                 r = norm_row_len(r)
                 incoming[make_key(r)] = r
 
@@ -271,7 +319,7 @@ def write_combined_dynamic(
     if not combined_path.exists():
         with combined_path.open("w", encoding="utf-8", newline="") as f_out:
             w = csv.writer(f_out)
-            w.writerow(header_out)
+            w.writerow(header_used)
             for r in incoming.values():
                 w.writerow(r)
         print(f"[WRITE] Created new combined file with {len(incoming)} rows: {combined_path}")
@@ -281,14 +329,6 @@ def write_combined_dynamic(
     # Append mode
     # -----------------------------
     if mode == "append":
-        existing_header = _inspect_header(combined_path)
-        if existing_header != header_out:
-            raise ValueError(
-                f"Combined file header mismatch.\n"
-                f"  got: {existing_header}\n"
-                f"  exp: {header_out}"
-            )
-
         with combined_path.open("a", encoding="utf-8", newline="") as f_out:
             w = csv.writer(f_out)
             for r in incoming.values():
@@ -302,14 +342,6 @@ def write_combined_dynamic(
     # -----------------------------
     if mode != "replace":
         raise ValueError(f"Unknown mode: {mode}")
-
-    existing_header = _inspect_header(combined_path)
-    if existing_header != header_out:
-        raise ValueError(
-            f"Combined file header mismatch.\n"
-            f"  got: {existing_header}\n"
-            f"  exp: {header_out}"
-        )
 
     tmp_path = combined_path.with_suffix(".tmp.csv")
 
@@ -326,7 +358,7 @@ def write_combined_dynamic(
         writer = csv.writer(f_out)
 
         _ = next(reader, None)  # skip header
-        writer.writerow(header_out)
+        writer.writerow(header_used)
 
         line_no = 1  # header is line 1
 
@@ -337,6 +369,10 @@ def write_combined_dynamic(
 
             if k in incoming:
                 new_row = norm_row_len(incoming[k])
+                if missing_from_incoming_idx:
+                    for i in missing_from_incoming_idx:
+                        if i < len(new_row) and (new_row[i] or "") == "":
+                            new_row[i] = old_row[i]
                 used_keys.add(k)
 
                 if llm_idx is not None:

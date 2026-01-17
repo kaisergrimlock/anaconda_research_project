@@ -16,14 +16,15 @@ TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
-LANGS: list[str] = ["raw", "eng", "ru", "fr", "vi", "th", "sw", "ga", "zh"]
+LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "th", "sw", "ga", "ar"]
+#LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "he", "th", "sw", "ga", "ar"]
 CRITERIA: list[str] = ["topicality", "coverage", "exactness", "contextuality"]
 
 VALID_LABELS = {0, 1, 2, 3}
 
 # Bootstrap CI settings
 CI_LEVEL = 95
-N_BOOT = 2000
+N_BOOT = 1000
 RNG_SEED = 7
 
 THIS_FILE = Path(__file__).resolve()

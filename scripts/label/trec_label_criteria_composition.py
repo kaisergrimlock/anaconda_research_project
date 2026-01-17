@@ -32,14 +32,14 @@ from scripts.log_helpers import timestamp_id
 # Config
 # ===============================================================
 
-TREC_DL_YEAR = "2022"
-LANG = "ga"                      # e.g. raw/eng/vi/ru/...
+TREC_DL_YEAR = "2021"
+LANG = "eng"                     # e.g. raw/eng/vi/ru/...
 START_PART = 1
 END_PART = 6
 MODE = "replace"                  # replace|append
 #MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
-#MODELS = ["openai.gpt-oss-20b-1:0"]
-MODELS = ["meta.llama3-8b-instruct-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
+MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 RELEVANCE_COL = "relevance"      # in criterion files
@@ -270,6 +270,12 @@ def start_stop_key_listener(loop, stop_event):
     t.start()
     return t
 
+def signal_stop(loop, stop_event):
+    if loop and stop_event:
+        loop.call_soon_threadsafe(stop_event.set)
+    elif stop_event:
+        stop_event.set()
+
 def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
@@ -278,6 +284,7 @@ def _label_single_part_file_blocking(
     out_dir: Path,
     logs_dir: Path,
     stop_event: Optional[asyncio.Event] = None,
+    loop: Optional[asyncio.AbstractEventLoop] = None,
 ):
     safe_model = model_id.replace(":", "_")
     header_in = _inspect_header(part_csv)
@@ -364,9 +371,11 @@ def _label_single_part_file_blocking(
 
         except Exception as e:
             print(f"[ERR] API failed on row {idx}: {e}")
+            signal_stop(loop, stop_event)
             txt = ""
             reasoning = ""
             in_tok = out_tok = 0
+            break
 
         row_values = [row_out_map.get(col, "") for col in header_out]
         try:
@@ -412,28 +421,122 @@ def write_combined(per_file_csvs, header_out, short, lang, year, mode, out_dir):
     lang_tag = f"{lang}_crit"
     combined = out_dir / f"{short}_trecdl_{year}_{lang_tag}_labels.csv"
 
+    def norm_row_len(r: list[str]) -> list[str]:
+        if len(r) < len(header_out):
+            return r + [""] * (len(header_out) - len(r))
+        if len(r) > len(header_out):
+            return r[: len(header_out)]
+        return r
 
-    if mode == "replace" or not combined.exists():
+    def make_key(r: list[str]) -> str:
+        r = norm_row_len(r)
+        qid = (r[qid_i] or "").strip()
+        pid = (r[pid_i] or "").strip()
+        return f"{qid}|{pid}"
+
+    def is_blank_or_nan_like(v: str) -> bool:
+        s = (v or "").strip()
+        if s == "":
+            return True
+        return s.lower() in {"nan", "none", "null"}
+
+    def should_preserve_old(old: str, new: str) -> bool:
+        old_s = (old or "").strip()
+        new_s = (new or "").strip()
+        return (old_s != "") and is_blank_or_nan_like(new_s)
+
+    def load_incoming() -> dict[str, list[str]]:
+        incoming: dict[str, list[str]] = {}
+        for p in per_file_csvs:
+            with open(p, "r", encoding="utf-8") as fin:
+                r = csv.reader(fin)
+                in_header = next(r, None)
+                if in_header is None:
+                    continue
+                if list(in_header) != list(header_out):
+                    raise ValueError(
+                        f"Inconsistent header in {p}.\n"
+                        f"  got: {in_header}\n"
+                        f"  exp: {header_out}"
+                    )
+                for row in r:
+                    row = norm_row_len(row)
+                    incoming[make_key(row)] = row
+        return incoming
+
+    if "qid" not in header_out or "pid" not in header_out:
+        raise ValueError(f"Cannot replace without qid+pid columns. header_out={header_out}")
+
+    qid_i = header_out.index("qid")
+    pid_i = header_out.index("pid")
+    rel_i = header_out.index("llm_relevance") if "llm_relevance" in header_out else None
+
+    incoming = load_incoming()
+
+    if mode == "replace":
+        if not combined.exists():
+            with combined.open("w", encoding="utf-8", newline="") as f:
+                w = csv.writer(f)
+                w.writerow(header_out)
+                for row in incoming.values():
+                    w.writerow(row)
+            return combined
+
+        existing_header = _inspect_header(combined)
+        if existing_header != header_out:
+            raise ValueError(
+                f"Combined file header mismatch.\n"
+                f"  got: {existing_header}\n"
+                f"  exp: {header_out}"
+            )
+
+        tmp_path = combined.with_suffix(".tmp.csv")
+        used_keys: set[str] = set()
+
+        with combined.open("r", encoding="utf-8", newline="") as f_in, tmp_path.open(
+            "w", encoding="utf-8", newline=""
+        ) as f_out:
+            reader = csv.reader(f_in)
+            writer = csv.writer(f_out)
+            _ = next(reader, None)
+            writer.writerow(header_out)
+
+            for old_row in reader:
+                old_row = norm_row_len(old_row)
+                k = make_key(old_row)
+                if k in incoming:
+                    new_row = norm_row_len(incoming[k])
+                    used_keys.add(k)
+                    if rel_i is not None and should_preserve_old(old_row[rel_i], new_row[rel_i]):
+                        new_row[rel_i] = old_row[rel_i]
+                    writer.writerow(new_row)
+                else:
+                    writer.writerow(old_row)
+
+            for k, row in incoming.items():
+                if k not in used_keys:
+                    writer.writerow(norm_row_len(row))
+
+        tmp_path.replace(combined)
+        return combined
+
+    if not combined.exists():
         with combined.open("w", encoding="utf-8", newline="") as f:
             w = csv.writer(f)
             w.writerow(header_out)
-            for p in per_file_csvs:
-                with open(p, "r", encoding="utf-8") as fin:
-                    r = csv.reader(fin)
-                    next(r, None)
-                    w.writerows(r)
-    else:
-        with combined.open("a", encoding="utf-8", newline="") as f:
-            w = csv.writer(f)
-            for p in per_file_csvs:
-                with open(p, "r", encoding="utf-8") as fin:
-                    r = csv.reader(fin)
-                    next(r, None)
-                    w.writerows(r)
+            for row in incoming.values():
+                w.writerow(row)
+        return combined
+
+    with combined.open("a", encoding="utf-8", newline="") as f:
+        w = csv.writer(f)
+        for row in incoming.values():
+            w.writerow(row)
 
     return combined
 
 async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
+    loop = asyncio.get_running_loop()
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
 
@@ -471,15 +574,24 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
             if stop_event.is_set():
                 return None
             return await label_single_part_file(
-                p, model_id, prompt_template, run_id, per_file_tmp, logs_dir, stop_event
+                p, model_id, prompt_template, run_id, per_file_tmp, logs_dir, stop_event, loop
             )
 
     tasks = [asyncio.create_task(task(p)) for p in part_files]
+    pending = set(tasks)
 
-    for t in asyncio.as_completed(tasks):
-        r = await t
-        if r:
-            results.append(r)
+    while pending:
+        if stop_event.is_set():
+            for t in pending:
+                t.cancel()
+            await asyncio.gather(*pending, return_exceptions=True)
+            break
+
+        done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=0.1)
+        for t in done:
+            r = t.result()
+            if r:
+                results.append(r)
 
     if not results:
         print("[INFO] No results to merge.")

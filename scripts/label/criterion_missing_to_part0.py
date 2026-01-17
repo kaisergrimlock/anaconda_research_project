@@ -10,14 +10,14 @@ import pandas as pd
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
-MODEL = "llama3-8b-instruct"
+TREC_DL_YEAR = "2022"
+MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "coverage"
+CRITERION = "topicality"
 
 # Language filter (required). Only these languages will be processed.
-LANGS: list[str] = ["eng", "vi", "fr", "ar", "ru", "sw", "ga", "ar", "th"]
+LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "th", "sw", "ga", "ar"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

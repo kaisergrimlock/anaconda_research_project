@@ -33,8 +33,10 @@ from scripts.log_helpers import timestamp_id
 # Config
 # ===============================================================
 
-TREC_DL_YEAR = "2022"
-LANGS = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh"]                  # e.g. ["raw", "eng", "vi", "ru", ...]
+TREC_DL_YEAR = "2021"
+LANGS = ["raw", "eng", "fr", "ru", "ar", "zh"]   #Batch class-5
+
+#LANGS = ["vi", "th"]                  # e.g. ["raw", "eng", "vi", "ru", ...]
 START_PART = 1
 END_PART = 6
 MODE = "replace"                  # replace|append
