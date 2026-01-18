@@ -63,17 +63,17 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANGS: list[str] =["raw", "fr"]    # batch over multiple languages; defaults to [LANG]
+LANGS: list[str] = ["hi"]   # batch over multiple languages; defaults to [LANG]
    # batch over multiple languages; defaults to [LANG]
-START_PART = 0
-END_PART = 0
-TREC_DL_YEAR = "2022"
+START_PART = 1
+END_PART = 6
+TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
-#CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
-CRITERION_KEYS = ["exactness"] 
+CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
+#CRITERION_KEYS = ["coverage"] 
 #CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
 
 # Input part files
@@ -81,10 +81,10 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # ===== Models =====
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["openai.gpt-oss-20b-1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 
-INFERENCE_CONFIG = {"maxTokens": 128000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -450,12 +450,24 @@ def _label_single_part_file_blocking(
         )
 
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs = {
-            "modelId": model_id,
-            "messages": messages,
-            "inferenceConfig": INFERENCE_CONFIG,
-            "system": [{"text": SYSTEM_PROMPT}],
-        }
+        kwargs = {}
+        if MODELS == "openai.gpt-oss-20b-1:0":
+            kwargs = {
+                "modelId": model_id,
+                "messages": messages,
+                "inferenceConfig": INFERENCE_CONFIG,
+                "system": [{"text": SYSTEM_PROMPT}],
+                "additionalModelRequestFields": {
+                    "reasoning_effort": "low",   # <- low / medium / high
+                },
+            }
+        else:
+            kwargs = {
+                "modelId": model_id,
+                "messages": messages,
+                "inferenceConfig": INFERENCE_CONFIG,
+                "system": [{"text": SYSTEM_PROMPT}],
+            }
 
         text = ""
         score = ""

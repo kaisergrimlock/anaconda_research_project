@@ -10,15 +10,15 @@ import pandas as pd
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "exactness"
+CRITERION = "coverage"
 
 # Language filter (required). Only these languages will be processed.
 #LANGS: list[str] = ["sw"]
-LANGS: list[str] = ["ga", "sw", "zh", "ar", "he", "th", "vi", "ru", "fr", "raw", "eng"]
+LANGS: list[str] = ["ar", "he", "th", "vi", "ru", "fr", "raw", "eng"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

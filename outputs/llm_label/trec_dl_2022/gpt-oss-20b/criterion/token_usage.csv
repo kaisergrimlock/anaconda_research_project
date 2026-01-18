@@ -151,3 +151,7 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260118_151932,2026-01-18T15:22:29,openai.gpt-oss-20b-1:0,2,10207,517,10724,0.000870,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_raw_topicality_labels.csv,(see logs index)
 20260118_152356,2026-01-18T15:29:15,openai.gpt-oss-20b-1:0,1,284,128000,128284,0.038420,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_raw_exactness_labels.csv,(see logs index)
 20260118_152915,2026-01-18T15:32:55,openai.gpt-oss-20b-1:0,1,297,128000,128297,0.038421,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_fr_exactness_labels.csv,(see logs index)
+20260118_163740,2026-01-18T16:39:50,openai.gpt-oss-20b-1:0,1,284,234,518,0.000090,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_raw_exactness_labels.csv,(see logs index)
+20260118_163951,2026-01-18T16:45:23,openai.gpt-oss-20b-1:0,1,297,386,683,0.000137,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_fr_exactness_labels.csv,(see logs index)
+20260118_164741,2026-01-18T16:49:19,openai.gpt-oss-20b-1:0,1,288,176,464,0.000073,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_raw_coverage_labels.csv,(see logs index)
+20260118_164919,2026-01-18T16:52:01,openai.gpt-oss-20b-1:0,5,51125,514,51639,0.003733,outputs\llm_label\trec_dl_2022\gpt-oss-20b\criterion\gpt-oss-20b_trecdl_2022_ru_coverage_labels.csv,(see logs index)

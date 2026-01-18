@@ -23,9 +23,9 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_first"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -45,10 +45,10 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng", "eng_vi", "eng", "vi_th", "vi"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_mult", "vi_mult"]
 #LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last"]
-LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first"]
+#LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first"]
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
 
-#LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh"] # if empty, allow all langs found
+LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"] # if empty, allow all langs found
 #LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "ko", "ko_corrected"]  # if empty, allow all langs found
 METRIC = "mean_diff"
 KEY_COLS = ["qid", "pid"]
@@ -390,7 +390,7 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
-    ax.set_xlim(-0.1, 1.6)
+    ax.set_xlim(-0.1, 1.75)
 
 
     plt.tight_layout()

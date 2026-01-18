@@ -56,10 +56,10 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"]
 
 #Lang
-#LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh"]
+LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"]
 
 #corrected
-LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "he", "he_corrected", "ar", "ar_corrected"]
+#LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "he", "he_corrected", "ar", "ar_corrected"]
 
 METRIC = "mean_diff"
 

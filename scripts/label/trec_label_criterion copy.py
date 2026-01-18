@@ -63,15 +63,15 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "vi"          # "raw", "vi", "sw_trans_p", "enclosed", ...
-START_PART = 1
-END_PART = 6
+LANG = "ga"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2021"
 MODE = "append"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
-CRITERION_KEYS = ["contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
+CRITERION_KEYS = ["coverage"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
 #CRITERION_KEYS = ["exactness"] 
 #CRITERION_KEYS = ["contextuality", "topicality", "coverage"] 
 

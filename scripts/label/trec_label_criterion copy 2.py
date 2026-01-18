@@ -63,16 +63,16 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "ga"          # "raw", "vi", "sw_trans_p", "enclosed", ...
-START_PART = 1
-END_PART = 6
+LANG = "zh"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
 #CRITERION_KEYS = ["coverage"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
-CRITERION_KEYS = ["topicality"] 
+CRITERION_KEYS = ["contextuality"] 
 #CRITERION_KEYS = ["contextuality", "topicality", "coverage"] 
 
 # Input part files
@@ -88,7 +88,7 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]
 
-INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 128000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -448,12 +448,25 @@ def _label_single_part_file_blocking(
         )
 
         messages = [{"role": "user", "content": [{"text": prompt}]}]
-        kwargs = {
-            "modelId": model_id,
-            "messages": messages,
-            "inferenceConfig": INFERENCE_CONFIG,
-            "system": [{"text": SYSTEM_PROMPT}],
-        }
+
+        kwargs = {}
+        if MODELS == "openai.gpt-oss-20b-1:0":
+            kwargs = {
+                "modelId": model_id,
+                "messages": messages,
+                "inferenceConfig": INFERENCE_CONFIG,
+                "system": [{"text": SYSTEM_PROMPT}],
+                "additionalModelRequestFields": {
+                    "reasoning_effort": "low",   # <- low / medium / high
+                },
+            }
+        else:
+            kwargs = {
+                "modelId": model_id,
+                "messages": messages,
+                "inferenceConfig": INFERENCE_CONFIG,
+                "system": [{"text": SYSTEM_PROMPT}],
+            }
 
         text = ""
         score = ""
