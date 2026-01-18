@@ -14,10 +14,11 @@ TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "topicality"
+CRITERION = "exactness"
 
 # Language filter (required). Only these languages will be processed.
-LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "th", "sw", "ga", "ar"]
+#LANGS: list[str] = ["sw"]
+LANGS: list[str] = ["ga", "sw", "zh", "ar", "he", "th", "vi", "ru", "fr", "raw", "eng"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

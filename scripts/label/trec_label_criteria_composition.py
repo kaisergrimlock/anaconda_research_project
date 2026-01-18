@@ -33,7 +33,7 @@ from scripts.log_helpers import timestamp_id
 # ===============================================================
 
 TREC_DL_YEAR = "2021"
-LANG = "eng"                     # e.g. raw/eng/vi/ru/...
+LANG = "he"                     # e.g. raw/eng/vi/ru/...
 START_PART = 1
 END_PART = 6
 MODE = "replace"                  # replace|append

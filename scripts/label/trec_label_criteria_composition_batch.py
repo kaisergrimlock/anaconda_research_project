@@ -34,14 +34,14 @@ from scripts.log_helpers import timestamp_id
 # ===============================================================
 
 TREC_DL_YEAR = "2021"
-LANGS = ["raw", "eng", "fr", "ru", "ar", "zh"]   #Batch class-5
-
+#LANGS = ["raw", "eng", "fr", "ru", "ar", "zh"]   #Batch class-5
+LANGS = ["ga", "sw"]
 #LANGS = ["vi", "th"]                  # e.g. ["raw", "eng", "vi", "ru", ...]
 START_PART = 1
 END_PART = 6
 MODE = "replace"                  # replace|append
-#MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
-MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
+#MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]

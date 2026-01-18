@@ -63,16 +63,17 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANGS: list[str] = ["sw", "ga", "ar"]     # batch over multiple languages; defaults to [LANG]
-START_PART = 1
-END_PART = 6
-TREC_DL_YEAR = "2021"
+LANGS: list[str] =["raw", "fr"]    # batch over multiple languages; defaults to [LANG]
+   # batch over multiple languages; defaults to [LANG]
+START_PART = 0
+END_PART = 0
+TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
-CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
-#CRITERION_KEYS = ["contextuality"] 
+#CRITERION_KEYS = ["exactness", "topicality", "coverage", "contextuality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
+CRITERION_KEYS = ["exactness"] 
 #CRITERION_KEYS = ["exactness", "topicality", "coverage"] 
 
 # Input part files
