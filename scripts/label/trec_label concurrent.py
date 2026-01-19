@@ -57,14 +57,16 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "hi_first"          # "raw", "vi", "enclosed", ...
-START_PART = 1
-END_PART = 6
+LANG = "sw_last"          # "raw", "vi", "enclosed", ...
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2022"
 MODE = "replace"           # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
+
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
@@ -75,7 +77,10 @@ LOG_ROOT_DIR = Path("logs")
 # ===== Concurrency knobs =====
 # Part-level concurrency is handled by asyncio semaphore in run_for_model().
 # Row-level concurrency here speeds up Bedrock calls massively.
-ROW_CONCURRENCY = 50
+if MODELS[0].startswith("meta.llama3"):
+    ROW_CONCURRENCY = 1
+else:
+    ROW_CONCURRENCY = 50
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 # Input part files

@@ -16,17 +16,19 @@ import seaborn as sns
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
 
-YEAR = "2021"
+YEAR = "2022"
 INCLUDE_VARIANTS = ["base"]
 INPUT_ROOT = PROJECT_ROOT / "outputs" / "token"
 OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR / f"avg_fertility_by_lang_model_{INCLUDE_VARIANTS[0]}_{YEAR}_ci95_only.pdf"
 OUTPUT_PNG = PROJECT_ROOT / "figures" / f"avg_fertility_by_lang_model_{YEAR}_ci95_only.png"
 
 AUTO_DISCOVER_MODELS = True
-MODELS = ["llama", "qwen"]
+MODELS = ["llama", "qwen", "gpt"]
 
 FERTILITY_COL = "fertility_score"
 TAXONOMY_CSV = PROJECT_ROOT / "scripts" / "report" / "seaborn_script" / "lang.csv"
+EXCLUDE_LANGS = {"All"}
+EXCLUDE_LANGS_NORM = {l.strip().casefold() for l in EXCLUDE_LANGS}
 
 # CI settings (bootstrap percentile CI for the mean)
 CI_LEVEL = 95
@@ -210,7 +212,11 @@ def build_raw_df() -> pd.DataFrame:
             "No matching CSVs found. Check YEAR, INPUT_ROOT, INCLUDE_VARIANTS, and filenames."
         )
 
-    return pd.concat(frames, ignore_index=True)
+    raw_df = pd.concat(frames, ignore_index=True)
+    if EXCLUDE_LANGS_NORM:
+        lang_norm = raw_df["lang"].astype(str).str.strip().str.casefold()
+        raw_df = raw_df[~lang_norm.isin(EXCLUDE_LANGS_NORM)]
+    return raw_df
 
 
 def bootstrap_ci_mean(

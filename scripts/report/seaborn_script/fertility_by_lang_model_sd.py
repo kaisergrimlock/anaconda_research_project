@@ -26,6 +26,8 @@ MODELS = ["gpt", "qwen", "llama"]
 
 FERTILITY_COL = "fertility_score"
 TAXONOMY_CSV = PROJECT_ROOT / "scripts" / "report" / "seaborn_script" / "lang.csv"
+EXCLUDE_LANGS = {"All"}
+EXCLUDE_LANGS_NORM = {l.strip().casefold() for l in EXCLUDE_LANGS}
 
 # Plot settings
 Y_MIN: float | None = 1.0  # set to None to auto-scale
@@ -54,7 +56,7 @@ SEPARATOR_LINEWIDTH = 0.8
 #   - Compare base vs word: ["base", "word"]
 #   - Compare base vs first: ["base", "first"]
 #   - Compare base vs word vs first: ["base", "word", "first"]
-INCLUDE_VARIANTS = ["first"]  # change to ["base","word","first"] when needed
+INCLUDE_VARIANTS = ["base"]  # change to ["base","word","first"] when needed
 
 # Display strategy:
 # - True: x-axis categories are (lang,variant) e.g. "ga", "ga_word", "ga_first"
@@ -198,7 +200,11 @@ def build_raw_df() -> pd.DataFrame:
             "No matching CSVs found. Check YEAR, INPUT_ROOT, INCLUDE_VARIANTS, and filenames."
         )
 
-    return pd.concat(frames, ignore_index=True)
+    raw_df = pd.concat(frames, ignore_index=True)
+    if EXCLUDE_LANGS_NORM:
+        lang_norm = raw_df["lang"].astype(str).str.strip().str.casefold()
+        raw_df = raw_df[~lang_norm.isin(EXCLUDE_LANGS_NORM)]
+    return raw_df
 
 
 def summarize_sd(raw_df: pd.DataFrame) -> pd.DataFrame:

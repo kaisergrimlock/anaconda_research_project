@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 # ============================================================
 # Config
 # ============================================================
-YEAR = "2021"
+YEAR = "2022"
 
 # Run one or many langs at once:
 LANGS: List[str] = ["eng", "ar", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]

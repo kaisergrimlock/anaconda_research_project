@@ -14,7 +14,7 @@ TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "coverage"
+CRITERION = "topicality"
 
 # Language filter (required). Only these languages will be processed.
 #LANGS: list[str] = ["sw"]
@@ -79,6 +79,37 @@ def header_matches(path: Path, cols: list[str]) -> bool:
     return existing == cols
 
 
+def expected_columns_for_lang(lang: str) -> list[str]:
+    if lang == "raw":
+        return ["qid", "query", "pid", "passage", "relevance"]
+    return [
+        "qid",
+        "query",
+        "pid",
+        "passage",
+        "relevance",
+        f"query_{lang}",
+        "passage_injected",
+    ]
+
+
+def ensure_expected_columns(df: pd.DataFrame, lang: str, expected_cols: list[str]) -> pd.DataFrame:
+    df = df.copy()
+    if "passage" in expected_cols and "passage" not in df.columns:
+        judged_path = part0_path_for_lang("raw")
+        if judged_path.exists():
+            passage_df = pd.read_csv(judged_path, usecols=["qid", "pid", "passage"])
+            df = df.merge(passage_df, on=["qid", "pid"], how="left")
+        else:
+            df["passage"] = ""
+        if "passage" in df.columns:
+            df["passage"] = df["passage"].fillna("")
+    for col in expected_cols:
+        if col not in df.columns:
+            df[col] = ""
+    return df[expected_cols]
+
+
 def main() -> None:
     if not CRITERION_DIR.exists():
         print(f"[FATAL] Criterion dir not found: {CRITERION_DIR}")
@@ -126,6 +157,8 @@ def main() -> None:
 
         # Drop criterion column so the part0 file matches input format for re-runs.
         missing_df = missing_df.drop(columns=[criterion], errors="ignore")
+        expected_cols = expected_columns_for_lang(lang)
+        missing_df = ensure_expected_columns(missing_df, lang, expected_cols)
 
         out_path = part0_path_for_lang(lang)
         out_path.parent.mkdir(parents=True, exist_ok=True)
