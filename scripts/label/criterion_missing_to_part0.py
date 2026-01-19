@@ -18,7 +18,7 @@ CRITERION = "coverage"
 
 # Language filter (required). Only these languages will be processed.
 #LANGS: list[str] = ["sw"]
-LANGS: list[str] = ["ar", "he", "th", "vi", "ru", "fr", "raw", "eng"]
+LANGS: list[str] = ["ar", "he", "th", "vi", "ru", "fr", "raw", "eng", "zh", "hi"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"

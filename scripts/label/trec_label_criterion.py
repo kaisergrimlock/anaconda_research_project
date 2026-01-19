@@ -26,6 +26,8 @@ from scripts.csv_helpers import (
     # pick_passage_for_lang,  # <-- no longer needed
     model_short_name,
     _inspect_header,
+    base_trec_cols,
+    extra_trec_cols_for_lang,
 )
 from scripts.log_helpers import (
     timestamp_id,
@@ -63,15 +65,15 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "zh"          # "raw", "vi", "sw_trans_p", "enclosed", ...
-START_PART = 4
+LANG = "hi"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
 
 # Single “selector” variable: which criterion to use (by name)
 # This should match the name in criteria.csv (case-insensitive match)
-CRITERION_KEYS = ["contextuality", "coverage", "topicality"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
+CRITERION_KEYS = ["contextuality", "coverage", "topicality", "exactness"]   # e.g. "exactness", "topicality", "coverage", "contextuality"..
 #CRITERION_KEYS = ["exactness"] 
 #CRITERION_KEYS = ["contextuality", "topicality", "coverage"] 
 
@@ -85,8 +87,8 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # ===== Models =====
 
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["openai.gpt-oss-20b-1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -265,20 +267,44 @@ def usage_from_resp(resp: dict) -> Tuple[int, int]:
     return int(u.get("inputTokens", 0) or 0), int(u.get("outputTokens", 0) or 0)
 
 
-def read_rows_stream(path: Path):
+def read_rows_stream(
+    path: Path,
+    header_override: Optional[List[str]] = None,
+    has_header: bool = True,
+):
     f = path.open("r", encoding="utf-8", newline="")
-    reader = csv.DictReader(f, skipinitialspace=True)
     try:
+        if header_override is None:
+            reader = csv.DictReader(f, skipinitialspace=True)
+            for row in reader:
+                yield row
+            return
+
+        reader = csv.reader(f)
+        if has_header:
+            next(reader, None)
+        header = list(header_override)
         for row in reader:
-            yield row
+            row = list(row)
+            if len(row) < len(header):
+                row += [""] * (len(header) - len(row))
+            elif len(row) > len(header):
+                row = row[: len(header)]
+            yield {header[i]: row[i] for i in range(len(header))}
     finally:
         f.close()
 
 
-def count_data_rows(path: Path) -> int:
+def count_data_rows(path: Path, has_header: bool = True) -> int:
     with path.open("r", encoding="utf-8", newline="") as f:
-        # total lines minus header
-        return max(0, sum(1 for _ in f) - 1)
+        lines = sum(1 for _ in f)
+        if has_header:
+            return max(0, lines - 1)
+        return lines
+
+
+def default_header_for_lang(lang: str) -> List[str]:
+    return base_trec_cols() + extra_trec_cols_for_lang(lang)
 
 
 def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
@@ -326,6 +352,8 @@ def _label_single_part_file_blocking(
     logs_dir.mkdir(parents=True, exist_ok=True)
 
     header_in = _inspect_header(part_csv)
+    header_override: Optional[List[str]] = None
+    has_header = True
 
     # ===== Minimal required columns =====
     required_cols = ["query"]
@@ -335,16 +363,30 @@ def _label_single_part_file_blocking(
         required_cols.append("passage_injected")
 
     # NEW: also require the relevance column to be present
-    if RELEVANCE_COL not in header_in:
+    missing_required = [c for c in required_cols if c not in header_in]
+    missing_relevance = RELEVANCE_COL not in header_in
+    is_part0 = part_csv.stem.endswith("part0")
+
+    if is_part0 and (missing_required or missing_relevance):
+        header_in = default_header_for_lang(LANG)
+        header_override = header_in
+        has_header = False
+        missing_required = [c for c in required_cols if c not in header_in]
+        missing_relevance = RELEVANCE_COL not in header_in
+        print(
+            f"[WARN] {part_csv.name}: falling back to default header for part0. "
+            f"header={header_in}"
+        )
+
+    if missing_relevance:
         print(
             f"[FATAL] {part_csv.name}: missing required relevance column "
             f"'{RELEVANCE_COL}'. Available columns: {header_in}"
         )
         sys.exit(2)
 
-    missing = [c for c in required_cols if c not in header_in]
-    if missing:
-        print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
+    if missing_required:
+        print(f"[FATAL] {part_csv.name}: missing required columns {missing_required}.")
         sys.exit(2)
 
     # ===== Output header = input header + criterion column,
@@ -378,7 +420,7 @@ def _label_single_part_file_blocking(
     total_in = total_out = 0
     logs: List[Dict[str, Any]] = []
 
-    total_rows = count_data_rows(part_csv)
+    total_rows = count_data_rows(part_csv, has_header=has_header)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
     print(f"[HEADER] LANG='{LANG}' | output columns = {header_out}")
 
@@ -389,7 +431,10 @@ def _label_single_part_file_blocking(
         with path.open("a", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(new_row)
 
-    for idx, row in enumerate(read_rows_stream(part_csv), start=1):
+    for idx, row in enumerate(
+        read_rows_stream(part_csv, header_override=header_override, has_header=has_header),
+        start=1,
+    ):
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}")
             break

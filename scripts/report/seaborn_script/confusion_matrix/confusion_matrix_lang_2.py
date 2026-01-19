@@ -30,8 +30,8 @@ from helpers.metrics_llm import (
 
 # -------- Config --------
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b-1:0"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG = "hi" # "raw","eng","vi","fr", etc.
+MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
+LANG = "hi_last" # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance

@@ -63,9 +63,9 @@ CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
 RELEVANCE_COL = "relevance"   # change this if your relevance column has a different name
 
 # ===== Data / run config =====
-LANG = "ga"          # "raw", "vi", "sw_trans_p", "enclosed", ...
-START_PART = 0
-END_PART = 0
+LANG = "hi"          # "raw", "vi", "sw_trans_p", "enclosed", ...
+START_PART = 1
+END_PART = 6
 TREC_DL_YEAR = "2021"
 MODE = "append"       # "append" or "replace"
 

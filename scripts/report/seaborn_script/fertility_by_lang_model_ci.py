@@ -23,7 +23,7 @@ OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR / f"avg_fertility_by_lang_model_{IN
 OUTPUT_PNG = PROJECT_ROOT / "figures" / f"avg_fertility_by_lang_model_{YEAR}_ci95_only.png"
 
 AUTO_DISCOVER_MODELS = True
-MODELS = ["gpt", "qwen", "llama"]
+MODELS = ["llama", "qwen"]
 
 FERTILITY_COL = "fertility_score"
 TAXONOMY_CSV = PROJECT_ROOT / "scripts" / "report" / "seaborn_script" / "lang.csv"

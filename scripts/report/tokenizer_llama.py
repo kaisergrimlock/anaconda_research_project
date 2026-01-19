@@ -11,13 +11,22 @@ from transformers import AutoTokenizer
 # from huggingface_hub import login
 # login()  # or login(token="...")
 
+from huggingface_hub import login
+
+TOKEN_PATH = Path(__file__).with_name("token.txt")
+if TOKEN_PATH.exists():
+    token = TOKEN_PATH.read_text(encoding="utf-8").strip()
+    if token:
+        login(token=token)
+
+
 # ============================================================
 # Config
 # ============================================================
 YEAR = "2022"
 
 # Run one or many langs at once:
-LANGS: List[str] = ["ga_first", "ru_first", "he_first", "eng_first", "vi_first", "fr_first", "ar_first", "sw_first", "th_first"]
+LANGS: List[str] = ["eng", "ar", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
 
 
 PART_MIN = 1

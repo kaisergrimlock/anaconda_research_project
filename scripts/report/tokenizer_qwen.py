@@ -13,9 +13,7 @@ from transformers import AutoTokenizer
 YEAR = "2022"
 
 # Run one or many langs at once:
-LANGS: List[str] = [
-    "he_first", "ar_first", "ru_first", "eng_first", "vi_first", "th_first", "fr_first", "sw_first", "ga_first"
-]
+LANGS: List[str] = ["eng", "ar", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
 
 PART_MIN = 1
 PART_MAX = 6

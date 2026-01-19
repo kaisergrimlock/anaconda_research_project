@@ -7,6 +7,10 @@ from typing import Any, Dict, Tuple, Optional
 
 import boto3
 from botocore.config import Config
+import boto3
+from botocore.exceptions import ProfileNotFound
+
+AWS_REGION = "us-west-2"
 
 
 @dataclass(frozen=True)
@@ -20,8 +24,13 @@ class BedrockResult:
 
 
 def make_bedrock_runtime_client(cfg: Config):
+    try:
+        session = boto3.Session(profile_name="rmit", region_name=AWS_REGION)
+    except ProfileNotFound:
+        session = boto3.Session(region_name=AWS_REGION)
+
     """Create a Bedrock Runtime client using the provided botocore Config."""
-    return boto3.client("bedrock-runtime", config=cfg)
+    return session.client("bedrock-runtime")
 
 
 def parse_llm_text_to_score(text: str) -> str:

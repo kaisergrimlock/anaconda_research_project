@@ -13,10 +13,10 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "gpt-oss-20b"
+MODEL = "llama3-8b-instruct"  # e.g. "qwen.qwen3-32b-v1", "openai.gpt-oss-20b-1", "llama3-8b-instruct"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
-LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "th", "sw", "ga", "ar"]
+LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "th", "sw", "ga", "ar", "hi"]
 #LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "he", "th", "sw", "ga", "ar"]
 CRITERIA: list[str] = ["topicality", "coverage", "exactness", "contextuality"]
 
