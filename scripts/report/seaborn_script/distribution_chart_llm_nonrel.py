@@ -29,7 +29,7 @@ LABEL_DIR = Path("outputs") / "llm_label" / f"trec_dl_{TREC_DL_YEAR}" / MODEL
 
 # Only keep these “language” variants.-
 # Set to [] or None to include all non-raw files.
-TARGET_LANGS: Optional[List[str]] = ["vi", "th", "th_corrected", "vi_corrected", "ar", "ar_corrected", "he", "he_corrected"]
+TARGET_LANGS: Optional[List[str]] = ["eng", "ar", "ru", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
 #TARGET_LANGS: List[str] = ["eng", "eng_word", "fr", "fr_word", "ru", "ru_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word"]
 
 # Relevance scores used by the models

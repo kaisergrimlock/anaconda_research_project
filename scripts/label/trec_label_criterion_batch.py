@@ -63,14 +63,14 @@ RELEVANCE_COL = "relevance"   # change if needed
 # Data / run config
 # =========================
 # Batch languages (e.g. ["raw", "vi", ...])
-LANGS = ["eng", "fr", "zh", "vi"," th"]
+LANGS = ["sw", "ga"]
 START_PART = 0
 END_PART = 0
 TREC_DL_YEAR = "2021"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["topicality"]
+CRITERION_KEYS = ["contextuality"]
 
 # Input part files
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"

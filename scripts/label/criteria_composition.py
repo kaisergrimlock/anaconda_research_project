@@ -200,6 +200,9 @@ def save_cache(data: RowDict) -> None:
             writer.writeheader()
             for row in part_rows:
                 out_row = {fn: row.get(fn, "") for fn in fieldnames}
+                for criterion in CRITERIA:
+                    if not out_row.get(criterion):
+                        out_row[criterion] = "NaN"
                 writer.writerow(out_row)
 
         print(f"  Wrote rows {start}–{end-1} to {part_path.name}")

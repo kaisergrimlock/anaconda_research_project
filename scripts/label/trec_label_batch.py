@@ -54,7 +54,7 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANGS = ["hi_first", "hi_last"]
+LANGS = ["sw", "ga"]
 #LANGS = ["vi_first", "th_first", "eng_first", "ru_first", "he_first", "ar_first", "sw_first", "ga_first", "fr_first"]  # e.g. ["raw", "vi_first", "enclosed", ...]
 #LANGS = ["vi_brackets", "th_brackets", "eng_brackets", "ru_brackets", "he_brackets", "ar_brackets", "sw_brackets", "ga_brackets", "fr_brackets"]
 START_PART = 0

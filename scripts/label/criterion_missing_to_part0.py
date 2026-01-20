@@ -14,11 +14,11 @@ TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "topicality"
+CRITERION = "contextuality"
 
 # Language filter (required). Only these languages will be processed.
 #LANGS: list[str] = ["sw"]
-LANGS: list[str] = ["ar", "he", "th", "vi", "ru", "fr", "raw", "eng", "zh", "hi"]
+LANGS: list[str] = ["ar", "he", "th", "vi", "ru", "raw", "hi", "fr", "sw", "zh", "ga"]
 
 # Output mode for part0 files
 MODE = "replace"  # "replace" or "append"
@@ -98,7 +98,11 @@ def ensure_expected_columns(df: pd.DataFrame, lang: str, expected_cols: list[str
     if "passage" in expected_cols and "passage" not in df.columns:
         judged_path = part0_path_for_lang("raw")
         if judged_path.exists():
-            passage_df = pd.read_csv(judged_path, usecols=["qid", "pid", "passage"])
+            passage_df = pd.read_csv(
+                judged_path,
+                usecols=["qid", "pid", "passage"],
+                dtype={"qid": "string", "pid": "string"},
+            )
             df = df.merge(passage_df, on=["qid", "pid"], how="left")
         else:
             df["passage"] = ""
@@ -142,7 +146,7 @@ def main() -> None:
         if CRITERION and criterion != CRITERION:
             continue
 
-        df = pd.read_csv(path)
+        df = pd.read_csv(path, dtype={"qid": "string", "pid": "string"})
         if criterion not in df.columns:
             print(f"[WARN] Column {criterion!r} missing in {path.name}, skipping.")
             continue
