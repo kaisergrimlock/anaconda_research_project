@@ -32,7 +32,7 @@ from scripts.log_helpers import timestamp_id
 # Config
 # ===============================================================
 
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LANG = "he"                     # e.g. raw/eng/vi/ru/...
 START_PART = 1
 END_PART = 6

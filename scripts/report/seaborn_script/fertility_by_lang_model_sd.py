@@ -15,7 +15,7 @@ import seaborn as sns
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
 
-YEAR = "2021"
+YEAR = "2022"
 INPUT_ROOT = PROJECT_ROOT / "outputs" / "token"
 
 OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR / f"avg_fertility_by_lang_model_base_{YEAR}_sd_only.pdf"

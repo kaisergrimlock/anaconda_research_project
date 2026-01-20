@@ -34,14 +34,15 @@ from scripts.log_helpers import timestamp_id
 # ===============================================================
 # Config
 # ===============================================================
+#Finished qwen
 
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 # LANGS = ["raw", "eng", "fr", "ru", "ar", "zh"]   # Batch class-5
-LANGS = ["raw", "eng", "fr", "ru", "ar", "zh", "vi", "hi", "he", "th", "sw", "ga"]  # Full set
+LANGS = ["he"]  # Full set
 START_PART = 1
 END_PART = 6
 MODE = "replace"
-MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 RELEVANCE_COL = "relevance"  # in criterion files

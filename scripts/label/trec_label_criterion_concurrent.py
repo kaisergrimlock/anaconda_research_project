@@ -62,14 +62,14 @@ RELEVANCE_COL = "relevance"   # change if needed
 # =========================
 # Data / run config
 # =========================
-LANG = "sw"          # "raw", "vi", ...
-START_PART = 0
-END_PART = 0
-TREC_DL_YEAR = "2021"
+LANG = "he"          # "raw", "vi", ...
+START_PART = 1
+END_PART = 6
+TREC_DL_YEAR = "2022"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["exactness"]  # e.g. ["contextuality"]
+CRITERION_KEYS = ["coverage", "exactness"]  # e.g. ["contextuality"]
 
 # Input part files
 if LANG == "raw":

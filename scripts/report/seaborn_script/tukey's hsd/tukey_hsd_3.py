@@ -23,9 +23,9 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_corrected"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_mult"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -51,7 +51,7 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
 
 #Crit
-#LANGS: List[str] =["raw", "raw_crit", "eng", "eng_crit", "ar", "ar_crit", "fr", "fr_crit", "ru", "ru_crit"]
+LANGS: List[str] =["raw", "raw_crit", "eng", "eng_crit", "ar", "ar_crit", "fr", "fr_crit", "ru", "ru_crit", "zh_crit", "zh", "vi", "vi_crit", "hi", "hi_crit", "he", "he_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
 
 #LANGS: List[str] = ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"]
 
@@ -62,7 +62,7 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "he", "he_corrected", "ar", "ar_corrected"]
 
 
-LANGS: List[str] = ["raw", "eng", "eng_mult", "eng_mult_2"]
+#LANGS: List[str] = ["raw", "eng", "eng_mult_2", "eng_mult_3"]
 
 METRIC = "mean_diff"
 
@@ -251,7 +251,8 @@ def main() -> None:
     dropped = [g for g in counts.index if g not in set(keep_groups)]
     long_df = long_df[long_df["group"].isin(keep_groups)].copy()
 
-    if long_df["group"].nunique() < 2:
+    group_count = long_df["group"].nunique()
+    if group_count < 2:
         raise RuntimeError("Not enough (model,lang) groups with >=2 samples to run Tukey.")
 
     # Save samples for reproducibility
@@ -284,7 +285,10 @@ def main() -> None:
     # =========================
     # Step 8b: Plot simultaneous confidence intervals
     # =========================
-    fig, ax = plt.subplots(figsize=(10, 8))
+    base_height = 20.0
+    height_per_group = 2.5
+    fig_height = 100.0
+    fig, ax = plt.subplots(figsize=(10, fig_height))
     tukey.plot_simultaneous(ax=ax)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
@@ -298,6 +302,8 @@ def main() -> None:
     )
     taxonomy_legend(ax, level_to_rgba=level_palette, title="Taxonomy level", loc="upper left")
     center_x_axis_at_zero(ax)
+    ax.set_xlim(-0.1, 1.75)
+    ax.tick_params(axis="y", pad=12, labelsize=6)
 
     # Axis labels and title
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
