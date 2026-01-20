@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import os
 import sys
 from pathlib import Path
 from typing import Iterable
@@ -89,7 +90,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Fix CSV so each row is on a single line by removing newlines inside fields."
     )
-    parser.add_argument("input_csv", type=Path)
+    parser.add_argument("input_csv", type=Path, nargs="?")
     parser.add_argument("-o", "--output", type=Path, default=None)
     parser.add_argument("--inplace", action="store_true", help="Overwrite the input file.")
     parser.add_argument("--delimiter", default=None, help="Override CSV delimiter.")
@@ -104,11 +105,29 @@ def main() -> int:
 
     args = parser.parse_args()
 
+    env_input = os.getenv("CSV_FIX_INPUT")
+    env_input_dir = os.getenv("CSV_FIX_INPUT_DIR")
+    env_output = os.getenv("CSV_FIX_OUTPUT")
+    env_output_dir = os.getenv("CSV_FIX_OUTPUT_DIR")
+
+    in_path = args.input_csv or (Path(env_input) if env_input else None)
+    if in_path is None:
+        print(
+            "[ERROR] Missing input CSV. Provide it as an argument or set CSV_FIX_INPUT / CSV_FIX_INPUT_DIR."
+        )
+        return 2
+
+    if env_input_dir and not in_path.is_absolute():
+        in_path = Path(env_input_dir) / in_path
+
+    out_arg = args.output or (Path(env_output) if env_output else None)
+    if out_arg is None and env_output_dir:
+        out_arg = Path(env_output_dir) / in_path.name
+
     if "\n" in args.newline_replacement or "\r" in args.newline_replacement:
         print("[ERROR] --newline-replacement must not contain newline characters.")
         return 2
 
-    in_path = args.input_csv
     if not in_path.exists():
         print(f"[ERROR] Input not found: {in_path}")
         return 2
@@ -118,7 +137,7 @@ def main() -> int:
     sample = in_path.read_text(encoding=args.input_encoding, errors="ignore")[:65536]
     dialect = _detect_dialect(sample, args.delimiter, args.quotechar)
 
-    out_path = _resolve_output_path(in_path, args.output, args.inplace)
+    out_path = _resolve_output_path(in_path, out_arg, args.inplace)
     rows, changed = fix_csv(
         in_path,
         out_path,

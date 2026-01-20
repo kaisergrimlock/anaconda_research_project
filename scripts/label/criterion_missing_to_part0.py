@@ -14,7 +14,7 @@ TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
 
 # Set to a single criterion (e.g. "contextuality"). Leave empty to scan all criteria.
-CRITERION = "contextuality"
+CRITERION = "topicality"
 
 # Language filter (required). Only these languages will be processed.
 #LANGS: list[str] = ["sw"]

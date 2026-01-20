@@ -7,20 +7,15 @@ from typing import Dict, Tuple, Any
 import sys
 
 # ========= Config you can edit =========
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODEL        = "llama3-8b-instruct" # e.g. "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG         = "hi"  # e.g. "raw", "eng", "vi", etc.
+LANGS        = ["raw", "eng", "ru", "fr", "ar", "zh", "vi", "hi", "he", "th", "sw", "ga"]  # e.g. ["raw", "eng", "vi"], etc.
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
 
 # Relevance column name in the *criterion label files*
 RELEVANCE_COL = "relevance"
 # ======================================
-
-# Decide which passage column we will OUTPUT
-#   - "raw" => "passage"
-#   - others => "passage_injected"
-PASSAGE_COL = "passage" if LANG == "raw" else "passage_injected"
 
 # If this script is in scripts/ or similar, adjust depth accordingly
 THIS_FILE = Path(__file__).resolve()
@@ -41,31 +36,33 @@ CRITERION_DIR = (
     / "criterion"
 )
 
-# Where to store the cache
-CACHE_DIR = (
-    PROJECT_ROOT
-    / "outputs"
-    / "llm_label"
-    / f"trec_dl_{TREC_DL_YEAR}"
-    / MODEL
-    / "criteria_composed"
-    / LANG
-)
-CACHE_DIR.mkdir(parents=True, exist_ok=True)
-CACHE_PREFIX = f"{MODEL}_trecdl_{TREC_DL_YEAR}_{LANG}_criterion_cache"
+def cache_dir_for_lang(lang: str) -> Path:
+    return (
+        PROJECT_ROOT
+        / "outputs"
+        / "llm_label"
+        / f"trec_dl_{TREC_DL_YEAR}"
+        / MODEL
+        / "criteria_composed"
+        / lang
+    )
+
+
+def cache_prefix_for_lang(lang: str) -> str:
+    return f"{MODEL}_trecdl_{TREC_DL_YEAR}_{lang}_criterion_cache"
 
 # Type alias: (qid, pid) -> combined info
 RowKey = Tuple[str, str]
 RowDict = Dict[RowKey, Dict[str, Any]]
 
 
-def find_file_for_criterion(criterion: str) -> Path:
+def find_file_for_criterion(criterion: str, lang: str) -> Path:
     """
     Find the CSV file for a given criterion.
     Expected pattern like:
       gpt-oss-20b_trecdl_2022_vi_contextuality_labels.csv
     """
-    pattern = f"*_{LANG}_{criterion}_labels.csv"
+    pattern = f"*_{lang}_{criterion}_labels.csv"
     matches = list(CRITERION_DIR.glob(pattern))
     if not matches:
         raise FileNotFoundError(
@@ -80,13 +77,13 @@ def find_file_for_criterion(criterion: str) -> Path:
 
 
 def load_criterion_into_dict(
-    data: RowDict, csv_path: Path, criterion_name: str
+    data: RowDict, csv_path: Path, criterion_name: str, lang: str, passage_col: str
 ) -> None:
     """
     Read a single criterion CSV and merge into `data`.
 
     `data` maps (qid, pid) -> {
-        'qid', 'pid', 'query', PASSAGE_COL,
+        'qid', 'pid', 'query', passage_col,
         'contextuality', 'coverage', 'exactness', 'topicality',
         RELEVANCE_COL
     }
@@ -117,7 +114,7 @@ def load_criterion_into_dict(
             # Decide which passage column to READ from this file:
             #   - For raw: prefer 'passage', fallback to 'passage_injected'
             #   - For others: prefer 'passage_injected', fallback to 'passage'
-            if LANG == "raw":
+            if lang == "raw":
                 passage_val = row.get("passage", "")
                 if not passage_val:
                     passage_val = row.get("passage_injected", "")
@@ -136,12 +133,12 @@ def load_criterion_into_dict(
                     "qid": qid,
                     "pid": pid,
                     "query": query,
-                    PASSAGE_COL: passage_val,
+                    passage_col: passage_val,
                 }
             else:
                 # If passage isn't set yet for this key, fill it
-                if not data[key].get(PASSAGE_COL):
-                    data[key][PASSAGE_COL] = passage_val
+                if not data[key].get(passage_col):
+                    data[key][passage_col] = passage_val
 
             # Store the score under the logical criterion name
             data[key][criterion_name] = criterion_score
@@ -151,7 +148,7 @@ def load_criterion_into_dict(
             data[key][RELEVANCE_COL] = relevance_val
 
 
-def build_combined_dict() -> RowDict:
+def build_combined_dict(lang: str, passage_col: str) -> RowDict:
     """
     Load all criterion files for the given LANG and return the big dictionary.
     """
@@ -161,32 +158,36 @@ def build_combined_dict() -> RowDict:
     combined: RowDict = {}
 
     for criterion in CRITERIA:
-        csv_path = find_file_for_criterion(criterion)
+        csv_path = find_file_for_criterion(criterion, lang)
         print(f"Loading {criterion} from {csv_path.name}")
-        load_criterion_into_dict(combined, csv_path, criterion)
+        load_criterion_into_dict(combined, csv_path, criterion, lang, passage_col)
 
     return combined
 
 
-def save_cache(data: RowDict) -> None:
+def save_cache(data: RowDict, lang: str, passage_col: str) -> None:
     """
     Save the combined dict to chunked CSV cache files.
 
     We write rows as flat dicts with:
-      ["qid", "pid", "query", PASSAGE_COL] + CRITERIA + [RELEVANCE_COL]
+      ["qid", "pid", "query", passage_col] + CRITERIA + [RELEVANCE_COL]
     """
     chunk_size = 500
 
     # Keep header order similar to your raw_crit files:
     # qid,pid,query,passage,contextuality,coverage,exactness,topicality,llm_relevance
-    fieldnames = ["qid", "pid", "query", PASSAGE_COL] + CRITERIA + [RELEVANCE_COL]
+    fieldnames = ["qid", "pid", "query", passage_col] + CRITERIA + [RELEVANCE_COL]
 
     rows = list(data.values())
     total = len(rows)
     if total == 0:
-        print(f"[WARN] No data to save to cache at: {CACHE_DIR}")
+        cache_dir = cache_dir_for_lang(lang)
+        print(f"[WARN] No data to save to cache at: {cache_dir}")
         return
 
+    cache_dir = cache_dir_for_lang(lang)
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_prefix = cache_prefix_for_lang(lang)
     num_parts = (total + chunk_size - 1) // chunk_size
 
     for part_idx in range(num_parts):
@@ -194,7 +195,7 @@ def save_cache(data: RowDict) -> None:
         end = min(start + chunk_size, total)
         part_rows = rows[start:end]
 
-        part_path = CACHE_DIR / f"{CACHE_PREFIX}_part{part_idx + 1:03d}.csv"
+        part_path = cache_dir / f"{cache_prefix}_part{part_idx + 1:03d}.csv"
         with part_path.open("w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
@@ -209,18 +210,28 @@ def save_cache(data: RowDict) -> None:
 
 
 def main() -> None:
-    combined_dict = build_combined_dict()
-    print(f"\nTotal (qid, pid) pairs: {len(combined_dict)}")
+    if not LANGS:
+        raise ValueError("LANGS must contain at least one language.")
 
-    # Show one example row
-    if combined_dict:
-        example_key = next(iter(combined_dict))
-        print("\nExample entry:")
-        for k, v in combined_dict[example_key].items():
-            print(f"  {k}: {v}")
+    for lang in LANGS:
+        # Decide which passage column we will OUTPUT
+        #   - "raw" => "passage"
+        #   - others => "passage_injected"
+        passage_col = "passage" if lang == "raw" else "passage_injected"
 
-    # Save to cache
-    save_cache(combined_dict)
+        print(f"\n=== Processing language: {lang} ===")
+        combined_dict = build_combined_dict(lang, passage_col)
+        print(f"\nTotal (qid, pid) pairs: {len(combined_dict)}")
+
+        # Show one example row
+        if combined_dict:
+            example_key = next(iter(combined_dict))
+            print("\nExample entry:")
+            for k, v in combined_dict[example_key].items():
+                print(f"  {k}: {v}")
+
+        # Save to cache
+        save_cache(combined_dict, lang, passage_col)
 
 
 if __name__ == "__main__":

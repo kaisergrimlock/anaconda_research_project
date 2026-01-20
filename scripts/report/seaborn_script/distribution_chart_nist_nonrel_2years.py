@@ -14,7 +14,7 @@ import seaborn as sns
 # =========================
 # Take 2 years (or more if you want)
 TREC_DL_YEARS: List[str] = ["2021", "2022"]
-MODEL = "llama3-8b-instruct"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "qwen3-32b-v1"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEARS[0] / MODEL
@@ -23,7 +23,7 @@ PROJECT_ROOT = BASELINE_DIR.parents[3]  # .../<project_root>/outputs/...
 # Output figure directory
 FIG_ROOT = PROJECT_ROOT / "figures" / "2021_2022" / MODEL / "nonrel_nist"
 FIG_ROOT.mkdir(parents=True, exist_ok=True)
-CHART_TYPE = "word"
+CHART_TYPE = "lang"
 
 YEARS_TAG = "_".join(TREC_DL_YEARS)
 GROUPED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{CHART_TYPE}_grouped"
@@ -34,8 +34,8 @@ LABEL_BASE_DIR = Path("outputs") / "llm_label"
 
 # Column order you want (and ONLY these variants will be plotted by default)
 #TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
-#TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "vi", "th", "sw", "ga",]
-TARGET_LANGS: List[str] = ["eng", "eng_word", "ar", "ar_word", "ru", "ru_word", "fr", "fr_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word",]
+TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "zh", "vi", "he", "th", "sw", "ga"]
+#TARGET_LANGS: List[str] = ["eng", "eng_word", "ar", "ar_word", "ru", "ru_word", "fr", "fr_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word",]
 
 
 # Relevance scores used by the models
@@ -54,6 +54,9 @@ label_map = {
     "fr": "Baseline + FrQP",
     "sw": "Baseline + SwQP",
     "ga": "Baseline + GaQP",
+    "zh": "Baseline + ZhQP",
+    "hi": "Baseline + HiQP",
+    "he": "Baseline + HeQP",
     "eng_word": "Baseline + EnWP",
     "vi_word": "Baseline + ViWP",
     "th_word": "Baseline + ThWP",

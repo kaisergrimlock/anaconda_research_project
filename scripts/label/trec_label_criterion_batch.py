@@ -70,7 +70,7 @@ TREC_DL_YEAR = "2021"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["contextuality"]
+CRITERION_KEYS = ["exactness"]
 
 # Input part files
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"

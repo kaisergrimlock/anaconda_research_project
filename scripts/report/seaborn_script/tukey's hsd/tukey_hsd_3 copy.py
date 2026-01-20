@@ -383,7 +383,7 @@ def main() -> None:
         default_level=0,   # e.g. color "raw" or unknown langs consistently
         linewidth=2.5,
     )
-    taxonomy_legend(ax, level_to_rgba=level_palette, title="Taxonomy level", loc="upper left")
+    taxonomy_legend(ax, level_to_rgba=level_palette, title="Resource Class", loc="upper left")
     center_x_axis_at_zero(ax)
 
     # Axis labels and title
