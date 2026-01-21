@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, Iterable
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -38,6 +38,12 @@ def _build_level_palette(levels: set[int]):
     return level_to_rgba
 
 
+def _build_item_palette(items: Iterable[str]) -> Dict[str, Tuple[float, float, float, float]]:
+    ordered = sorted(set(items))
+    cmap = plt.get_cmap("tab10")
+    return {item: cmap(i % cmap.N) for i, item in enumerate(ordered)}
+
+
 def taxonomy_legend(
             ax: Axes,
     *,
@@ -68,6 +74,30 @@ def taxonomy_legend(
         fontsize="small",
         title_fontsize="medium",
     ) 
+
+
+def language_legend(
+    ax: Axes,
+    *,
+    lang_to_rgba: Dict[str, Tuple[float, float, float, float]],
+    title: str = "Language",
+    loc: str = "lower right",
+) -> None:
+    from matplotlib.patches import Patch
+
+    if not lang_to_rgba:
+        return
+
+    handles = [Patch(color=rgba, label=lang) for lang, rgba in sorted(lang_to_rgba.items())]
+    ax.legend(
+        handles=handles,
+        title=title,
+        loc=loc,
+        framealpha=0.9,
+        edgecolor="black",
+        fontsize="small",
+        title_fontsize="medium",
+    )
 
 def color_tukey_by_taxonomy(
     fig: Figure,
@@ -172,6 +202,95 @@ def color_tukey_by_taxonomy(
         coll.set_facecolors(facecolors)
 
     return level_to_rgba
+
+
+def _base_language(lang: str) -> str:
+    return lang.split("_", 1)[0].strip()
+
+
+def color_tukey_by_language(
+    fig: Figure,
+    ax: Axes,
+    *,
+    group_sep: str = "|",
+    linewidth: float = 2.5,
+    eps: float = 1e-6,
+) -> Dict[str, Tuple[float, float, float, float]]:
+    """
+    Color Tukey plot elements by base language. For example, "vi" and "vi_word"
+    share the same color.
+    """
+    fig.canvas.draw()
+
+    base_langs = []
+    for tick in ax.get_yticklabels():
+        text = tick.get_text()
+        lang = text.split(group_sep)[-1].strip()
+        base_langs.append(_base_language(lang))
+
+    if not base_langs:
+        return {}
+
+    lang_to_rgba = _build_item_palette(base_langs)
+    y_to_rgba: Dict[float, Tuple[float, float, float, float]] = {}
+
+    for tick in ax.get_yticklabels():
+        text = tick.get_text()
+        lang = text.split(group_sep)[-1].strip()
+        base_lang = _base_language(lang)
+        rgba = lang_to_rgba[base_lang]
+        tick.set_color(rgba)
+        y_to_rgba[float(tick.get_position()[1])] = rgba
+
+    # 1) Color CI bars
+    for coll in ax.collections:
+        if not isinstance(coll, LineCollection):
+            continue
+
+        segs = coll.get_segments()
+        if not segs:
+            continue
+
+        colors = coll.get_colors()
+        if len(colors) == 1:
+            colors = [colors[0]] * len(segs)
+
+        for i, seg in enumerate(segs):
+            y = float(seg[0][1])
+            for ty, rgba in y_to_rgba.items():
+                if abs(y - ty) < eps:
+                    colors[i] = rgba
+                    break
+
+        coll.set_color(colors)
+        coll.set_linewidth(linewidth)
+
+    # 2) Color mean dots
+    for coll in ax.collections:
+        if not isinstance(coll, PathCollection):
+            continue
+
+        offsets = coll.get_offsets()
+        if offsets is None or len(offsets) == 0:
+            continue
+
+        facecolors = coll.get_facecolors()
+        if facecolors is None or len(facecolors) == 0:
+            continue
+
+        if len(facecolors) == 1:
+            facecolors = facecolors.repeat(len(offsets), axis=0)
+
+        for i, (x, y) in enumerate(offsets):
+            y = float(y)
+            for ty, rgba in y_to_rgba.items():
+                if abs(y - ty) < eps:
+                    facecolors[i] = rgba
+                    break
+
+        coll.set_facecolors(facecolors)
+
+    return lang_to_rgba
 
 
 def center_x_axis_at_zero(ax: Axes) -> None:

@@ -63,10 +63,10 @@ RELEVANCE_COL = "relevance"   # change if needed
 # Data / run config
 # =========================
 # Batch languages (e.g. ["raw", "vi", ...])
-LANGS = ["sw", "ga"]
+LANGS = ["he", "ar"]
 START_PART = 0
 END_PART = 0
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
@@ -95,7 +95,6 @@ ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 # Allow large CSV fields
 bump_field_limit()
 
-# Global criterion key mutated in main loop (matches your current structure)
 CRITERION_KEY: str = ""
 
 
@@ -103,10 +102,6 @@ CRITERION_KEY: str = ""
 # Utilities
 # =========================
 def load_criterion_from_csv() -> None:
-    """
-    Populate CRITERION_NAME, CRITERION_DESC, CRITERION_COL
-    from prompts/criterion/criteria.csv using CRITERION_KEY.
-    """
     global CRITERION_NAME, CRITERION_DESC, CRITERION_COL
 
     if not CRITERIA_CSV.exists():
@@ -293,9 +288,6 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
     return t
 
 
-# =========================
-# CSV merge (your same logic)
-# =========================
 def write_combined_dynamic(
     per_file_labels: List[str],
     header_out: List[str],
@@ -476,9 +468,6 @@ def write_combined_dynamic(
     return combined_path
 
 
-# =========================
-# Core labelling logic (ROW-CONCURRENT)
-# =========================
 def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
@@ -758,7 +747,7 @@ async def run_for_model_lang(model_id: str, lang: str, stop_event: asyncio.Event
     per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{lang}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Part-level concurrency (same behavior as you had)
+    # Part-level concurrency
     sem = asyncio.Semaphore(min(6, len(part_files)))
     results: List[Dict[str, Any]] = []
 

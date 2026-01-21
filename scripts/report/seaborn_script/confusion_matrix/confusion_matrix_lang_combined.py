@@ -32,7 +32,7 @@ from helpers.metrics_llm import (
 # -------- Config --------
 TREC_DL_YEARS = ["2021", "2022"]   # <-- combined years
 MODEL = "gpt-oss-20b"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG  = "raw_crit"  # "raw","eng","vi","fr", etc.
+LANG  = "vi_word"  # "raw","eng","vi","fr", etc.
 
 LABELS = [0, 1, 2, 3]
 

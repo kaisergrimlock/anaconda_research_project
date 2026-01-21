@@ -23,9 +23,9 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
-OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_mult"
+OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_crit"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_TUKEY_CSV = OUT_DIR / "tukey_hsd_table_all_groups.csv"
 OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
@@ -48,10 +48,10 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first"]
 
 #Word
-#LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
+LANGS: List[str] = ["raw", "eng", "ru", "ar", "vi", "th", "sw", "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word"] 
 
 #Crit
-LANGS: List[str] =["raw", "raw_crit", "eng", "eng_crit", "ar", "ar_crit", "fr", "fr_crit", "ru", "ru_crit", "zh_crit", "zh", "vi", "vi_crit", "hi", "hi_crit", "he", "he_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
+#LANGS: List[str] =["raw", "raw_crit", "eng", "eng_crit", "ar", "ar_crit", "fr", "fr_crit", "ru", "ru_crit", "zh_crit", "zh", "vi", "vi_crit", "hi", "hi_crit", "he", "he_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
 
 #LANGS: List[str] = ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"]
 

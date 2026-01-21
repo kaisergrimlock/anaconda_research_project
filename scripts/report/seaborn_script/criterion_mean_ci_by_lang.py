@@ -13,7 +13,7 @@ import seaborn as sns
 # Config
 # =========================
 TREC_DL_YEAR = "2022"
-MODEL = "qwen3-32b-v1"  # e.g. "qwen.qwen3-32b-v1", "openai.gpt-oss-20b-1", "llama3-8b-instruct"
+MODEL = "gpt-oss-20b"  # e.g. "qwen.qwen3-32b-v1", "openai.gpt-oss-20b-1", "llama3-8b-instruct"
 
 # If empty, auto-discover from filenames in CRITERION_DIR
 LANGS: list[str] = ["eng", "fr", "ru", "ar", "zh", "vi", "he", "th", "sw", "ga", "ar", "hi"]

@@ -87,8 +87,8 @@ PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 # ===== Models =====
 
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["openai.gpt-oss-20b-1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
