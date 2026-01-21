@@ -4,9 +4,16 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from helpers.draw import color_tukey_by_taxonomy, center_x_axis_at_zero, taxonomy_legend, add_model_separators
+from helpers.draw import (
+    color_tukey_by_taxonomy,
+    center_x_axis_at_zero,
+    taxonomy_legend,
+    add_model_separators,
+    load_lang_taxonomy,
+)
 
 # =========================
 # File Location
@@ -195,6 +202,11 @@ def main() -> None:
     model_files = find_llm_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
 
+    lang_to_level: Dict[str, int] = {}
+    default_level = 0
+    if TAXONOMY_CSV.exists():
+        lang_to_level = load_lang_taxonomy(TAXONOMY_CSV)
+
     rows: List[pd.DataFrame] = []
     excluded_rows: List[pd.DataFrame] = []
     skipped = 0
@@ -309,9 +321,12 @@ def main() -> None:
 
         perrow["model"] = model
         perrow["lang"] = lang
-        perrow["group"] = perrow["model"] + GROUP_SEP + perrow["lang"]
+        display_group = perrow["model"] + GROUP_SEP + perrow["lang"]
+        level = lang_to_level.get(lang, default_level)
+        perrow["group"] = display_group
+        perrow["group_sort"] = f"{model}__{level:02d}__{display_group}"
 
-        rows.append(perrow[["group", "model", "lang", "qid", "pid", "value"]])
+        rows.append(perrow[["group", "group_sort", "model", "lang", "qid", "pid", "value"]])
 
     if not rows:
         raise RuntimeError(
@@ -333,12 +348,12 @@ def main() -> None:
         excluded_df = excluded_df.drop_duplicates(subset=KEY_COLS)
 
     # Require >=2 row samples per group
-    counts = long_df["group"].value_counts()
+    counts = long_df["group_sort"].value_counts()
     keep_groups = counts[counts >= 2].index
     dropped = [g for g in counts.index if g not in set(keep_groups)]
-    long_df = long_df[long_df["group"].isin(keep_groups)].copy()
+    long_df = long_df[long_df["group_sort"].isin(keep_groups)].copy()
 
-    if long_df["group"].nunique() < 2:
+    if long_df["group_sort"].nunique() < 2:
         raise RuntimeError("Not enough (model,lang) groups with >=2 samples to run Tukey.")
 
     # Save samples for reproducibility
@@ -351,11 +366,19 @@ def main() -> None:
     # =========================
     tukey = pairwise_tukeyhsd(
         endog=long_df["value"].to_numpy(),
-        groups=long_df["group"].to_numpy(),
+        groups=long_df["group_sort"].to_numpy(),
         alpha=ALPHA,
     )
 
     tukey_df = tukey_to_df(tukey)
+    sort_to_display = (
+        long_df.drop_duplicates(subset=["group_sort"])
+        .set_index("group_sort")["group"]
+        .to_dict()
+    )
+    for col in ["group1", "group2"]:
+        if col in tukey_df.columns:
+            tukey_df[col] = tukey_df[col].map(sort_to_display).fillna(tukey_df[col])
 
     # Save CSV
     write_df(tukey_df, OUT_TUKEY_CSV)
@@ -373,6 +396,10 @@ def main() -> None:
     # =========================
     fig, ax = plt.subplots(figsize=(10, 8))
     tukey.plot_simultaneous(ax=ax)
+    tick_labels = ax.get_yticklabels()
+    if tick_labels:
+        new_labels = [sort_to_display.get(t.get_text(), t.get_text()) for t in tick_labels]
+        ax.set_yticklabels(new_labels)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
     level_palette = color_tukey_by_taxonomy(
@@ -390,7 +417,8 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
-    ax.set_xlim(-0.1, 1.75)
+    ax.set_xlim(-0.1, 1.25)
+    sns.despine(ax=ax, top=True, right=True)
 
 
     plt.tight_layout()
@@ -402,12 +430,7 @@ def main() -> None:
     # =========================
     # Final logging
     # =========================
-    print(f"\n[OK] Wrote samples: {OUT_SAMPLES}")
-    if OUT_EXCLUDED.exists():
-        print(f"[OK] Wrote excluded rows: {OUT_EXCLUDED}")
-    print(f"[OK] Wrote Tukey CSV: {OUT_TUKEY_CSV}")
-    print(f"[OK] Wrote Tukey TeX: {OUT_TUKEY_TEX}")
-    print(f"[OK] Wrote plot: {OUT_SIMUL_SVG}")
+    print(f"[OK] Wrote plot: {OUT_SIMUL_PDF}")
     if excluded_df is not None:
         write_df(excluded_df, OUT_EXCLUDED)
         print(f"[OK] Wrote excluded rows: {OUT_EXCLUDED}")

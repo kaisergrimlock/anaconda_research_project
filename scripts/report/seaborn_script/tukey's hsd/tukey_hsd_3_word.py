@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from helpers.draw import color_tukey_by_language, center_x_axis_at_zero, language_legend, add_model_separators
 
@@ -23,7 +24,7 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_crit"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -299,8 +300,10 @@ def main() -> None:
     )
     language_legend(ax, lang_to_rgba=lang_palette, title="Language", loc="upper left")
     center_x_axis_at_zero(ax)
-    ax.set_xlim(-0.1, 1.75)
+    ax.set_xlim(-0.1, 1.25)
     ax.tick_params(axis="y", pad=12, labelsize=6)
+    sns.despine(ax=ax, top=True, right=True)
+
 
     # Axis labels and title
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)

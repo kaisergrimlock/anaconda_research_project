@@ -1,2 +1,7 @@
 model,lang,qid,pid,reason
 gpt-oss-20b,raw,2032949,msmarco_passage_52_787310974,"missing_in_models=llama3-8b-instruct,qwen3-32b-v1"
+gpt-oss-20b,eng,1121909,msmarco_passage_01_739578998,not_in_common_keys
+gpt-oss-20b,eng,1121909,msmarco_passage_29_317614290,not_in_common_keys
+gpt-oss-20b,eng,1121909,msmarco_passage_08_667548896,not_in_common_keys
+gpt-oss-20b,eng,1121909,msmarco_passage_36_257721712,not_in_common_keys
+gpt-oss-20b,eng,1121909,msmarco_passage_04_217389885,not_in_common_keys

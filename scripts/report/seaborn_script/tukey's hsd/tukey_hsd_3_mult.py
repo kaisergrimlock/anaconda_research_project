@@ -9,6 +9,7 @@ from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.patches import Patch
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from helpers.draw import center_x_axis_at_zero, add_model_separators
+import seaborn as sns
 
 # =========================
 # File Location
@@ -25,7 +26,7 @@ from helpers.output_writer import write_df
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_mult"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -504,7 +505,8 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
-    ax.set_xlim(-0.1, 1.75)
+    ax.set_xlim(-0.1, 1.25)
+    sns.despine(ax=ax, top=True, right=True)
 
 
     plt.tight_layout()
