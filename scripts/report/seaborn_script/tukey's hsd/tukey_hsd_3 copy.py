@@ -51,8 +51,8 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets", "th_brackets"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_vi", "eng", "vi_th", "vi"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_mult_2", "eng_mult_3"]
-LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
-#LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first", "hi_first"]
+#LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
+LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first", "hi_first"]
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
 
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"] # if empty, allow all langs found
