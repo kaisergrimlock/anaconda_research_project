@@ -7,7 +7,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from helpers.draw import color_tukey_by_language, center_x_axis_at_zero, language_legend, add_model_separators
+from helpers.draw import (
+    color_tukey_by_language,
+    center_x_axis_at_zero,
+    language_legend,
+    add_model_separators,
+    add_model_prefix_labels,
+)
 
 # =========================
 # File Location
@@ -19,12 +25,13 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
+from scripts.report.seaborn_script.settings import apply_paper_fmt
 
 
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / "all_models_all_crit"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -33,20 +40,13 @@ OUT_TUKEY_TEX = OUT_DIR / "tukey_hsd_table_all_groups.tex"
 OUT_SIMUL_SVG = OUT_DIR / f"tukey_hsd_plot_simultaneous_all_groups_{TREC_DL_YEAR}.svg"
 OUT_SIMUL_PDF = OUT_DIR / f"tukey_hsd_plot_simultaneous_all_groups_{TREC_DL_YEAR}.pdf"
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
+OUT_EXCLUDED  = Path(__file__).resolve().parent / f"invalid_{TREC_DL_YEAR}.csv"
 GROUP_SEP = "|"
 # ========================
 # Parameters
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-#LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets", "th_brackets"]
-
-#Last
-#LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last"]
-
-#First
-#LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first"]
-
 #Word
 LANGS: List[str] = ["eng", "ru", "ar", "vi", "th", "sw", "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word"] 
 
@@ -65,6 +65,7 @@ LANGS: List[str] = ["eng", "ru", "ar", "vi", "th", "sw", "eng_word", "ru_word", 
 #LANGS: List[str] = ["raw", "eng", "eng_mult_2", "eng_mult_3"]
 
 METRIC = "mean_diff"
+KEY_COLS = ["qid", "pid"]
 
 def find_llm_files() -> Dict[str, List[Path]]:
     """
@@ -141,6 +142,24 @@ def per_row_metric(df: pd.DataFrame, metric: str) -> pd.DataFrame:
 
     raise ValueError("Unknown METRIC. Use 'mean_diff', 'mae_4pt', or 'disagree_rate'.")
 
+def load_invalid_keys() -> Optional[pd.DataFrame]:
+    if not OUT_EXCLUDED.exists():
+        return None
+
+    try:
+        invalid_df = pd.read_csv(OUT_EXCLUDED)
+    except pd.errors.EmptyDataError:
+        return None
+
+    if invalid_df.empty:
+        return None
+
+    if not set(KEY_COLS).issubset(invalid_df.columns):
+        print(f"[WARN] Invalid file {OUT_EXCLUDED.name}: missing qid/pid columns.")
+        return None
+
+    return invalid_df[KEY_COLS].drop_duplicates()
+
 # =========================
 # Step 6: Tukey helpers (formatting/output)
 # =========================
@@ -206,6 +225,9 @@ def main() -> None:
     model_files = find_llm_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
 
+    apply_paper_fmt()
+
+    invalid_df = load_invalid_keys()
     rows: List[pd.DataFrame] = []
     skipped = 0
 
@@ -218,9 +240,17 @@ def main() -> None:
                 continue
             try:
                 df = load_labels(f)
+                if invalid_df is not None:
+                    df = df.merge(
+                        invalid_df,
+                        on=KEY_COLS,
+                        how="left",
+                        indicator=True,
+                    )
+                    df = df[df["_merge"] == "left_only"].drop(columns=["_merge"])
                 pair_count = (
-                    df.dropna(subset=["qid", "pid"])
-                    .drop_duplicates(subset=["qid", "pid"])
+                    df.dropna(subset=KEY_COLS)
+                    .drop_duplicates(subset=KEY_COLS)
                     .shape[0]
                 )
                 print(f"[INFO] {model} {lang}: {pair_count} valid (qid,pid) pairs")
@@ -292,6 +322,19 @@ def main() -> None:
     tukey.plot_simultaneous(ax=ax)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
+    add_model_prefix_labels(
+        fig,
+        ax,
+        group_sep=GROUP_SEP,
+        x=-0.09,
+        rotation=90,
+        fontsize="large",
+        fontweight="bold",
+    )
+    tick_labels = ax.get_yticklabels()
+    if tick_labels:
+        lang_labels = [t.get_text().split(GROUP_SEP)[-1].strip() for t in tick_labels]
+        ax.set_yticklabels(lang_labels)
     lang_palette = color_tukey_by_language(
         fig,
         ax,
@@ -312,7 +355,7 @@ def main() -> None:
 
 
     plt.tight_layout()
-    plt.savefig(OUT_SIMUL_SVG, format="svg")
+    plt.savefig(OUT_SIMUL_SVG, format="svg", bbox_inches="tight", pad_inches=0.02)
     plt.savefig(OUT_SIMUL_PDF, format="pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 

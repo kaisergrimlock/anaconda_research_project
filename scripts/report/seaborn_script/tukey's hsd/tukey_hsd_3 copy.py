@@ -12,6 +12,7 @@ from helpers.draw import (
     center_x_axis_at_zero,
     taxonomy_legend,
     add_model_separators,
+    add_model_prefix_labels,
     load_lang_taxonomy,
 )
 
@@ -25,6 +26,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
+from scripts.report.seaborn_script.settings import apply_paper_fmt
 
 
 # =========================
@@ -201,6 +203,8 @@ def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
 def main() -> None:
     model_files = find_llm_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
+
+    apply_paper_fmt()
 
     lang_to_level: Dict[str, int] = {}
     default_level = 0
@@ -402,6 +406,19 @@ def main() -> None:
         ax.set_yticklabels(new_labels)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
+    add_model_prefix_labels(
+        fig,
+        ax,
+        group_sep=GROUP_SEP,
+        x=-0.09,
+        rotation=90,
+        fontsize="large",
+        fontweight="bold",
+    )
+    tick_labels = ax.get_yticklabels()
+    if tick_labels:
+        lang_labels = [t.get_text().split(GROUP_SEP)[-1].strip() for t in tick_labels]
+        ax.set_yticklabels(lang_labels)
     level_palette = color_tukey_by_taxonomy(
         fig,
         ax,
@@ -422,7 +439,7 @@ def main() -> None:
 
 
     plt.tight_layout()
-    plt.savefig(OUT_SIMUL_SVG, format="svg")
+    plt.savefig(OUT_SIMUL_SVG, format="svg", bbox_inches="tight", pad_inches=0.02)
     plt.savefig(OUT_SIMUL_PDF, format="pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 

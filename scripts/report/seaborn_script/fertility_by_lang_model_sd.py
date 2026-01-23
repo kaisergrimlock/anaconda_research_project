@@ -9,8 +9,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.lines import Line2D
+from matplotlib import font_manager as fm
 
-from settings import apply_paper_fmt
+from settings import apply_paper_fmt, paper_fmt
 
 # =========================
 # Config
@@ -37,6 +38,9 @@ EXCLUDE_LANGS_NORM = {l.strip().casefold() for l in EXCLUDE_LANGS}
 # Plot settings
 Y_MIN: float | None = 1.0  # set to None to auto-scale
 FIGSIZE = (12, 4)
+LABEL_FONTSIZE = 12
+TICK_FONTSIZE = 10
+LEGEND_FONTSIZE = 11
 
 # Per-model colors (Matplotlib accepts hex). If missing, falls back to default.
 MODEL_COLORS = {
@@ -92,6 +96,17 @@ def discover_models() -> list[str]:
     if MODELS:
         return [m for m in MODELS if m in discovered]
     return discovered
+
+
+def warn_if_fonts_missing(fonts: list[str]) -> None:
+    missing: list[str] = []
+    for font in fonts:
+        try:
+            fm.findfont(fm.FontProperties(family=font), fallback_to_default=False)
+        except Exception:
+            missing.append(font)
+    if missing:
+        print(f"[WARN] Missing fonts: {', '.join(missing)}")
 
 
 def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
@@ -269,8 +284,9 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
     Plot ONLY error bars representing ±1 SD around the mean (no markers).
     Supports comparing variants like base vs word vs first.
     """
+    sns.set_theme(style="whitegrid")
+    plt.style.use("default")
     apply_paper_fmt()
-    sns.set(style="whitegrid")
     fig, ax = plt.subplots(figsize=FIGSIZE)
     mean_handle = Line2D(
         [0],
@@ -362,13 +378,16 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
                 zorder=3,
             )
 
-        ax.set_xticks(x_base)
-        ax.set_xticklabels(xticklabels)
-        ax.set_xlabel("Language / Variant" if len(variants_present) > 1 else "Language")
+    ax.set_xticks(x_base)
+    ax.set_xticklabels(xticklabels, fontsize=TICK_FONTSIZE)
+    ax.set_xlabel(
+        "Language / Variant" if len(variants_present) > 1 else "Language",
+        fontsize=LABEL_FONTSIZE,
+    )
 
-        # Optional: separators between every x category
-        if DRAW_LANG_SEPARATORS:
-            add_language_separators(ax, len(x_pairs))
+    # Optional: separators between every x category
+    if DRAW_LANG_SEPARATORS:
+        add_language_separators(ax, len(x_pairs))
 
     else:
         # x-axis is base language only; dodge by (variant, model) within each language
@@ -428,13 +447,13 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
             )
 
         ax.set_xticks(x_base)
-        ax.set_xticklabels(xticklabels)
-        ax.set_xlabel("Language")
+        ax.set_xticklabels(xticklabels, fontsize=TICK_FONTSIZE)
+        ax.set_xlabel("Language", fontsize=LABEL_FONTSIZE)
 
         if DRAW_LANG_SEPARATORS:
             add_language_separators(ax, len(lang_order))
 
-    ax.set_ylabel("Mean fertility score")
+    ax.set_ylabel("Mean fertility score", fontsize=LABEL_FONTSIZE)
 
     if Y_MIN is not None:
         ax.set_ylim(bottom=Y_MIN)
@@ -452,6 +471,8 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
         loc="upper center",
         bbox_to_anchor=(0.5, -0.18),
         ncol=max(1, min(6, len(labels))),
+        fontsize=LEGEND_FONTSIZE,
+        title_fontsize=LEGEND_FONTSIZE,
         frameon=False,
     )
 
@@ -465,6 +486,7 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
 
 
 def main() -> None:
+    warn_if_fonts_missing(paper_fmt.get("font.serif", []))
     raw_df = build_raw_df()
     summary_df = summarize_sd(raw_df)
     plot_sd_bars_only(summary_df)

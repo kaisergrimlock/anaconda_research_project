@@ -342,3 +342,58 @@ def add_model_separators(
         if model_of(lab0) != model_of(lab1):
             y_mid = (y0 + y1) / 2.0
             ax.axhline(y_mid, linewidth=linewidth, alpha=alpha, linestyle=linestyle)
+
+
+def add_model_prefix_labels(
+    fig: Figure,
+    ax: Axes,
+    *,
+    group_sep: str = "|",
+    x: float = -0.08,
+    rotation: float = 90,
+    fontsize: str = "medium",
+    fontweight: str = "bold",
+    color: str = "black",
+) -> None:
+    """
+    Add a single model label per contiguous block, positioned parallel to the y axis.
+    Assumes y tick labels look like "<model>|<lang>".
+    """
+    fig.canvas.draw()
+
+    yticks = list(ax.get_yticks())
+    ylabels = [t.get_text() for t in ax.get_yticklabels()]
+    pairs = [(float(y), lab) for y, lab in zip(yticks, ylabels) if str(lab).strip() != ""]
+    if not pairs:
+        return
+    pairs.sort(key=lambda t: t[0])
+
+    def model_of(label: str) -> str:
+        if group_sep in label:
+            return label.split(group_sep, 1)[0].strip()
+        return label.strip()
+
+    i = 0
+    while i < len(pairs):
+        y_start, lab = pairs[i]
+        model = model_of(lab)
+        y_end = y_start
+        j = i + 1
+        while j < len(pairs) and model_of(pairs[j][1]) == model:
+            y_end = pairs[j][0]
+            j += 1
+        y_center = (y_start + y_end) / 2.0
+        ax.text(
+            x,
+            y_center,
+            model,
+            transform=ax.get_yaxis_transform(),
+            rotation=rotation,
+            va="center",
+            ha="right",
+            fontsize=fontsize,
+            fontweight=fontweight,
+            color=color,
+            clip_on=False,
+        )
+        i = j

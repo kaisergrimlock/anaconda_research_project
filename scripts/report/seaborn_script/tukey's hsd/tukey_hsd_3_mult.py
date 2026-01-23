@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection, PathCollection
 from matplotlib.patches import Patch
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from helpers.draw import center_x_axis_at_zero, add_model_separators
+from helpers.draw import center_x_axis_at_zero, add_model_separators, add_model_prefix_labels
 import seaborn as sns
 
 # =========================
@@ -21,6 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
+from scripts.report.seaborn_script.settings import apply_paper_fmt
 
 
 # =========================
@@ -65,10 +66,17 @@ LANG_GROUP_COLORS = {
 
 LANG_GROUP_LABELS = {
     "baseline": "Baseline",
-    "injected_1": "Injected 1 time",
-    "injected_2": "Injected 2 times",
-    "injected_3": "Injected 3 times",
+    "injected_1": "1_injection",
+    "injected_2": "2_injections",
+    "injected_3": "3_injections",
 }
+
+LANG_LABEL_REMAP = {
+    "eng": "1_injection",
+    "eng_mult_2": "2_injections",
+    "eng_mult_3": "3_injections",
+}
+LANG_LABEL_ALIASES = {v: k for k, v in LANG_LABEL_REMAP.items()}
 
 
 def find_llm_files() -> Dict[str, List[Path]]:
@@ -197,6 +205,7 @@ def color_tukey_by_lang_group(
     ax: plt.Axes,
     *,
     group_sep: str = "|",
+    label_aliases: Optional[Dict[str, str]] = None,
     linewidth: float = 2.5,
     eps: float = 1e-6,
 ) -> Dict[str, Tuple[float, float, float, float]]:
@@ -207,7 +216,8 @@ def color_tukey_by_lang_group(
 
     for tick in ax.get_yticklabels():
         text = tick.get_text()
-        lang = text.split(group_sep)[-1].strip()
+        lang_label = text.split(group_sep)[-1].strip()
+        lang = label_aliases.get(lang_label, lang_label) if label_aliases else lang_label
         group = _lang_group(lang)
         if group is None:
             continue
@@ -277,7 +287,7 @@ def lang_group_legend(ax: plt.Axes, group_to_rgba: Dict[str, Tuple[float, float,
 
     ax.legend(
         handles=handles,
-        title="Language Group",
+        title="Injection Count",
         loc="upper left",
         framealpha=0.9,
         edgecolor="black",
@@ -311,6 +321,8 @@ def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
 def main() -> None:
     model_files = find_llm_files()
     print(f"Found {len(model_files)} models under: {LABEL_ROOT}")
+
+    apply_paper_fmt()
 
     rows: List[pd.DataFrame] = []
     excluded_rows: List[pd.DataFrame] = []
@@ -488,14 +500,31 @@ def main() -> None:
     # =========================
     # Step 8b: Plot simultaneous confidence intervals
     # =========================
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(10, 4))
     tukey.plot_simultaneous(ax=ax)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
+    add_model_prefix_labels(
+        fig,
+        ax,
+        group_sep=GROUP_SEP,
+        x=-0.1,
+        rotation=90,
+        fontsize="large",
+        fontweight="bold",
+    )
+    tick_labels = ax.get_yticklabels()
+    if tick_labels:
+        lang_labels = [
+            LANG_LABEL_REMAP.get(t.get_text().split(GROUP_SEP)[-1].strip(), t.get_text().split(GROUP_SEP)[-1].strip())
+            for t in tick_labels
+        ]
+        ax.set_yticklabels(lang_labels)
     group_palette = color_tukey_by_lang_group(
         fig,
         ax,
         group_sep=GROUP_SEP,
+        label_aliases=LANG_LABEL_ALIASES,
         linewidth=2.5,
     )
     lang_group_legend(ax, group_to_rgba=group_palette)
@@ -510,7 +539,7 @@ def main() -> None:
 
 
     plt.tight_layout()
-    plt.savefig(OUT_SIMUL_SVG, format="svg")
+    plt.savefig(OUT_SIMUL_SVG, format="svg", bbox_inches="tight", pad_inches=0.02)
     plt.savefig(OUT_SIMUL_PDF, format="pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 

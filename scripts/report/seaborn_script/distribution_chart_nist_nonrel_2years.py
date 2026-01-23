@@ -16,7 +16,7 @@ from settings import apply_paper_fmt, paper_fmt
 # =========================
 # Take 2 years (or more if you want)
 TREC_DL_YEARS: List[str] = ["2021", "2022"]
-MODEL = "qwen3-32b-v1"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
+MODEL = "llama3-8b-instruct"    # e.g. "gpt-oss-20b", "qwen3-32b-v1", ...
 
 # Where the baseline figs live (just to get project root)
 BASELINE_DIR = Path("outputs") / "baseline" / TREC_DL_YEARS[0] / MODEL
@@ -382,8 +382,11 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
 
     ax.legend(
         title="Variant",
-        loc="center left",
-        bbox_to_anchor=(1.02, 0.5),
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.12),
+        ncol=min(4, n_variants),
+        fontsize=10,
+        title_fontsize=10,
         frameon=True,
         framealpha=1.0,
         edgecolor="white",
@@ -456,9 +459,12 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     #ax.set_title(title, fontsize=12)
 
     ax.legend(
-        title="Relevance\nScore",
-        loc="center left",
-        bbox_to_anchor=(1.02, 0.5),
+        title="Relevance Score",
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.12),
+        ncol=min(4, len(scores)),
+        fontsize=10,
+        title_fontsize=10,
         frameon=True,
         framealpha=1.0,
         edgecolor="white",
