@@ -19,7 +19,7 @@ from scripts.csv_helpers import bump_field_limit  # type: ignore
 # ===============================================================
 # Config
 # ===============================================================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 START_PART = 1
 END_PART = 6
 

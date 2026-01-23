@@ -7,6 +7,8 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib import font_manager as fm
+from settings import apply_paper_fmt, paper_fmt
 
 
 # =========================
@@ -32,9 +34,12 @@ STACKED_FIG_PATH = FIG_ROOT / CHART_TYPE / f"nonreloverall_{MODEL}_{YEARS_TAG}_{
 # Where the LLM label CSVs live (base dir; year/model appended under it)
 LABEL_BASE_DIR = Path("outputs") / "llm_label"
 
+# Where invalid qid/pid pairs live (per-year)
+INVALID_DIR = Path("scripts") / "report" / "seaborn_script" / "tukey's hsd"
+
 # Column order you want (and ONLY these variants will be plotted by default)
 #TARGET_LANGS: List[str] = ["eng", "eng_crit", "fr", "fr_crit", "ru", "ru_crit", "vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit"]
-TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "zh", "vi", "he", "th", "sw", "ga"]
+TARGET_LANGS: List[str] = ["eng", "ar", "ru", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
 #TARGET_LANGS: List[str] = ["eng", "eng_word", "ar", "ar_word", "ru", "ru_word", "fr", "fr_word", "vi", "vi_word", "th", "th_word", "sw", "sw_word", "ga", "ga_word",]
 
 
@@ -47,25 +52,25 @@ VARIANT_ORDER: List[str] = ["baseline"] + TARGET_LANGS
 
 label_map = {
     "baseline": "Baseline",
-    "eng": "Baseline + EnQP",
-    "vi": "Baseline + ViQP",
-    "th": "Baseline + ThQP",
-    "ru": "Baseline + RuQP",
-    "fr": "Baseline + FrQP",
-    "sw": "Baseline + SwQP",
-    "ga": "Baseline + GaQP",
-    "zh": "Baseline + ZhQP",
-    "hi": "Baseline + HiQP",
-    "he": "Baseline + HeQP",
-    "eng_word": "Baseline + EnWP",
-    "vi_word": "Baseline + ViWP",
-    "th_word": "Baseline + ThWP",
-    "ru_word": "Baseline + RuWP",
-    "fr_word": "Baseline + FrWP",
-    "sw_word": "Baseline + SwWP",
-    "ga_word": "Baseline + GaWP",
-    "ar_word": "Baseline + ArWP",
-    "ar": "Baseline + ArQP",
+    "eng": "EnQP",
+    "vi": "ViQP",
+    "th": "ThQP",
+    "ru": "RuQP",
+    "fr": "FrQP",
+    "sw": "SwQP",
+    "ga": "GaQP",
+    "zh": "ZhQP",
+    "hi": "HiQP",
+    "he": "HeQP",
+    "eng_word": "EnWP",
+    "vi_word": "ViWP",
+    "th_word": "ThWP",
+    "ru_word": "RuWP",
+    "fr_word": "FrWP",
+    "sw_word": "SwWP",
+    "ga_word": "GaWP",
+    "ar_word": "ArWP",
+    "ar": "ArQP",
     "raw_crit": "Baseline Crit",
     "eng_crit": "Baseline Crit + EnQP",
     "vi_crit": "Base Crit + ViQP",
@@ -75,6 +80,17 @@ label_map = {
 # =========================
 # Helpers
 # =========================
+def warn_if_fonts_missing(fonts: Sequence[str]) -> None:
+    missing: List[str] = []
+    for font in fonts:
+        try:
+            fm.findfont(fm.FontProperties(family=font), fallback_to_default=False)
+        except Exception:
+            missing.append(font)
+    if missing:
+        print(f"[WARN] Missing fonts: {', '.join(missing)}")
+
+
 def pick_gold_col(df: pd.DataFrame) -> Optional[str]:
     """Pick the NIST / gold relevance column, if present."""
     if "relevance" in df.columns:
@@ -101,7 +117,7 @@ def read_csv_safe(path: Path) -> Optional[pd.DataFrame]:
         return None
 
 
-def build_raw_zero_keyset(raw_file: Path) -> tuple[pd.DataFrame, Set[str], str]:
+def build_raw_zero_keyset(raw_file: Path, invalid_keys: Set[str]) -> tuple[pd.DataFrame, Set[str], str]:
     """
     Load the RAW file, filter to rows where:
       - gold relevance == 0
@@ -131,6 +147,10 @@ def build_raw_zero_keyset(raw_file: Path) -> tuple[pd.DataFrame, Set[str], str]:
 
     df_raw["llm_relevance"] = pd.to_numeric(df_raw["llm_relevance"], errors="coerce")
 
+    if invalid_keys:
+        df_raw["__pair_key"] = df_raw["qid"].astype(str) + "|" + df_raw[id_col].astype(str)
+        df_raw = df_raw[~df_raw["__pair_key"].isin(invalid_keys)].drop(columns=["__pair_key"])
+
     # RAW cohort: NIST==0 AND RAW_LLM==0
     df_zero = df_raw[(df_raw[gold_col] == 0)]
 
@@ -147,6 +167,7 @@ def build_raw_zero_keyset(raw_file: Path) -> tuple[pd.DataFrame, Set[str], str]:
 def compute_distribution_for_variant(
     df_variant: pd.DataFrame,
     base_keys: Set[str],
+    invalid_keys: Set[str],
     *,
     year: str,
     variant_name: str,
@@ -171,6 +192,8 @@ def compute_distribution_for_variant(
     df_variant["llm_relevance"] = pd.to_numeric(df_variant["llm_relevance"], errors="coerce")
 
     df_variant["__pair_key"] = df_variant["qid"].astype(str) + "|" + df_variant[id_col].astype(str)
+    if invalid_keys:
+        df_variant = df_variant[~df_variant["__pair_key"].isin(invalid_keys)]
     df_cohort = df_variant[df_variant["__pair_key"].isin(base_keys)].drop(columns=["__pair_key"])
 
     df_valid = df_cohort.dropna(subset=["llm_relevance"])
@@ -197,6 +220,22 @@ def compute_distribution_for_variant(
 # =========================
 # Data loading (multi-year; ordered variants)
 # =========================
+def load_invalid_keyset(year: str) -> Set[str]:
+    invalid_path = INVALID_DIR / f"invalid_{year}.csv"
+    if not invalid_path.exists():
+        return set()
+
+    df_invalid = read_csv_safe(invalid_path)
+    if df_invalid is None or df_invalid.empty:
+        return set()
+
+    if "qid" not in df_invalid.columns or "pid" not in df_invalid.columns:
+        print(f"[WARN] Invalid file {invalid_path.name}: missing qid/pid columns.")
+        return set()
+
+    return set(df_invalid["qid"].astype(str) + "|" + df_invalid["pid"].astype(str))
+
+
 def load_label_distributions_multi_year(
     label_base_dir: Path,
     years: Sequence[str],
@@ -214,6 +253,7 @@ def load_label_distributions_multi_year(
     per_year_records: List[Dict] = []
 
     for year in years:
+        invalid_keys = load_invalid_keyset(year)
         label_dir = label_base_dir / f"trec_dl_{year}" / MODEL
         if not label_dir.exists():
             print(f"[ERROR] Missing label directory for year {year}: {label_dir}")
@@ -224,7 +264,7 @@ def load_label_distributions_multi_year(
             print(f"[ERROR] Missing raw labels file for year {year}: {raw_file}")
             continue
 
-        df_raw_zero, base_keys, _raw_id_col = build_raw_zero_keyset(raw_file)
+        df_raw_zero, base_keys, _raw_id_col = build_raw_zero_keyset(raw_file, invalid_keys)
         if not base_keys:
             print(f"[ERROR] Year {year}: empty RAW cohort; skipping year.")
             continue
@@ -258,6 +298,7 @@ def load_label_distributions_multi_year(
                 compute_distribution_for_variant(
                     df_lang,
                     base_keys,
+                    invalid_keys,
                     year=year,
                     variant_name=lang,
                 )
@@ -286,6 +327,7 @@ def load_label_distributions_multi_year(
 def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "") -> None:
     sns.set_theme(style="whitegrid")
     plt.style.use("default")
+    apply_paper_fmt()
 
     df = df.copy()
 
@@ -331,18 +373,8 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
 
         ax.grid(False)
 
-        for x, h in zip(offsets, heights):
-            if h >= 0.04:
-                ax.text(
-                    x,
-                    h + 0.01,
-                    f"{h:.2f}",
-                    ha="center",
-                    va="bottom",
-                    fontsize=5,
-                    color="white",
-                )
 
+    sns.despine(ax=ax, top=True, right=True)
     ax.set_xticks(x_base)
     ax.set_ylabel("Score Distribution")
     ax.set_ylim(0, 1.05)
@@ -369,6 +401,7 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
 def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "") -> None:
     sns.set_theme(style="whitegrid")
     plt.style.use("default")
+    apply_paper_fmt()
 
     df = df.copy()
 
@@ -409,21 +442,11 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
             linewidth=0.5,
         )
 
-        for xi, h, b in zip(x, heights, bottom):
-            if h >= 0.04:
-                ax.text(
-                    xi,
-                    b + h / 2.0,
-                    f"{h:.2f}",
-                    ha="center",
-                    va="center",
-                    fontsize=5,
-                    color="white",
-                )
 
         bottom = [b + h for b, h in zip(bottom, heights)]
 
     ax.grid(False)
+    sns.despine(ax=ax, top=True, right=True)
     pretty_labels = [label_map.get(v, v) for v in variants]
 
     ax.set_xticks(x)
@@ -433,14 +456,13 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     #ax.set_title(title, fontsize=12)
 
     ax.legend(
-        title="Relevance Scores",
+        title="Relevance\nScore",
         loc="center left",
         bbox_to_anchor=(1.02, 0.5),
         frameon=True,
         framealpha=1.0,
         edgecolor="white",
     )
-
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -450,6 +472,8 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
 # Main
 # =========================
 if __name__ == "__main__":
+    warn_if_fonts_missing(paper_fmt.get("font.serif", []))
+
     df_labels = load_label_distributions_multi_year(LABEL_BASE_DIR, TREC_DL_YEARS)
 
     if df_labels.empty:

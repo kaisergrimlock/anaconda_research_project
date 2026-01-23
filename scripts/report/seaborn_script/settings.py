@@ -10,7 +10,7 @@ paper_fmt = {
         "Linux Biolinum",
         "Linux Biolinum O",
     ],
-    "font.size": 9,
+    "font.size": 10,
     "font.sans-serif": [
         "Linux Libertine",
         "Linux Libertine O",
