@@ -26,7 +26,7 @@ if TOKEN_PATH.exists():
 YEAR = "2022"
 
 # Run one or many langs at once:
-LANGS: List[str] = ["eng", "ar", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
+LANGS: List[str] = ["eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
 
 
 PART_MIN = 1

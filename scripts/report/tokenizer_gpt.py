@@ -11,10 +11,10 @@ from transformers import AutoTokenizer
 # ============================================================
 # Config
 # ============================================================
-YEAR = "2022"
+YEARS: List[str] = ["2022", "2021"]
 
 # Run one or many langs at once:
-LANGS: List[str] = ["eng", "ar", "fr", "zh", "vi", "he", "hi", "th", "sw", "ga"]
+LANGS: List[str] = ["eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
 
 # If you still want the old behavior, set LANGS = ["ga_first"]
 PART_MIN = 1
@@ -178,5 +178,7 @@ def run_for_langs(year: str, langs: Iterable[str]) -> pd.DataFrame:
 # ============================================================
 # Main
 # ============================================================
-combined_df = run_for_langs(YEAR, LANGS)
-print("done. langs:", list(dict.fromkeys(combined_df["lang"].tolist())))
+last_df: Optional[pd.DataFrame] = None
+for year in YEARS:
+    last_df = run_for_langs(year, LANGS)
+    print(f"done for {year}. langs:", list(dict.fromkeys(last_df["lang"].tolist())))

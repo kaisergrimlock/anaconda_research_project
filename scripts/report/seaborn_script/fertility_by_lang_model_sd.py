@@ -15,11 +15,13 @@ import seaborn as sns
 THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
 
-YEAR = "2022"
+# Use one or more years to combine.
+YEARS = ["2022", "2021"]
 INPUT_ROOT = PROJECT_ROOT / "outputs" / "token"
 
-OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR / f"avg_fertility_by_lang_model_base_{YEAR}_sd_only.pdf"
-OUTPUT_PNG = PROJECT_ROOT / "figures" / f"avg_fertility_by_lang_model_{YEAR}_sd_only.png"
+YEAR_LABEL = "_".join(YEARS)
+OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR_LABEL / f"avg_fertility_by_lang_model_base_{YEAR_LABEL}_sd_only_first.pdf"
+OUTPUT_PNG = PROJECT_ROOT / "figures" / f"avg_fertility_by_lang_model_{YEAR_LABEL}_sd_only.png"
 
 AUTO_DISCOVER_MODELS = True
 MODELS = ["gpt", "qwen", "llama"]
@@ -56,7 +58,7 @@ SEPARATOR_LINEWIDTH = 0.8
 #   - Compare base vs word: ["base", "word"]
 #   - Compare base vs first: ["base", "first"]
 #   - Compare base vs word vs first: ["base", "word", "first"]
-INCLUDE_VARIANTS = ["base"]  # change to ["base","word","first"] when needed
+INCLUDE_VARIANTS = ["first"]  # change to ["base","word","first"] when needed
 
 # Display strategy:
 # - True: x-axis categories are (lang,variant) e.g. "ga", "ga_word", "ga_first"
@@ -89,7 +91,7 @@ def discover_models() -> list[str]:
     return discovered
 
 
-def parse_lang_and_variant(csv_path: Path) -> tuple[str, str] | None:
+def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
     """
     Parse filename:
       passage_tokens_<YEAR>_<lang>.csv
@@ -100,7 +102,7 @@ def parse_lang_and_variant(csv_path: Path) -> tuple[str, str] | None:
     Returns (base_lang, variant) where variant in:
       base, word, first, crit, corrected
     """
-    m = re.match(rf"passage_tokens_{re.escape(YEAR)}_(.+)\.csv$", csv_path.name)
+    m = re.match(rf"passage_tokens_{re.escape(year)}_(.+)\.csv$", csv_path.name)
     if not m:
         return None
 
@@ -171,29 +173,30 @@ def build_raw_df() -> pd.DataFrame:
         if not model_root.exists():
             continue
 
-        for csv_path in model_root.glob(f"passage_tokens_{YEAR}_*.csv"):
-            parsed = parse_lang_and_variant(csv_path)
-            if parsed is None:
-                continue
+        for year in YEARS:
+            for csv_path in model_root.glob(f"passage_tokens_{year}_*.csv"):
+                parsed = parse_lang_and_variant(csv_path, year)
+                if parsed is None:
+                    continue
 
-            lang, variant = parsed
-            if variant not in allowed:
-                continue
+                lang, variant = parsed
+                if variant not in allowed:
+                    continue
 
-            vals = read_fertility_values(csv_path)
-            if vals.size == 0:
-                continue
+                vals = read_fertility_values(csv_path)
+                if vals.size == 0:
+                    continue
 
-            frames.append(
-                pd.DataFrame(
-                    {
-                        "lang": lang,
-                        "variant": variant,
-                        "model": model,
-                        FERTILITY_COL: vals,
-                    }
+                frames.append(
+                    pd.DataFrame(
+                        {
+                            "lang": lang,
+                            "variant": variant,
+                            "model": model,
+                            FERTILITY_COL: vals,
+                        }
+                    )
                 )
-            )
 
     if not frames:
         raise ValueError(
