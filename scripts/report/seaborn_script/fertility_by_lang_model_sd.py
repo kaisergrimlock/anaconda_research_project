@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.lines import Line2D
+
+from settings import apply_paper_fmt
 
 # =========================
 # Config
@@ -20,7 +23,7 @@ YEARS = ["2022", "2021"]
 INPUT_ROOT = PROJECT_ROOT / "outputs" / "token"
 
 YEAR_LABEL = "_".join(YEARS)
-OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR_LABEL / f"avg_fertility_by_lang_model_base_{YEAR_LABEL}_sd_only_first.pdf"
+OUTPUT_PDF = PROJECT_ROOT / "figures" / YEAR_LABEL / f"avg_fertility_by_lang_model_base_{YEAR_LABEL}_sd_only.pdf"
 OUTPUT_PNG = PROJECT_ROOT / "figures" / f"avg_fertility_by_lang_model_{YEAR_LABEL}_sd_only.png"
 
 AUTO_DISCOVER_MODELS = True
@@ -51,14 +54,14 @@ SEPARATOR_LINEWIDTH = 0.8
 # NEW: derived variants control
 # -------------------------
 # Baseline: lang (e.g., "ga")
-# Derived variants: "<lang>_word", "<lang>_first" (also supports "_crit", "_corrected" if present)
+# Derived variants: "<lang>_word", "<lang>_first" (also supports "_crit", "_corrected", "_last" if present)
 #
 # Examples:
 #   - Only baseline: ["base"]
 #   - Compare base vs word: ["base", "word"]
 #   - Compare base vs first: ["base", "first"]
 #   - Compare base vs word vs first: ["base", "word", "first"]
-INCLUDE_VARIANTS = ["first"]  # change to ["base","word","first"] when needed
+INCLUDE_VARIANTS = ["base"]  # change to ["base","word","first"] when needed
 
 # Display strategy:
 # - True: x-axis categories are (lang,variant) e.g. "ga", "ga_word", "ga_first"
@@ -67,7 +70,7 @@ INCLUDE_VARIANTS = ["first"]  # change to ["base","word","first"] when needed
 VARIANT_ON_X_AXIS = True
 
 # Optional: how to order variants within each language
-VARIANT_ORDER = ["base", "word", "first", "crit", "corrected"]
+VARIANT_ORDER = ["base", "word", "first", "crit", "corrected", "last"]
 
 
 # =========================
@@ -97,10 +100,10 @@ def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
       passage_tokens_<YEAR>_<lang>.csv
 
     Where <lang> may end with:
-      _word, _first, _crit, _corrected
+      _word, _first, _crit, _corrected, _last
 
     Returns (base_lang, variant) where variant in:
-      base, word, first, crit, corrected
+      base, word, first, crit, corrected, last
     """
     m = re.match(rf"passage_tokens_{re.escape(year)}_(.+)\.csv$", csv_path.name)
     if not m:
@@ -113,6 +116,7 @@ def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
         ("_first", "first"),
         ("_crit", "crit"),
         ("_corrected", "corrected"),
+        ("_last", "last"),
     ]:
         if name.endswith(suf):
             return (name[: -len(suf)], var)
@@ -265,8 +269,19 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
     Plot ONLY error bars representing ±1 SD around the mean (no markers).
     Supports comparing variants like base vs word vs first.
     """
+    apply_paper_fmt()
     sns.set(style="whitegrid")
     fig, ax = plt.subplots(figsize=FIGSIZE)
+    mean_handle = Line2D(
+        [0],
+        [0],
+        marker="D",
+        linestyle="none",
+        markersize=5,
+        markerfacecolor="none",
+        markeredgecolor="0.2",
+        label="Mean",
+    )
 
     # base language order
     langs = sorted(summary_df["lang"].unique().tolist())
@@ -336,6 +351,16 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
                 label=model,
                 zorder=2,
             )
+            ax.scatter(
+                xs,
+                ys,
+                marker="D",
+                s=18,
+                facecolors="none",
+                edgecolors=MODEL_COLORS.get(model),
+                linewidths=1.0,
+                zorder=3,
+            )
 
         ax.set_xticks(x_base)
         ax.set_xticklabels(xticklabels)
@@ -391,6 +416,16 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
                 label=f"{variant}/{model}",
                 zorder=2,
             )
+            ax.scatter(
+                xs,
+                ys,
+                marker="D",
+                s=18,
+                facecolors="none",
+                edgecolors=MODEL_COLORS.get(model),
+                linewidths=1.0,
+                zorder=3,
+            )
 
         ax.set_xticks(x_base)
         ax.set_xticklabels(xticklabels)
@@ -408,10 +443,15 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
     ax.grid(axis="y", visible=False)
     ax.grid(axis="x", visible=False)
 
+    handles, labels = ax.get_legend_handles_labels()
+    handles.append(mean_handle)
+    labels.append("Mean")
     ax.legend(
+        handles,
+        labels,
         loc="upper center",
         bbox_to_anchor=(0.5, -0.18),
-        ncol=max(1, min(6, len(ax.get_legend_handles_labels()[1]))),
+        ncol=max(1, min(6, len(labels))),
         frameon=False,
     )
 

@@ -28,6 +28,7 @@ DEFAULT_OUT_DIR.mkdir(parents=True, exist_ok=True)
 # Helpers
 # ===============================================================
 LANG_FROM_SUFFIX_RE = re.compile(r"_inj-([a-z]{2,3})-", re.IGNORECASE)
+RAND_SUFFIX_RE = re.compile(r"_inj-[a-z]{2,3}-qp-rand", re.IGNORECASE)
 
 def language_from_suffix(suffix: str) -> Optional[str]:
     """
@@ -63,7 +64,7 @@ def read_suffixes(path: Path) -> List[str]:
 
         for row in r:
             s = (row.get("suffix", "") or "").strip()
-            if s:
+            if s and RAND_SUFFIX_RE.search(s):
                 out.append(s)
 
     out.sort(key=len, reverse=True)  # longest-first to avoid partial matches

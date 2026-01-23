@@ -27,6 +27,7 @@ PROJECT_ROOT = find_repo_root(THIS_FILE.parent)
 
 IN_DIR = PROJECT_ROOT / "outputs" / "anserini_rank_deltas"
 FIG_DIR = PROJECT_ROOT / "figures"
+RAND_SUFFIX_RE = re.compile(r"_inj-[a-z]{2,3}-qp-rand", re.IGNORECASE)
 
 # Adjust if your lang.csv lives elsewhere
 LANG_CSV = PROJECT_ROOT / "scripts" / "report" / "seaborn_script" / "lang.csv"
@@ -64,10 +65,10 @@ def load_lang_levels(
     df = pd.read_csv(lang_csv)
 
     lang_col = _pick_first_col(
-        df, ("lang", "language", "code", "lang_code", "iso", "iso639", "iso_639_1", "iso_639_3")
+        df, ("lang",)
     )
     level_col = _pick_first_col(
-        df, ("taxonomy", "class", "resource_class", "joshi_class", "tax_class", "level", "resource_level")
+        df, ("taxonomy",)
     )
 
     if lang_col is None or level_col is None:
@@ -115,8 +116,6 @@ def plot_raw_box_by_lang(
 
     # attach resource level for coloring
     dfp["resource_level"] = dfp["language"].map(lang_to_level)
-
-    # If a language is missing from lang.csv, fall back to default_level (if provided).
     if default_level is not None:
         dfp["resource_level"] = dfp["resource_level"].fillna(default_level)
     dfp["resource_level"] = dfp["resource_level"].fillna(-1).astype(int)
@@ -159,8 +158,8 @@ def plot_raw_box_by_lang(
         order=order,
         hue="resource_level",
         palette=palette,
-        dodge=False,        # IMPORTANT: one box per language
-        whis=1.5,           # Tukey whiskers
+        dodge=False,
+        whis=1.5,
         showfliers=True,
         flierprops={
             "marker": "o",
@@ -250,19 +249,21 @@ def main() -> None:
     for in_csv in in_files:
         df = pd.read_csv(in_csv)
 
-        required = {"language", "delta_rank"}
+        required = {"language", "delta_rank", "suffix"}
         missing = required - set(df.columns)
         if missing:
             raise ValueError(f"{in_csv.name} missing columns: {sorted(missing)}. Found: {list(df.columns)}")
 
+        df = df[df["suffix"].astype(str).str.contains(RAND_SUFFIX_RE, na=False)]
+        if df.empty:
+            print(f"[WARN] {in_csv.name}: no qp-rand rows after filtering; skipping.")
+            continue
+
         year = detect_year_from_name(in_csv.name) or "misc"
         out_dir = FIG_DIR / year
-        out_pdf = out_dir / f"{in_csv.stem}.raw_box_by_lang_whis1p5.langcsv.pdf"
-
-        title = f"ΔRank by Language (raw; boxplot, whis=1.5) — {in_csv.name}"
+        out_pdf = out_dir / f"{in_csv.stem}.raw_box_by_lang_whisminmax.langcsv.pdf"
         plot_raw_box_by_lang(
             df_raw=df,
-            title=title,
             out_pdf=out_pdf,
             lang_to_level=lang_to_level,
             level_to_color=level_to_color,

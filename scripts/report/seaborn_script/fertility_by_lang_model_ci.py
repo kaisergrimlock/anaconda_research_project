@@ -53,7 +53,7 @@ SEPARATOR_LINEWIDTH = 0.8
 # NEW: derived variants control
 # -------------------------
 # Baseline: lang (e.g., "ga")
-# Variants are derived from filename suffixes: "_word", "_first", "_crit", "_corrected"
+# Variants are derived from filename suffixes: "_word", "_first", "_crit", "_corrected", "_last"
 # Set which variants you want to INCLUDE in the plot.
 #
 # Examples:
@@ -112,9 +112,9 @@ def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
     Parse filename:
       passage_tokens_<YEAR>_<lang>.csv
     where <lang> may have a derived suffix:
-      <base>_word, <base>_first, <base>_crit, <base>_corrected
+      <base>_word, <base>_first, <base>_crit, <base>_corrected, <base>_last
 
-    Returns: (base_lang, variant) where variant in {"base","word","first","crit","corrected"}
+    Returns: (base_lang, variant) where variant in {"base","word","first","crit","corrected","last"}
     """
     m = re.match(rf"passage_tokens_{re.escape(year)}_(.+)\.csv$", csv_path.name)
     if not m:
@@ -127,6 +127,7 @@ def parse_lang_and_variant(csv_path: Path, year: str) -> tuple[str, str] | None:
         ("_first", "first"),
         ("_crit", "crit"),
         ("_corrected", "corrected"),
+        ("_last", "last"),
     ]:
         if name.endswith(suf):
             return (name[: -len(suf)], var)
