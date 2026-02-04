@@ -4,14 +4,31 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+# =========================
+# Path setup (MUST be before helpers imports)
+# =========================
+THIS_FILE = Path(__file__).resolve()
+
+# /scripts/report/seaborn_script
+SEABORN_SCRIPT_DIR = THIS_FILE.parents[1]
+
+# repo root (same as your current pattern)
+PROJECT_ROOT = THIS_FILE.parents[4]
+
+# Ensure global seaborn_script/helpers wins over local subfolder helpers
+if str(SEABORN_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SEABORN_SCRIPT_DIR))
+
+# Keep repo root for scripts.* imports
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# =========================
+# Imports
+# =========================
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-THIS_FILE = Path(__file__).resolve()
-PROJECT_ROOT = THIS_FILE.parents[4]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import (
@@ -28,14 +45,13 @@ from helpers.metrics_llm import (
     binarize_labels,
 )
 
+
+from helpers.draw import apply_paper_fmt
 # -------- Config --------
 TREC_DL_YEAR = "2022"
-MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG = "ar_word" # "raw","eng","vi","fr", etc.
+MODEL = "qwen3-32b-v1"
+LANG = "ar_word"
 
-# This CSV is now assumed to already contain:
-#   - relevance
-#   - llm_relevance
 LLM_FILE = (
     Path("outputs/llm_label")
     / f"trec_dl_{TREC_DL_YEAR}"
@@ -93,31 +109,32 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     invalid_df = df[~valid_mask].copy()
 
     print("Total rows:", len(df))
-    print("Valid rows:", valid_mask.sum())
-    print("Invalid rows:", (~valid_mask).sum())
+    print("Valid rows:", int(valid_mask.sum()))
+    print("Invalid rows:", int((~valid_mask).sum()))
 
-    # Keep your existing debug dump (optional)
-    # Keep debug columns so we can see WHY it was marked invalid
-    debug_cols = []
+    # Keep your existing debug dump: show why invalid
+    debug_cols: list[str] = []
     for c in ["qid", "pid", "relevance", "llm_relevance", "NIST", "LLM"]:
         if c in invalid_df.columns:
             debug_cols.append(c)
 
-    # Add a reason column to make it obvious
     invalid_dbg = invalid_df.copy()
     invalid_dbg["reason"] = ""
     invalid_dbg.loc[invalid_dbg["NIST"].isna(), "reason"] += "NIST_NaN;"
-    invalid_dbg.loc[~invalid_dbg["NIST"].isin(LABELS) & invalid_dbg["NIST"].notna(), "reason"] += "NIST_out_of_range;"
+    invalid_dbg.loc[
+        ~invalid_dbg["NIST"].isin(LABELS) & invalid_dbg["NIST"].notna(),
+        "reason",
+    ] += "NIST_out_of_range;"
     invalid_dbg.loc[invalid_dbg["LLM"].isna(), "reason"] += "LLM_NaN;"
-    invalid_dbg.loc[~invalid_dbg["LLM"].isin(LABELS) & invalid_dbg["LLM"].notna(), "reason"] += "LLM_out_of_range;"
+    invalid_dbg.loc[
+        ~invalid_dbg["LLM"].isin(LABELS) & invalid_dbg["LLM"].notna(),
+        "reason",
+    ] += "LLM_out_of_range;"
 
     write_df(invalid_dbg[debug_cols + ["reason"]], OUT_INVALID_ROWS)
 
-
-    # Write ALL invalid rows as "part0" exactly as-is (no renaming, no new cols)
     # Write ONLY rows where llm_relevance is NaN after coercion ("LLM" column)
     OUT_MISSING_PART0.parent.mkdir(parents=True, exist_ok=True)
-
     missing_llm_df = df[df["LLM"].isna()].copy()
 
     missing_llm_df.drop(columns=["NIST", "LLM"], errors="ignore").to_csv(
@@ -125,8 +142,9 @@ def split_valid_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         index=False,
         encoding="utf-8",
     )
-    print(f"[Missing->Part0] Wrote {len(missing_llm_df)} rows (LLM is NaN) to: {OUT_MISSING_PART0}")
-
+    print(
+        f"[Missing->Part0] Wrote {len(missing_llm_df)} rows (LLM is NaN) to: {OUT_MISSING_PART0}"
+    )
 
     return valid_df, invalid_df
 
@@ -136,35 +154,58 @@ def latex_metrics_row(
     mae_2pt: float,
     kappa_4pt: float,
     kappa_2pt: float,
+    alpha_4pt: float,
+    alpha_2pt: float,
 ) -> str:
-    """
-    Return a LaTeX table row fragment in exactly this style:
-
-    & \\num{...}  %MAE_4pt
-    & \\num{...}  %MAE_2pt
-    & \\num{...}  %kappa_4pt
-    & \\num{...}  %kappa_2pt \\\\
-    """
-    # Keep full precision (like your example). If you want rounding, change here.
     return (
         f"& \\num{{{mae_4pt}}}  %MAE_4pt\n"
         f"& \\num{{{mae_2pt}}} %MAE_2pt\n"
         f"& \\num{{{kappa_4pt}}}   %kappa_4pt\n"
-        f"& \\num{{{kappa_2pt}}} \\\\ %kappa_2pt \n"
+        f"& \\num{{{kappa_2pt}}}   %kappa_2pt\n"
+        f"& \\num{{{alpha_4pt}}}   %alpha_4pt\n"
+        f"& \\num{{{alpha_2pt}}} \\\\ %alpha_2pt\n"
     )
 
 
 def save_latex_row(text: str, path: Path) -> None:
-    """Write LaTeX row fragment to disk (overwrites)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
 
 
+def plot_confusion_heatmap(
+    cm: pd.DataFrame,
+    *,
+    title: str,
+    out_svg: Path,
+    dpi: int = 200,
+) -> None:
+    """
+    Confusion heatmap using repo style defaults.
+    We call apply_paper_fmt() (from helpers.draw) once per plot to ensure
+    consistent styling regardless of import order.
+    """
+    apply_paper_fmt()
+
+    fig, ax = plt.subplots()
+
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        linewidths=0.5,
+        cbar=True,
+        ax=ax,
+    )
+
+    ax.set_title(title)
+    ax.set_ylabel("NIST label")
+    ax.set_xlabel("LLM label")
+
+    save_heatmap(plt, out_svg, dpi=dpi, tight=True, show=True)
+    plt.close(fig)
+
+
 def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
-    """
-    Given a DataFrame with columns NIST and LLM (already validated),
-    compute the confusion matrix and metrics, then write outputs + heatmap + LaTeX row.
-    """
     # 1) Confusion matrix (4-point)
     cm = pd.crosstab(
         index=pd.Categorical(paired["NIST"], categories=LABELS, ordered=True),
@@ -179,15 +220,13 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     # 2) Metrics (4-point / graded)
     mae_4pt = compute_mae(paired["NIST"], paired["LLM"])
     kappa_4pt_weighted = compute_weighted_kappa_ordinal(cm)
-
-    # Krippendorff's alpha (4-point, ordinal) (kept for CSV outputs)
     alpha_4pt = compute_krippendorff_alpha_paired(
         paired["NIST"],
         paired["LLM"],
         level="ordinal",
     )
 
-    # Binary version: collapse labels into [0, 1]
+    # Binary version
     paired_bin = paired.copy()
     paired_bin["NIST_bin"] = binarize_labels(paired_bin["NIST"])
     paired_bin["LLM_bin"] = binarize_labels(paired_bin["LLM"])
@@ -200,8 +239,6 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
 
     kappa_2pt = compute_unweighted_kappa(cm_bin)
     mae_2pt = compute_mae(paired_bin["NIST_bin"], paired_bin["LLM_bin"])
-
-    # Krippendorff's alpha (binary, treat as nominal) (kept for CSV outputs)
     alpha_2pt = compute_krippendorff_alpha_paired(
         paired_bin["NIST_bin"],
         paired_bin["LLM_bin"],
@@ -211,7 +248,7 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
     # 3) Write confusion outputs
     write_confusion_outputs(cm, cm_pct, OUT_COUNTS, OUT_PCT)
 
-    # 4) Metrics CSV (kept)
+    # 4) Metrics CSV
     metrics_df = pd.DataFrame(
         [
             {"metric": "mae_4pt", "value": float(mae_4pt)},
@@ -231,69 +268,28 @@ def compute_and_save_confusion_and_metrics(paired: pd.DataFrame) -> None:
         mae_2pt=float(mae_2pt),
         kappa_4pt=float(kappa_4pt_weighted),
         kappa_2pt=float(kappa_2pt),
+        alpha_4pt=float(alpha_4pt),
+        alpha_2pt=float(alpha_2pt),
     )
     print("\n[LaTeX row]\n" + latex_row)
     save_latex_row(latex_row, OUT_LATEX)
 
     # 6) Heatmap
-    plt.figure(figsize=(6, 5))
-    sns.heatmap(cm, annot=True, fmt="d", linewidths=0.5, cbar=True)
-    plt.title(f"Confusion Matrix: NIST vs LLM — {MODEL} {TREC_DL_YEAR} {LANG}")
-    plt.ylabel("NIST label")
-    plt.xlabel("LLM label")
-
-    save_heatmap(plt, OUT_SVG, dpi=200, tight=True, show=True)
-
-
-def print_false_positive_examples(paired: pd.DataFrame) -> None:
-    """
-    Print 1 example for each case where:
-      - NIST (relevance) == 0
-      - LLM (llm_relevance) == 1, 2, or 3
-    Uses only valid pairs (paired).
-    """
-    fp = paired[(paired["NIST"] == 0) & (paired["LLM"].isin([1, 2, 3]))].copy()
-
-    if fp.empty:
-        print("[FP] No false positives found (NIST==0 but LLM in {1,2,3}).")
-        return
-
-    cols_prefer = [
-        "qid",
-        "docid",
-        "pid",
-        "query_id",
-        "passage_id",
-        "relevance",
-        "llm_relevance",
-        "NIST",
-        "LLM",
-        "query",
-        "passage",
-    ]
-
-    for llm_label in [1, 2, 3]:
-        bucket = fp[fp["LLM"] == llm_label]
-        if bucket.empty:
-            print(f"[FP] No examples where NIST=0 and LLM={llm_label}.")
-            continue
-
-        row = bucket.sample(n=1, random_state=42).iloc[0]
-        cols = [c for c in cols_prefer if c in bucket.columns]
-
-        print(f"[FP] Example where NIST=0 and LLM={llm_label}:")
-        if cols:
-            kv = ", ".join([f"{c}={repr(row[c])}" for c in cols])
-            print("  -", kv)
-        else:
-            print("  -", row.to_dict())
+    plot_confusion_heatmap(
+        cm,
+        title=f"Confusion Matrix: {MODEL} {TREC_DL_YEAR} {LANG}",
+        out_svg=OUT_SVG,
+        dpi=200,
+    )
 
 
 def main() -> None:
+    # Apply style once at entry (draw.py -> settings.py), but we also re-apply in plots
+    # to avoid surprises if other scripts modify rcParams.
+    apply_paper_fmt()
+
     df = load_and_prepare()
     paired, _invalid_df = split_valid_invalid(df)
-
-    # print_false_positive_examples(paired)
 
     if paired.empty:
         raise RuntimeError(

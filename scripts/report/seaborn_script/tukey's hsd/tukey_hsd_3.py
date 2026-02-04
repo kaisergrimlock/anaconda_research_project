@@ -1,24 +1,46 @@
-
 import sys
 import re
 from pathlib import Path
 from typing import Dict, List, Optional
-import pandas as pd
-import matplotlib.pyplot as plt
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from helpers.draw import color_tukey_by_taxonomy, center_x_axis_at_zero, taxonomy_legend, add_model_separators
-from helpers.lang_profiles import get_langs
 
 # =========================
-# File Location
+# Path setup (MUST be before helpers imports)
 # =========================
 THIS_FILE = Path(__file__).resolve()
+
+# /scripts/report/seaborn_script
+SEABORN_SCRIPT_DIR = THIS_FILE.parents[1]
+
+# repo root (same as you had)
 PROJECT_ROOT = THIS_FILE.parents[4]
+
+# Put seaborn_script first so `import helpers.*` binds to seaborn_script/helpers
+if str(SEABORN_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SEABORN_SCRIPT_DIR))
+
+# Keep project root available for scripts.* imports
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# =========================
+# Imports
+# =========================
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+# These now resolve to: scripts/report/seaborn_script/helpers/*
+from helpers.draw import (
+    color_tukey_by_taxonomy,
+    center_x_axis_at_zero,
+    taxonomy_legend,
+    add_model_separators,
+)
+from helpers.lang_profiles import get_langs
+
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
+
 
 # ========================
 # Parameters
@@ -287,12 +309,10 @@ def main() -> None:
     ax.set_axisbelow(True)
     ax.set_title(None)
 
-
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
     plt.savefig(OUT_SIMUL_PDF, format="pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
-
 
     # =========================
     # Final logging
