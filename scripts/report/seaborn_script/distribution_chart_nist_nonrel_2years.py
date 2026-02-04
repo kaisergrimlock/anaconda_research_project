@@ -70,6 +70,8 @@ label_map = {
     "sw_word": "SwWP",
     "ga_word": "GaWP",
     "ar_word": "ArWP",
+    "hi_word": "HiWP",
+    "he_word": "HeWP",
     "ar": "ArQP",
     "raw_crit": "Baseline Crit",
     "eng_crit": "Baseline Crit + EnQP",
