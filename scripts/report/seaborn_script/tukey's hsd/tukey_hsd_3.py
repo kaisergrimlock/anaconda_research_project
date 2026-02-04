@@ -4,32 +4,26 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # =========================
-# Path setup (MUST be before helpers imports)
+# Repo root bootstrap (MUST be before repo imports)
 # =========================
 THIS_FILE = Path(__file__).resolve()
-
-# /scripts/report/seaborn_script
-SEABORN_SCRIPT_DIR = THIS_FILE.parents[1]
-
-# repo root (same as you had)
-PROJECT_ROOT = THIS_FILE.parents[4]
-
-# Put seaborn_script first so `import helpers.*` binds to seaborn_script/helpers
-if str(SEABORN_SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SEABORN_SCRIPT_DIR))
-
-# Keep project root available for scripts.* imports
+PROJECT_ROOT = THIS_FILE.parents[4]  # adjust if needed
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+THIS_FILE = Path(__file__).resolve()
+SEABORN_ROOT = THIS_FILE.parents[1]  # seaborn_script/
+
+if str(SEABORN_ROOT) not in sys.path:
+    sys.path.insert(0, str(SEABORN_ROOT))
+
 # =========================
-# Imports
+# Now safe to import repo modules
 # =========================
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
-# These now resolve to: scripts/report/seaborn_script/helpers/*
 from helpers.draw import (
     color_tukey_by_taxonomy,
     center_x_axis_at_zero,
@@ -37,11 +31,8 @@ from helpers.draw import (
     add_model_separators,
 )
 from helpers.lang_profiles import get_langs
-
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
-
-
 # ========================
 # Parameters
 # ========================
@@ -308,6 +299,7 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
+
 
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
