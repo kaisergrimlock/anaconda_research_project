@@ -320,13 +320,14 @@ def main() -> None:
     fig_height = 100.0
     fig, ax = plt.subplots(figsize=(10, fig_height))
     tukey.plot_simultaneous(ax=ax)
+    fig.set_size_inches(8, 7, forward=True)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
     add_model_prefix_labels(
         fig,
         ax,
         group_sep=GROUP_SEP,
-        x=-0.09,
+        x=-0.15,
         rotation=90,
         fontsize="large",
         fontweight="bold",
@@ -344,7 +345,7 @@ def main() -> None:
     language_legend(ax, lang_to_rgba=lang_palette, title="Language", loc="upper left")
     center_x_axis_at_zero(ax)
     ax.set_xlim(-0.1, 1.25)
-    ax.tick_params(axis="y", pad=12, labelsize=6)
+    ax.tick_params(axis="y", pad=12, labelsize=10)
     sns.despine(ax=ax, top=True, right=True)
 
 

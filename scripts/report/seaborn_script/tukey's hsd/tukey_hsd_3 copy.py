@@ -53,9 +53,11 @@ LABELS = [0, 1, 2, 3]
 #LANGS: List[str] = ["raw", "eng", "ru", "vi", "th", "sw", "ga", "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets", "th_brackets"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_vi", "eng", "vi_th", "vi"]  # if empty, allow all langs found
 #LANGS: List[str] = ["raw", "eng", "eng_mult_2", "eng_mult_3"]
-LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
+#LANGS: List[str] = ["raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "hi_last"]
 #LANGS: List[str] = ["raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first", "hi_first"]
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "eng_word", "fr_word", "ru_word", "vi_word", "he_word", "ar_word", "sw_word", "ga_word", "th_word"] 
+
+LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi", "eng_crit", "fr_crit", "ru_crit", ""] 
 
 #LANGS: List[str] = ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"] # if empty, allow all langs found
 #LANGS: List[str] = ["vi", "vi_corrected", "th", "th_corrected", "ko", "ko_corrected"]  # if empty, allow all langs found
@@ -398,21 +400,22 @@ def main() -> None:
     # =========================
     # Step 8b: Plot simultaneous confidence intervals
     # =========================
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(5, 8))
     tukey.plot_simultaneous(ax=ax)
+    fig.set_size_inches(8, 9, forward=True)
     tick_labels = ax.get_yticklabels()
     if tick_labels:
         new_labels = [sort_to_display.get(t.get_text(), t.get_text()) for t in tick_labels]
         ax.set_yticklabels(new_labels)
     # Customize plot
-    add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
+    add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.5, alpha=0.5)
     add_model_prefix_labels(
         fig,
         ax,
         group_sep=GROUP_SEP,
-        x=-0.09,
+        x=-0.15,
         rotation=90,
-        fontsize="large",
+        fontsize="medium",
         fontweight="bold",
     )
     tick_labels = ax.get_yticklabels()
@@ -434,13 +437,13 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
-    ax.set_xlim(-0.1, 1.25)
+    ax.set_xlim(-0.1, 1.75)
     sns.despine(ax=ax, top=True, right=True)
 
 
     plt.tight_layout()
-    plt.savefig(OUT_SIMUL_SVG, format="svg", bbox_inches="tight", pad_inches=0.02)
-    plt.savefig(OUT_SIMUL_PDF, format="pdf", bbox_inches="tight", pad_inches=0.02)
+    plt.savefig(OUT_SIMUL_SVG, format="svg")
+    plt.savefig(OUT_SIMUL_PDF, format="pdf")
     plt.close(fig)
 
 

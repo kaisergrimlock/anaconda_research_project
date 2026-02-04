@@ -502,15 +502,16 @@ def main() -> None:
     # =========================
     fig, ax = plt.subplots(figsize=(10, 4))
     tukey.plot_simultaneous(ax=ax)
+    fig.set_size_inches(8, 6, forward=True)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
     add_model_prefix_labels(
         fig,
         ax,
         group_sep=GROUP_SEP,
-        x=-0.1,
+        x=-0.20,
         rotation=90,
-        fontsize="large",
+        fontsize="smaller",
         fontweight="bold",
     )
     tick_labels = ax.get_yticklabels()

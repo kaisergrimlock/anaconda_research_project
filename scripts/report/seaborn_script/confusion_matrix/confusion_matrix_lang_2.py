@@ -31,7 +31,7 @@ from helpers.metrics_llm import (
 # -------- Config --------
 TREC_DL_YEAR = "2022"
 MODEL = "qwen3-32b-v1"  # e.g., "qwen3-32b-v1", "gpt-oss-20b", etc.
-LANG = "ar_last" # "raw","eng","vi","fr", etc.
+LANG = "ar_word" # "raw","eng","vi","fr", etc.
 
 # This CSV is now assumed to already contain:
 #   - relevance

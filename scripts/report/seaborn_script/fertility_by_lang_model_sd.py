@@ -38,9 +38,9 @@ EXCLUDE_LANGS_NORM = {l.strip().casefold() for l in EXCLUDE_LANGS}
 # Plot settings
 Y_MIN: float | None = 1.0  # set to None to auto-scale
 FIGSIZE = (12, 4)
-LABEL_FONTSIZE = 12
-TICK_FONTSIZE = 10
-LEGEND_FONTSIZE = 11
+LABEL_FONTSIZE = 20
+TICK_FONTSIZE = 13
+LEGEND_FONTSIZE = 15
 
 # Per-model colors (Matplotlib accepts hex). If missing, falls back to default.
 MODEL_COLORS = {
@@ -448,7 +448,7 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
 
         ax.set_xticks(x_base)
         ax.set_xticklabels(xticklabels, fontsize=TICK_FONTSIZE)
-        ax.set_xlabel("Language", fontsize=LABEL_FONTSIZE)
+        ax.set_xlabel("Language", fontsize=LABEL_FONTSIZE, fontweight="bold")
 
         if DRAW_LANG_SEPARATORS:
             add_language_separators(ax, len(lang_order))
@@ -469,7 +469,7 @@ def plot_sd_bars_only(summary_df: pd.DataFrame) -> None:
         handles,
         labels,
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.18),
+        bbox_to_anchor=(0.5, -0.25),
         ncol=max(1, min(6, len(labels))),
         fontsize=LEGEND_FONTSIZE,
         title_fontsize=LEGEND_FONTSIZE,

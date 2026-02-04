@@ -352,7 +352,7 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     group_width = 0.8
     bar_width = group_width / max(1, n_variants)
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=(3, 3))
 
     colors = sns.color_palette("muted", n_colors=n_variants)
     variant_colors: Dict[str, tuple] = {v: colors[i] for i, v in enumerate(variants)}
@@ -385,8 +385,8 @@ def plot_grouped_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
         loc="upper center",
         bbox_to_anchor=(0.5, -0.12),
         ncol=min(4, n_variants),
-        fontsize=10,
-        title_fontsize=10,
+        fontsize=15,
+        title_fontsize=15,
         frameon=True,
         framealpha=1.0,
         edgecolor="white",
@@ -453,8 +453,8 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
     pretty_labels = [label_map.get(v, v) for v in variants]
 
     ax.set_xticks(x)
-    ax.set_xticklabels(pretty_labels, rotation=45, ha="right", fontsize=9)
-    ax.set_ylabel("Relevance Label Score Distribution")
+    ax.set_xticklabels(pretty_labels, rotation=45, ha="right", fontsize=13)
+    ax.set_ylabel("Relevance Label Score Distribution", fontsize=15)
     ax.set_ylim(0, 1.05)
     #ax.set_title(title, fontsize=12)
 
@@ -463,8 +463,8 @@ def plot_stacked_distribution(df: pd.DataFrame, out_path: Path, title: str = "")
         loc="upper center",
         bbox_to_anchor=(0.5, -0.12),
         ncol=min(4, len(scores)),
-        fontsize=10,
-        title_fontsize=10,
+        fontsize=20,
+        title_fontsize=20,
         frameon=True,
         framealpha=1.0,
         edgecolor="white",
