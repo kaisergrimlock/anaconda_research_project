@@ -253,8 +253,6 @@ def color_tukey_by_language(
     Color Tukey plot elements by base language. For example, "vi" and "vi_word"
     share the same color.
     """
-    if apply_style:
-        apply_paper_fmt()
 
     # build palette over base languages present in tick labels
     fig.canvas.draw()

@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.metrics import jaccard_score
+from sklearn.preprocessing import MultiLabelBinarizer
+from helpers.lang_profiles import get_langs
+from helpers.settings import apply_paper_fmt
+
+# =========================
+# CONFIG
+# =========================
+THIS_FILE = Path(__file__).resolve()
+PROJECT_ROOT = THIS_FILE.parents[3]
+
+YEAR = "2021"
+INPUT_CSV = PROJECT_ROOT / "outputs" / "queries" /f"trec_dl_{YEAR}" / f"queries_trecdl_{YEAR}_all_lang_bowset.csv"
+
+OUT_DIR = PROJECT_ROOT / "outputs" / "query_analysis" / f"lang_similarity_{YEAR}"
+OUT_CSV = OUT_DIR / "jaccard_eng_vs_others_per_query.csv"
+
+OUT_AVG_CSV = OUT_DIR / "avg_jaccard_by_lang.csv"
+OUT_BAR_PNG = OUT_DIR / "avg_jaccard_by_lang.png"
+OUT_BAR_PDF = OUT_DIR / "avg_jaccard_by_lang.pdf"
+
+QID_COL = "qid"
+ENG_COL = "eng"
+OTHER_LANG_COLS = get_langs("lang")
+OTHER_LANG_COLS.remove("eng")  # remove English from the list of other langs
+OTHER_LANG_COLS.remove("raw")  # remove raw since it's not a language column
+
+
+def parse_bow(cell) -> list[str]:
+    """Cell is a JSON list of tokens. Return list[str]."""
+    if pd.isna(cell):
+        return []
+    s = str(cell).strip()
+    if not s:
+        return []
+    try:
+        v = json.loads(s)
+        return [str(t) for t in v] if isinstance(v, list) else []
+    except json.JSONDecodeError:
+        return []
+
+
+def jaccard_set(a_tokens: list[str], b_tokens: list[str]) -> tuple[float, int, int]:
+    """
+    Compute set Jaccard using scikit-learn.
+    Returns (jaccard, intersection_size, union_size)
+    """
+    A = set(a_tokens)
+    B = set(b_tokens)
+
+    union = A | B
+    if not union:
+        return 0.0, 0, 0
+
+    inter = A & B
+
+    mlb = MultiLabelBinarizer(classes=sorted(union))  # fixed order
+    vectors = mlb.fit_transform([A, B]).astype("uint8") 
+
+    jac = float(jaccard_score(vectors[0], vectors[1], average="binary", zero_division=0))
+    return jac, len(inter), len(union)
+
+
+def main() -> None:
+    if not INPUT_CSV.exists():
+        raise SystemExit(f"[ERROR] Input not found: {INPUT_CSV}")
+
+    df = pd.read_csv(INPUT_CSV)
+
+    needed = [QID_COL, ENG_COL] + OTHER_LANG_COLS
+    missing = [c for c in needed if c not in df.columns]
+    if missing:
+        raise SystemExit(f"[ERROR] Missing columns in CSV: {missing}\nGot: {list(df.columns)}")
+
+    qids = df[QID_COL].astype(int).to_numpy()
+    eng_tokens = df[ENG_COL].map(parse_bow).tolist()
+
+    rows: list[dict] = []
+
+    for lang in OTHER_LANG_COLS:
+        lang_tokens = df[lang].map(parse_bow).tolist()
+
+        # set sizes (unique tokens)
+        size_eng = np.fromiter((len(set(toks)) for toks in eng_tokens), dtype=int)
+        size_lang = np.fromiter((len(set(toks)) for toks in lang_tokens), dtype=int)
+
+        for i, qid in enumerate(qids):
+            jac, inter_sz, union_sz = jaccard_set(eng_tokens[i], lang_tokens[i])
+
+            rows.append(
+                {
+                    "qid": int(qid),
+                    "lang": lang,
+                    "jaccard_eng": jac,
+                    "size_eng": int(size_eng[i]),
+                    "size_lang": int(size_lang[i]),
+                    "intersection_size": int(inter_sz),
+                    "union_size": int(union_sz),
+                }
+            )
+
+        print(f"[OK] {lang}: computed jaccard for {len(qids)} queries")
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    out_df = pd.DataFrame(rows).sort_values(["qid", "lang"]).reset_index(drop=True)
+    out_df.to_csv(OUT_CSV, index=False)
+    print(f"[DONE] wrote: {OUT_CSV}")
+
+    avg_df = (
+        out_df.groupby("lang", as_index=False)["jaccard_eng"]
+        .mean()
+        .rename(columns={"jaccard_eng": "avg_jaccard_eng"})
+        .sort_values("avg_jaccard_eng", ascending=False)
+        .reset_index(drop=True)
+    )
+    avg_df.to_csv(OUT_AVG_CSV, index=False)
+    print(f"[DONE] wrote: {OUT_AVG_CSV}")
+
+    apply_paper_fmt()
+    plt.figure(figsize=(8, 4))
+    plt.bar(avg_df["lang"], avg_df["avg_jaccard_eng"])
+    plt.title("Average Jaccard Similarity vs English (BoW sets)")
+    plt.xlabel("Language")
+    plt.ylabel("Average jaccard (eng vs lang)")
+    plt.tight_layout()
+    plt.savefig(OUT_BAR_PNG, dpi=300)
+    plt.savefig(OUT_BAR_PDF, dpi=300)
+    plt.close()
+    print(f"[DONE] wrote: {OUT_BAR_PNG}")
+
+    print(f"[INFO] total_rows={len(out_df)}  langs={len(OTHER_LANG_COLS)}  queries={len(qids)}")
+
+
+if __name__ == "__main__":
+    main()
