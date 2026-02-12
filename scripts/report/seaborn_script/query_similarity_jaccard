@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import seaborn
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -19,7 +20,7 @@ THIS_FILE = Path(__file__).resolve()
 PROJECT_ROOT = THIS_FILE.parents[3]
 
 YEAR = "2021"
-INPUT_CSV = PROJECT_ROOT / "outputs" / "queries" /f"trec_dl_{YEAR}" / f"queries_trecdl_{YEAR}_all_lang_bowset.csv"
+INPUT_CSV = PROJECT_ROOT / "outputs" / "queries" /f"trec_dl_{YEAR}" / f"queries_trecdl_{YEAR}_all_lang_bowset_porter_stopped.tsv"
 
 OUT_DIR = PROJECT_ROOT / "outputs" / "query_analysis" / f"lang_similarity_{YEAR}"
 OUT_CSV = OUT_DIR / "jaccard_eng_vs_others_per_query.csv"
@@ -36,17 +37,14 @@ OTHER_LANG_COLS.remove("raw")  # remove raw since it's not a language column
 
 
 def parse_bow(cell) -> list[str]:
-    """Cell is a JSON list of tokens. Return list[str]."""
+    """Accept either JSON list or whitespace-separated tokens."""
     if pd.isna(cell):
         return []
     s = str(cell).strip()
     if not s:
         return []
-    try:
-        v = json.loads(s)
-        return [str(t) for t in v] if isinstance(v, list) else []
-    except json.JSONDecodeError:
-        return []
+    
+    return [t for t in s.split() if t]
 
 
 def jaccard_set(a_tokens: list[str], b_tokens: list[str]) -> tuple[float, int, int]:
@@ -74,7 +72,7 @@ def main() -> None:
     if not INPUT_CSV.exists():
         raise SystemExit(f"[ERROR] Input not found: {INPUT_CSV}")
 
-    df = pd.read_csv(INPUT_CSV)
+    df = pd.read_csv(INPUT_CSV, sep="\t")
 
     needed = [QID_COL, ENG_COL] + OTHER_LANG_COLS
     missing = [c for c in needed if c not in df.columns]
@@ -127,17 +125,19 @@ def main() -> None:
     print(f"[DONE] wrote: {OUT_AVG_CSV}")
 
     apply_paper_fmt()
-    plt.figure(figsize=(8, 4))
-    plt.bar(avg_df["lang"], avg_df["avg_jaccard_eng"])
-    plt.title("Average Jaccard Similarity vs English (BoW sets)")
-    plt.xlabel("Language")
-    plt.ylabel("Average jaccard (eng vs lang)")
-    plt.tight_layout()
-    plt.savefig(OUT_BAR_PNG, dpi=300)
-    plt.savefig(OUT_BAR_PDF, dpi=300)
-    plt.close()
-    print(f"[DONE] wrote: {OUT_BAR_PNG}")
+    fig, ax = plt.subplots(figsize=(8, 4))
 
+    seaborn.barplot(data=avg_df, x="lang", y="avg_jaccard_eng", ax=ax, color="green")
+    ax.set_xlabel("Language")
+    ax.set_ylabel("Average Jaccard Similarity with English")
+    ax.set_title("Average Jaccard Similarity of Query BOW Sets\nbetween English and Other Languages")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.savefig(OUT_BAR_PNG)
+    plt.savefig(OUT_BAR_PDF)
+    print(f"[DONE] wrote: {OUT_BAR_PDF}")
+    print(f"[DONE] wrote: {OUT_BAR_PNG}")
+    plt.close(fig)
     print(f"[INFO] total_rows={len(out_df)}  langs={len(OTHER_LANG_COLS)}  queries={len(qids)}")
 
 

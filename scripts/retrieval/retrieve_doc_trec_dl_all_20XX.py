@@ -16,7 +16,7 @@ from pyserini.search import get_topics, get_qrels
 os.environ["PYSERINI_CACHE"] = r"D:\PyseriniCache"
 Path(r"D:\PyseriniCache").mkdir(parents=True, exist_ok=True)
 
-TRECDL_YEAR = "2023"       # '2019', '2020', '2021', '2022', or '2023'
+TRECDL_YEAR = "2022"       # '2019', '2020', '2021', '2022', or '2023'
 LEVEL       = "passage"    # 'passage' or 'document'
 FETCH_TEXT  = True
 CHUNK_SIZE  = 500          # rows per output CSV chunk

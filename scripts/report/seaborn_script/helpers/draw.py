@@ -13,7 +13,7 @@ from matplotlib.collections import LineCollection, PathCollection
 
 # Use settings.py from the same folder (helpers/)
 import sys
-from settings import paper_fmt  # keep only this here
+from settings import apply_paper_fmt  # keep only this here
 
 # make sure the script directory is on sys.path so "helpers" is importable
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -253,6 +253,8 @@ def color_tukey_by_language(
     Color Tukey plot elements by base language. For example, "vi" and "vi_word"
     share the same color.
     """
+    if apply_style:
+        apply_paper_fmt()
 
     # build palette over base languages present in tick labels
     fig.canvas.draw()
