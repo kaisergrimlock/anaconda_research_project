@@ -38,14 +38,14 @@ from helpers.output_writer import write_df
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANG_PROFILE = "lang"  # change profiles in lang_profiles.py
+LANG_PROFILE = "low"  # change profiles in lang_profiles.py
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
 
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / f"all_models_all_{LANG_PROFILE}"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -279,7 +279,7 @@ def main() -> None:
     fig_height = 100.0
     fig, ax = plt.subplots(figsize=(10, fig_height))
     tukey.plot_simultaneous(ax=ax)
-    fig.set_size_inches(9, 12, forward=True)
+    fig.set_size_inches(9, 8, forward=True)
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
     level_palette = color_tukey_by_taxonomy(
