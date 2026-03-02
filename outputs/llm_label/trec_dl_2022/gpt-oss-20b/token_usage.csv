@@ -163,3 +163,6 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260220_180404,2026-02-20T18:07:46,openai.gpt-oss-20b-1:0,3067,1117936,866213,1984149,0.338119,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_uk_labels.csv,(see logs index)
 20260220_215520,2026-02-20T21:58:41,openai.gpt-oss-20b-1:0,3067,1127404,888889,2016293,0.345585,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_el_labels.csv,(see logs index)
 20260221_013712,2026-02-21T01:40:35,openai.gpt-oss-20b-1:0,3067,1115352,810432,1925784,0.321204,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_ha_labels.csv,(see logs index)
+20260223_132837,2026-02-23T13:41:02,openai.gpt-oss-20b-1:0,3067,1108830,832749,1941579,0.327443,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_eng_mid_labels.csv,(see logs index)
+20260223_143223,2026-02-23T14:36:18,openai.gpt-oss-20b-1:0,3067,1118983,847100,1966083,0.332459,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_vi_mid_labels.csv,(see logs index)
+20260223_143950,2026-02-23T14:43:58,openai.gpt-oss-20b-1:0,3067,1122717,818256,1940973,0.324067,outputs\llm_label\trec_dl_2022\gpt-oss-20b\gpt-oss-20b_trecdl_2022_ga_mid_labels.csv,(see logs index)

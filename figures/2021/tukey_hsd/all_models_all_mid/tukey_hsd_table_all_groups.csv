@@ -1,0 +1,11 @@
+group1,group2,meandiff,p-adj,lower,upper,reject
+gpt-oss-20b|eng,gpt-oss-20b|eng_mid,-0.1086,0.0008,-0.1838,-0.0334,True
+gpt-oss-20b|eng,llama3-8b-instruct|eng,0.3695,0.0,0.2944,0.4446,True
+gpt-oss-20b|eng,qwen3-32b-v1|eng,0.3165,0.0,0.2414,0.3916,True
+gpt-oss-20b|eng,qwen3-32b-v1|eng_mid,0.2225,0.0,0.1474,0.2977,True
+gpt-oss-20b|eng_mid,llama3-8b-instruct|eng,0.4781,0.0,0.4029,0.5533,True
+gpt-oss-20b|eng_mid,qwen3-32b-v1|eng,0.4251,0.0,0.3499,0.5003,True
+gpt-oss-20b|eng_mid,qwen3-32b-v1|eng_mid,0.3312,0.0,0.256,0.4063,True
+llama3-8b-instruct|eng,qwen3-32b-v1|eng,-0.053,0.3035,-0.1281,0.0221,False
+llama3-8b-instruct|eng,qwen3-32b-v1|eng_mid,-0.147,0.0,-0.2221,-0.0719,True
+qwen3-32b-v1|eng,qwen3-32b-v1|eng_mid,-0.0939,0.0058,-0.1691,-0.0188,True

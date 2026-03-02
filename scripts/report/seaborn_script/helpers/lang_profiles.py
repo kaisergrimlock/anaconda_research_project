@@ -34,7 +34,8 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "lang": ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"],
     "corrected": ["vi", "vi_corrected", "th", "th_corrected", "he", "he_corrected", "ar", "ar_corrected"],
     "mult": ["eng", "eng_mult", "eng_mult_2"],
-    "low": ["eng", "th", "uk", "el", "ha", "sw", "ga", "hi", "raw"]
+    "low": ["eng", "th", "uk", "el", "ha", "sw", "ga", "hi", "raw"],
+    "mid": ["eng", "eng_mid", "vi", "vi_mid"]
 }
 
 def get_langs(profile: str) -> List[str]:
