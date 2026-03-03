@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import re
 from pathlib import Path
@@ -33,6 +34,7 @@ from helpers.draw import (
 from helpers.lang_profiles import get_langs
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
+
 # ========================
 # Parameters
 # ========================
@@ -56,6 +58,21 @@ OUT_SIMUL_PDF = OUT_DIR / f"tukey_hsd_plot_simultaneous_all_groups_{TREC_DL_YEAR
 OUT_SAMPLES   = OUT_DIR / "tukey_samples_long.csv"
 GROUP_SEP = "|"
 TAXONOMY_CSV = Path(__file__).resolve().parents[1] / "lang.csv"
+
+# =========================
+# NEW: Language -> Script-group mapping
+# =========================
+LANG_TO_GROUP = {
+    "eng": "Latin",
+    "fr":  "Latin",
+    "ru":  "Cyrillic",
+    "uk":  "Cyrillic",
+    "ja":  "Hanzi",
+    "zh":  "Hanzi",
+}
+
+def get_lang_group(lang: str) -> Optional[str]:
+    return LANG_TO_GROUP.get(lang)
 
 def find_llm_files() -> Dict[str, List[Path]]:
     """
@@ -94,13 +111,13 @@ def load_labels(file_path: Path) -> pd.DataFrame:
     for r in requisite:
         if r not in df.columns:
             raise ValueError(f"Missing required column '{r}' in {file_path}")
-    df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce") # If conversion fails, NaN
-    df["LLM"] = pd.to_numeric(df["llm_relevance"], errors="coerce")
+    df["NIST"] = pd.to_numeric(df["relevance"], errors="coerce")  # If conversion fails, NaN
+    df["LLM"]  = pd.to_numeric(df["llm_relevance"], errors="coerce")
 
     # Keep only rows with valid NIST and LLM labels
     df = df.dropna(subset=["NIST", "LLM"])
     df["NIST"] = df["NIST"].astype(int)
-    df["LLM"] = df["LLM"].astype(int)
+    df["LLM"]  = df["LLM"].astype(int)
     valid = df["NIST"].isin(LABELS) & df["LLM"].isin(LABELS)
     return df[valid].copy()
 
@@ -144,7 +161,6 @@ def safe_slug(s: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "_", s)
     return s.strip("_")
 
-
 def tukey_to_df(tukey) -> pd.DataFrame:
     """
     Convert statsmodels Tukey result into a DataFrame.
@@ -169,7 +185,6 @@ def tukey_to_df(tukey) -> pd.DataFrame:
         )
 
     return df
-
 
 def to_latex_table(df: pd.DataFrame, caption: str, label: str) -> str:
     """
@@ -207,6 +222,12 @@ def main() -> None:
             # strict language include list
             if lang not in LANGS:
                 continue
+
+            # NEW: map language into your 3 script-groups
+            lang_group = get_lang_group(lang)
+            if lang_group is None:
+                continue  # skip languages not in mapping
+
             try:
                 df = load_labels(f)
                 pair_count = (
@@ -214,16 +235,19 @@ def main() -> None:
                     .drop_duplicates(subset=["qid", "pid"])
                     .shape[0]
                 )
-                print(f"[INFO] {model} {lang}: {pair_count} valid (qid,pid) pairs")
+                print(f"[INFO] {model} {lang} -> {lang_group}: {pair_count} valid (qid,pid) pairs")
                 perrow = per_row_metric(df, METRIC)
                 if perrow.empty:
                     continue
 
                 perrow["model"] = model
                 perrow["lang"] = lang
-                perrow["group"] = perrow["model"] + GROUP_SEP + perrow["lang"]
+                perrow["lang_group"] = lang_group
 
-                rows.append(perrow[["group", "model", "lang", "qid", "pid", "value"]])
+                # group is now (model | script-group)
+                perrow["group"] = perrow["model"] + GROUP_SEP + perrow["lang_group"]
+
+                rows.append(perrow[["group", "model", "lang_group", "lang", "qid", "pid", "value"]])
 
             except Exception as e:
                 skipped += 1
@@ -236,6 +260,20 @@ def main() -> None:
 
     long_df = pd.concat(rows, ignore_index=True)
 
+    # =========================
+    # NEW: Pool languages within the same script-group by averaging
+    # If the same (model, qid, pid) appears for multiple langs in the same
+    # group (e.g., eng + fr), they become one sample via mean().
+    # =========================
+    long_df = (
+        long_df.groupby(["model", "lang_group", "qid", "pid"], as_index=False)["value"]
+        .mean()
+    )
+    long_df["group"] = long_df["model"] + GROUP_SEP + long_df["lang_group"]
+
+    # Reorder columns for clarity
+    long_df = long_df[["group", "model", "lang_group", "qid", "pid", "value"]].copy()
+
     # Require >=2 row samples per group
     counts = long_df["group"].value_counts()
     keep_groups = counts[counts >= 2].index
@@ -244,7 +282,7 @@ def main() -> None:
 
     group_count = long_df["group"].nunique()
     if group_count < 2:
-        raise RuntimeError("Not enough (model,lang) groups with >=2 samples to run Tukey.")
+        raise RuntimeError("Not enough (model,lang_group) groups with >=2 samples to run Tukey.")
 
     # Save samples for reproducibility
     write_df(long_df, OUT_SAMPLES)
@@ -268,8 +306,8 @@ def main() -> None:
     # Save LaTeX table
     latex = to_latex_table(
         tukey_df,
-        caption=f"Tukey HSD across all (model,lang) groups for {METRIC}, FWER={ALPHA}.",
-        label=f"tab:tukey_all_models_all_langs_{safe_slug(METRIC)}",
+        caption=f"Tukey HSD across all (model,lang_group) groups for {METRIC}, FWER={ALPHA}.",
+        label=f"tab:tukey_all_models_all_langgroups_{safe_slug(METRIC)}",
     )
     OUT_TUKEY_TEX.write_text(latex, encoding="utf-8")
 
@@ -280,18 +318,24 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(10, fig_height))
     tukey.plot_simultaneous(ax=ax)
     fig.set_size_inches(9, 8, forward=True)
+
     # Customize plot
     add_model_separators(fig, ax, group_sep=GROUP_SEP, linewidth=1.0, alpha=0.5)
+
+    # NOTE: This taxonomy coloring expects groups like "model|lang".
+    # Now groups are "model|lang_group" (Latin/Cyrillic/Hanzi).
+    # If lang.csv does not contain these, everything may fall back to default_level.
     level_palette = color_tukey_by_taxonomy(
         fig,
         ax,
         taxonomy_csv=TAXONOMY_CSV,
         group_sep=GROUP_SEP,
-        default_level=0,   # e.g. color "raw" or unknown langs consistently
+        default_level=0,   # color "raw" or unknown langs consistently
         linewidth=2.5,
     )
     taxonomy_legend(ax, level_to_rgba=level_palette, title="Taxonomy level", loc="upper left")
     center_x_axis_at_zero(ax)
+
     ax.set_xlim(-0.1, 1.75)
     ax.tick_params(axis="y", pad=12, labelsize=6)
 
@@ -299,7 +343,6 @@ def main() -> None:
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
     ax.set_axisbelow(True)
     ax.set_title(None)
-
 
     plt.tight_layout()
     plt.savefig(OUT_SIMUL_SVG, format="svg")
