@@ -62,14 +62,14 @@ RELEVANCE_COL = "relevance"   # change if needed
 # =========================
 # Data / run config
 # =========================
-LANG = "he"          # "raw", "vi", ...
+LANG = "uk"          # "raw", "vi", ...
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["coverage", "exactness"]  # e.g. ["contextuality"]
+CRITERION_KEYS = ["topicality"]  # e.g. ["contextuality"]
 
 # Input part files
 if LANG == "raw":
@@ -79,8 +79,8 @@ else:
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
-INFERENCE_CONFIG = {"maxTokens": 128000, "temperature": 0.0, "topP": 1.0}
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
