@@ -48,9 +48,9 @@ from helpers.metrics_llm import (
 
 from helpers.draw import apply_paper_fmt
 # -------- Config --------
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODEL = "gpt-oss-20b"
-LANG = "hi_mult_2"
+LANG = "ja"
 
 LLM_FILE = (
     Path("outputs/llm_label")

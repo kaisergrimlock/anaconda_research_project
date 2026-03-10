@@ -62,14 +62,14 @@ RELEVANCE_COL = "relevance"   # change if needed
 # =========================
 # Data / run config
 # =========================
-LANG = "uk"          # "raw", "vi", ...
+LANG = "engcwb"          # "raw", "vi", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["topicality"]  # e.g. ["contextuality"]
+CRITERION_KEYS = ["topicality", "contextuality", "coverage", "exactness"]  # e.g. ["contextuality"]
 
 # Input part files
 if LANG == "raw":

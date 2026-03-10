@@ -53,17 +53,17 @@ PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng_mult"          # "raw", "vi", "enclosed", ...
+LANG = "es"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Models
 #"meta.llama3-8b-instruct-v1:0"
 #"qwen.qwen3-32b-v1:0"
-#MODELS = ['openai.gpt-oss-20b-1:0']
-MODELS = ["meta.llama3-8b-instruct-v1:0"]
+MODELS = ['openai.gpt-oss-20b-1:0']
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]  # e.g. qwen.qwen3-32b-v1:0, openai.gpt-oss-20b-1:0, "llama3-8b-instruct"
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -308,7 +308,6 @@ def _label_single_part_file_blocking(
         "log_json": str(per_file_log),
         "header_out": header_out,
     }
-
 
 async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)

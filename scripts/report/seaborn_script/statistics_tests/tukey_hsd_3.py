@@ -38,14 +38,14 @@ from helpers.output_writer import write_df
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANG_PROFILE = "script"  # change profiles in lang_profiles.py
+LANG_PROFILE = "cwb"  # change profiles in lang_profiles.py
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
 
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / f"all_models_all_{LANG_PROFILE}"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
