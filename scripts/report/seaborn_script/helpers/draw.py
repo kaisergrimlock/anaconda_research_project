@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, Mapping, Optional, Tuple, Callable, List
-
+from settings import apply_paper_fmt
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -45,6 +45,38 @@ def load_lang_taxonomy(csv_path: Path) -> Dict[str, int]:
         out[lang] = lvl
     return out
 
+from matplotlib.lines import Line2D
+
+
+def load_lang_cwb(csv_path: Path) -> Dict[str, int]:
+    """
+    Read a CSV with columns: lang,taxonomy.
+    Returns a dict keyed by the base language = first 2 letters.
+
+    Examples:
+      eng      -> en
+      engcwb   -> en
+      vicwb    -> vi
+      zh       -> zh
+
+    If both normal and cwb forms exist, the later row in the CSV wins.
+    """
+    df = pd.read_csv(csv_path)
+
+    required = {"lang", "taxonomy"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing columns {sorted(missing)} in {csv_path}")
+
+    out: Dict[str, int] = {}
+    for _, row in df.iterrows():
+        lang = str(row["lang"]).strip().lower()
+        if lang.endswith("cwb"):
+            lang = lang[:-3]
+        base = lang[:2]
+        out[base] = int(row["taxonomy"])
+    return out
+
 
 def taxonomy_legend(
     ax: Axes,
@@ -63,7 +95,7 @@ def taxonomy_legend(
     for lvl, rgba in sorted(level_to_rgba.items()):
         label = "Baseline" if lvl == 0 else f"Level {lvl}"
         handles.append(Patch(color=rgba, label=label))
-
+    
     ax.legend(
         handles=handles,
         title=title,
@@ -73,7 +105,99 @@ def taxonomy_legend(
         fontsize="small",
         title_fontsize="medium",
     )
+    
 
+from matplotlib.lines import Line2D
+
+
+def cwb_legend(
+    ax: Axes,
+    *,
+    level_to_rgba: Dict[int, RGBA],
+    variant_title: str = "Variant",
+    taxonomy_title: str = "Taxonomy level",
+    taxonomy_loc: str = "upper left",
+) -> None:
+    """
+    Add two legends:
+
+    1. Variant legend below the x-axis
+       - '^' = Default
+       - '+' = CWB
+
+    2. Taxonomy legend inside the axes
+       - color = taxonomy level
+    """
+    if not level_to_rgba:
+        return
+
+    levels = sorted(level_to_rgba.keys())
+    # -------------------------
+    # Legend 1: taxonomy colors
+    # -------------------------
+    taxonomy_handles = []
+    for lvl in levels:
+        label = "Baseline" if lvl == 0 else f"Level {lvl}"
+        taxonomy_handles.append(
+            Line2D(
+                [0], [0],
+                color=level_to_rgba[lvl],
+                marker="o",
+                linestyle="-",
+                linewidth=2.0,
+                markersize=7,
+                label=label,
+            )
+        )
+
+    legend_tax = ax.legend(
+        handles=taxonomy_handles,
+        title=taxonomy_title,
+        loc=taxonomy_loc,
+        framealpha=0.9,
+        edgecolor="black",
+        fontsize="small",
+        title_fontsize="medium",
+    )
+    ax.add_artist(legend_tax)
+
+    # -------------------------
+    # Legend 2: CWB vs Default
+    # placed BELOW x-axis
+    # -------------------------
+    variant_handles = [
+        Line2D(
+            [0], [0],
+            color="black",
+            marker="^",
+            linestyle="None",
+            markersize=10,
+            label="Default",
+        ),
+        Line2D(
+            [0], [0],
+            color="black",
+            marker="+",
+            linestyle="None",
+            markersize=12,
+            markeredgewidth=1.8,
+            label="CWB",
+        ),
+    ]
+
+    ax.legend(
+        handles=variant_handles,
+        title=variant_title,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.12),   # move below x-axis
+        ncol=2,
+        frameon=False,
+        fontsize="medium",
+        title_fontsize="medium",
+        handletextpad=0.8,
+        columnspacing=2.5,
+        borderaxespad=0.0,
+    )
 
 def language_legend(
     ax: Axes,
@@ -225,6 +349,85 @@ def color_tukey_by_taxonomy(
         seen_levels.add(default_level)
 
     level_to_rgba = _build_level_palette(seen_levels)
+
+    y_to_rgba = _color_ticks_and_build_y_map(
+        fig,
+        ax,
+        group_sep=group_sep,
+        eps=eps,
+        color_for_lang=lang_to_color,
+    )
+    if not y_to_rgba:
+        return {}
+
+    _color_tukey_collections(ax, y_to_rgba=y_to_rgba, linewidth=linewidth, eps=eps)
+    return level_to_rgba
+
+def color_tukey_by_cwb(
+    fig: Figure,
+    ax: Axes,
+    *,
+    taxonomy_csv: Path,
+    group_sep: str = "|",
+    default_level: Optional[int] = None,
+    linewidth: float = 2.5,
+    eps: float = 1e-6,
+    apply_style: bool = True,
+) -> Dict[int, RGBA]:
+    """
+    Color a Tukey plot using CWB taxonomy.
+
+    Works for either:
+      - full labels like "model|engcwb"
+      - collapsed labels like "ENG", "FR", "VI"
+
+    Taxonomy matching is done via normalized base language:
+      eng        -> en
+      engcwb     -> en
+      engcwb_wo  -> en
+      ENG        -> en
+      fr         -> fr
+    """
+    if apply_style:
+        apply_paper_fmt()
+
+    lang_to_level = load_lang_cwb(taxonomy_csv)
+
+    def normalize_lang(label_lang: str) -> str:
+        s = str(label_lang).strip().lower()
+
+        # if label looks like model|lang, keep only lang
+        if group_sep in s:
+            s = s.split(group_sep, 1)[1]
+
+        # remove common suffix variants
+        if s.endswith("_wo"):
+            s = s[:-3]
+
+        if s.endswith("cwb"):
+            s = s[:-3]
+
+        # keep first 2 letters only
+        return s[:2]
+
+    # compute palette AFTER we know which levels may appear
+    seen_levels: set[int] = set(lang_to_level.values())
+    if default_level is not None:
+        seen_levels.add(default_level)
+
+    level_to_rgba = _build_level_palette(seen_levels)
+
+    def lang_to_color(label_lang: str) -> Optional[RGBA]:
+        key = normalize_lang(label_lang)
+
+        if key in lang_to_level:
+            lvl = lang_to_level[key]
+        elif default_level is not None:
+            lvl = default_level
+        else:
+            return None
+
+        return level_to_rgba[lvl]
 
     y_to_rgba = _color_ticks_and_build_y_map(
         fig,
