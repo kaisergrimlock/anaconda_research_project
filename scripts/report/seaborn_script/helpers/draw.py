@@ -118,16 +118,6 @@ def cwb_legend(
     taxonomy_title: str = "Taxonomy level",
     taxonomy_loc: str = "upper left",
 ) -> None:
-    """
-    Add two legends:
-
-    1. Variant legend below the x-axis
-       - '^' = Default
-       - '+' = CWB
-
-    2. Taxonomy legend inside the axes
-       - color = taxonomy level
-    """
     if not level_to_rgba:
         return
 

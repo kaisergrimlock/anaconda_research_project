@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from settings import apply_paper_fmt
-from helpers.draw import center_x_axis_at_zero, color_tukey_by_cwb, cwb_legend
+from helpers.draw import center_x_axis_at_zero, color_tukey_by_cwb, cwb_legend, load_lang_cwb
 from helpers.lang_profiles import get_langs
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
@@ -42,7 +42,7 @@ METRIC = "mean_diff"
 # =========================
 # Config
 # =========================
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "tukey_hsd" / f"all_models_all_{LANG_PROFILE}"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -239,49 +239,62 @@ def pretty_lang_label(lang: str) -> str:
     """
     return strip_cwb_suffix(lang).lower()
 
-
-def build_group_metadata(groups: List[str]) -> pd.DataFrame:
-    """
-    Build metadata for each original group and collapse normal/CWB
-    onto the same visible language row.
-    """
+def build_group_metadata(groups: List[str], taxonomy_csv: Path) -> pd.DataFrame:
     rows = []
     for group in groups:
         model, lang = split_group(group)
+
+        base_lang = strip_cwb_suffix(lang)
+
         rows.append(
             {
                 "group": group,
                 "model": model,
                 "lang": lang,
-                "base_lang": strip_cwb_suffix(lang),
+                "base_lang": base_lang,
                 "label": pretty_lang_label(lang),
                 "is_cwb": is_cwb_lang(lang),
+                "tax_key": base_lang,
             }
         )
 
     meta = pd.DataFrame(rows).drop_duplicates()
+
+    lang_to_level = load_lang_cwb(taxonomy_csv)
+    meta["taxonomy_level"] = meta["tax_key"].map(lang_to_level).fillna(999).astype(int)
+
     meta = meta.sort_values(
-        by=["model", "base_lang", "is_cwb"],
-        ascending=[True, True, True],
+        by=["model", "taxonomy_level", "base_lang", "is_cwb"],
+        ascending=[True, True, True, True],
     ).reset_index(drop=True)
 
-    row_df = meta[["model", "base_lang", "label"]].drop_duplicates().reset_index(drop=True)
+    row_df = (
+        meta[["model", "base_lang", "label", "taxonomy_level"]]
+        .drop_duplicates()
+        .sort_values(by=["model", "taxonomy_level", "base_lang"])
+        .reset_index(drop=True)
+    )
+
     row_df["y"] = range(len(row_df))
 
-    meta = meta.merge(row_df, on=["model", "base_lang", "label"], how="left")
+    meta = meta.merge(
+        row_df[["model", "base_lang", "label", "y"]],
+        on=["model", "base_lang", "label"],
+        how="left",
+    )
+
     return meta
+
 
 def plot_simultaneous_collapsed_cwb_same_row(
     tukey,
     ax,
     *,
+    taxonomy_csv: Path,
     group_sep: str = GROUP_SEP,
-    linewidth: float = 1.4,
-    marker_size: float = 11.0,
-    model_fontsize: int = 14,
-    model_x: float = -0.14,
-    
+    model_x: float = -0.08,
 ) -> None:
+
     """
     Plot Tukey simultaneous CIs so that:
       - ENG and ENGCWB share the same row
@@ -291,7 +304,7 @@ def plot_simultaneous_collapsed_cwb_same_row(
           ^ = Default
     """
     groups_unique = list(tukey.groupsunique)
-    meta = build_group_metadata(groups_unique)
+    meta = build_group_metadata(groups_unique, taxonomy_csv=taxonomy_csv)
 
     # same y row for both normal and cwb
     group_to_y = dict(zip(meta["group"], meta["y"]))
@@ -317,14 +330,14 @@ def plot_simultaneous_collapsed_cwb_same_row(
 
         marker = "x" if is_cwb_lang(lang) else "^"
 
-        ax.hlines(y, left, right, color="black", linewidth=linewidth)
+        ax.hlines(y, left, right, color="black", linewidth=1.4)
         ax.plot(
             mean,
             y,
             marker=marker,
             linestyle="None",
             color="black",
-            markersize=marker_size,
+            markersize=11.0,
             markeredgewidth=2.0 if marker == "x" else 1.2,
         )
 
@@ -356,7 +369,6 @@ def plot_simultaneous_collapsed_cwb_same_row(
             rotation=90,
             va="center",
             ha="right",
-            fontsize=model_fontsize,
             fontweight="bold",
         )
     ax.invert_yaxis()
@@ -445,10 +457,8 @@ def main() -> None:
     plot_simultaneous_collapsed_cwb_same_row(
         tukey,
         ax,
+        taxonomy_csv=TAXONOMY_CSV,
         group_sep=GROUP_SEP,
-        linewidth=1.4,
-        marker_size=11.0,
-        model_fontsize=13,
         model_x=-0.08,
     )
 
@@ -466,12 +476,9 @@ def main() -> None:
         level_to_rgba=level_palette,
         variant_title="",
         taxonomy_title="Resource level",
-        taxonomy_loc="upper left",
+        taxonomy_loc="upper right",
     )
     center_x_axis_at_zero(ax)
-
-
-
     ax.set_xlim(-0.1, 1.75)
     ax.tick_params(axis="y", pad=10)
 
