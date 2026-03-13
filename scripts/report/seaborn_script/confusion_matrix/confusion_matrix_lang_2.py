@@ -50,7 +50,7 @@ from helpers.draw import apply_paper_fmt
 # -------- Config --------
 TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"
-LANG = "gacwb"
+LANG = "ko"
 
 LLM_FILE = (
     Path("outputs/llm_label")
