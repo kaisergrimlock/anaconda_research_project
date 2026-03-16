@@ -1,7 +1,7 @@
 import sys
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Sequence
 
 # =========================
 # Repo root bootstrap (MUST be before repo imports)
@@ -11,9 +11,7 @@ PROJECT_ROOT = THIS_FILE.parents[4]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-THIS_FILE = Path(__file__).resolve()
 SEABORN_ROOT = THIS_FILE.parents[1]
-
 if str(SEABORN_ROOT) not in sys.path:
     sys.path.insert(0, str(SEABORN_ROOT))
 
@@ -22,10 +20,16 @@ if str(SEABORN_ROOT) not in sys.path:
 # =========================
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
 from settings import apply_paper_fmt
-from helpers.draw import center_x_axis_at_zero, color_tukey_by_cwb, cwb_legend, load_lang_cwb
+from helpers.draw import (
+    center_x_axis_at_zero,
+    color_tukey_by_categorized_taxonomy,
+    categorized_variant_legend,
+    load_categorized_lang_taxonomy,
+    normalize_categorized_language,
+)
 from helpers.lang_profiles import get_langs
 from scripts.csv_helpers import bump_field_limit
 from helpers.output_writer import write_df
@@ -38,6 +42,14 @@ LABELS = [0, 1, 2, 3]
 LANG_PROFILE = "cwb"
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
+
+# category config: this is now the only place you change suffix behavior
+CATEGORY_SUFFIXES: Sequence[str] = ("cwb",)
+EXTRA_STRIP_SUFFIXES: Sequence[str] = ("_wo",)
+CATEGORY_LABEL = "CWB"
+CATEGORY_MARKER = "X"
+BASELINE_LABEL = "Default"
+BASELINE_MARKER = "^"
 
 # =========================
 # Config
@@ -222,29 +234,57 @@ def split_group(group: str, group_sep: str = GROUP_SEP) -> Tuple[str, str]:
     return "", group
 
 
-def is_cwb_lang(lang: str) -> bool:
-    return str(lang).strip().lower().endswith("cwb")
-
-
-def strip_cwb_suffix(lang: str) -> str:
+def is_categorized_lang(
+    lang: str,
+    *,
+    category_suffixes: Sequence[str],
+) -> bool:
     s = str(lang).strip().lower()
-    return s[:-3] if s.endswith("cwb") else s
+    return any(s.endswith(suf) for suf in category_suffixes)
 
 
-def pretty_lang_label(lang: str) -> str:
+def pretty_lang_label(
+    lang: str,
+    *,
+    group_sep: str = GROUP_SEP,
+    category_suffixes: Sequence[str],
+    extra_strip_suffixes: Sequence[str],
+) -> str:
     """
-    Base visible label.
-    eng -> ENG
-    vicwb -> VI
+    Base visible label after stripping configured suffixes.
+    Example:
+      eng -> en
+      engcwb -> en
+      vi_word -> vi
     """
-    return strip_cwb_suffix(lang).lower()
+    return normalize_categorized_language(
+        lang,
+        group_sep=group_sep,
+        category_suffixes=category_suffixes,
+        extra_strip_suffixes=extra_strip_suffixes,
+        base_len=2,
+    ).upper()
 
-def build_group_metadata(groups: List[str], taxonomy_csv: Path) -> pd.DataFrame:
+
+def build_group_metadata(
+    groups: List[str],
+    *,
+    taxonomy_csv: Path,
+    group_sep: str,
+    category_suffixes: Sequence[str],
+    extra_strip_suffixes: Sequence[str],
+) -> pd.DataFrame:
     rows = []
     for group in groups:
-        model, lang = split_group(group)
+        model, lang = split_group(group, group_sep=group_sep)
 
-        base_lang = strip_cwb_suffix(lang)
+        base_lang = normalize_categorized_language(
+            lang,
+            group_sep=group_sep,
+            category_suffixes=category_suffixes,
+            extra_strip_suffixes=extra_strip_suffixes,
+            base_len=2,
+        )
 
         rows.append(
             {
@@ -252,19 +292,32 @@ def build_group_metadata(groups: List[str], taxonomy_csv: Path) -> pd.DataFrame:
                 "model": model,
                 "lang": lang,
                 "base_lang": base_lang,
-                "label": pretty_lang_label(lang),
-                "is_cwb": is_cwb_lang(lang),
+                "label": pretty_lang_label(
+                    lang,
+                    group_sep=group_sep,
+                    category_suffixes=category_suffixes,
+                    extra_strip_suffixes=extra_strip_suffixes,
+                ),
+                "is_category": is_categorized_lang(
+                    lang,
+                    category_suffixes=category_suffixes,
+                ),
                 "tax_key": base_lang,
             }
         )
 
     meta = pd.DataFrame(rows).drop_duplicates()
 
-    lang_to_level = load_lang_cwb(taxonomy_csv)
+    lang_to_level = load_categorized_lang_taxonomy(
+        taxonomy_csv,
+        category_suffixes=category_suffixes,
+        extra_strip_suffixes=extra_strip_suffixes,
+        base_len=2,
+    )
     meta["taxonomy_level"] = meta["tax_key"].map(lang_to_level).fillna(999).astype(int)
 
     meta = meta.sort_values(
-        by=["model", "taxonomy_level", "base_lang", "is_cwb"],
+        by=["model", "taxonomy_level", "base_lang", "is_category"],
         ascending=[True, True, True, True],
     ).reset_index(drop=True)
 
@@ -286,31 +339,36 @@ def build_group_metadata(groups: List[str], taxonomy_csv: Path) -> pd.DataFrame:
     return meta
 
 
-def plot_simultaneous_collapsed_cwb_same_row(
+def plot_simultaneous_collapsed_same_row(
     tukey,
     ax,
     *,
     taxonomy_csv: Path,
+    category_suffixes: Sequence[str],
+    extra_strip_suffixes: Sequence[str] = ("_wo",),
+    category_marker: str = "x",
+    baseline_marker: str = "^",
     group_sep: str = GROUP_SEP,
     model_x: float = -0.08,
 ) -> None:
-
     """
     Plot Tukey simultaneous CIs so that:
-      - ENG and ENGCWB share the same row
+      - base language and categorized variant share the same row
       - both are drawn on the exact same y level
-      - marker distinguishes variant:
-          x = CWB
-          ^ = Default
+      - marker distinguishes variant
     """
     groups_unique = list(tukey.groupsunique)
-    meta = build_group_metadata(groups_unique, taxonomy_csv=taxonomy_csv)
+    meta = build_group_metadata(
+        groups_unique,
+        taxonomy_csv=taxonomy_csv,
+        group_sep=group_sep,
+        category_suffixes=category_suffixes,
+        extra_strip_suffixes=extra_strip_suffixes,
+    )
 
-    # same y row for both normal and cwb
     group_to_y = dict(zip(meta["group"], meta["y"]))
     row_df = meta[["model", "label", "y"]].drop_duplicates().sort_values("y")
 
-    # statsmodels internals for group means and simultaneous halfwidths
     means = tukey._multicomp.groupstats.groupmean
     tukey._simultaneous_ci()
     halfwidths = tukey.halfwidths
@@ -318,7 +376,6 @@ def plot_simultaneous_collapsed_cwb_same_row(
     group_to_mean = dict(zip(groups_unique, means))
     group_to_halfwidth = dict(zip(groups_unique, halfwidths))
 
-    # plot all intervals on same row if they belong to same base language
     for group in groups_unique:
         _, lang = split_group(group, group_sep=group_sep)
         y = group_to_y[group]
@@ -328,7 +385,11 @@ def plot_simultaneous_collapsed_cwb_same_row(
         left = mean - halfwidth
         right = mean + halfwidth
 
-        marker = "x" if is_cwb_lang(lang) else "^"
+        marker = (
+            category_marker
+            if is_categorized_lang(lang, category_suffixes=category_suffixes)
+            else baseline_marker
+        )
 
         ax.hlines(y, left, right, color="black", linewidth=1.4)
         ax.plot(
@@ -338,14 +399,12 @@ def plot_simultaneous_collapsed_cwb_same_row(
             linestyle="None",
             color="black",
             markersize=11.0,
-            markeredgewidth=2.0 if marker == "x" else 1.2,
+            markeredgewidth=2.0 if marker in {"x", "+", "X"} else 1.2,
         )
 
-    # y labels: one visible row only
     ax.set_yticks(row_df["y"].tolist())
     ax.set_yticklabels(row_df["label"].tolist())
 
-    # separators between model blocks
     model_blocks = []
     for model, sub in row_df.groupby("model", sort=False):
         ys = sub["y"].tolist()
@@ -357,7 +416,6 @@ def plot_simultaneous_collapsed_cwb_same_row(
         sep_y = (y1 + y2) / 2.0
         ax.axhline(y=sep_y, linewidth=1.2, alpha=0.8, color="black")
 
-    # model labels on left
     trans = ax.get_yaxis_transform()
     for model, y0, y1 in model_blocks:
         ymid = (y0 + y1) / 2.0
@@ -371,6 +429,7 @@ def plot_simultaneous_collapsed_cwb_same_row(
             ha="right",
             fontweight="bold",
         )
+
     ax.invert_yaxis()
 
 
@@ -454,30 +513,42 @@ def main() -> None:
     # Plot
     apply_paper_fmt()
     fig, ax = plt.subplots(figsize=(10, 8))
-    plot_simultaneous_collapsed_cwb_same_row(
+
+    plot_simultaneous_collapsed_same_row(
         tukey,
         ax,
         taxonomy_csv=TAXONOMY_CSV,
+        category_suffixes=CATEGORY_SUFFIXES,
+        extra_strip_suffixes=EXTRA_STRIP_SUFFIXES,
+        category_marker=CATEGORY_MARKER,
+        baseline_marker=BASELINE_MARKER,
         group_sep=GROUP_SEP,
         model_x=-0.08,
     )
 
-    level_palette = color_tukey_by_cwb(
+    level_palette = color_tukey_by_categorized_taxonomy(
         fig,
         ax,
         taxonomy_csv=TAXONOMY_CSV,
+        category_suffixes=CATEGORY_SUFFIXES,
+        extra_strip_suffixes=EXTRA_STRIP_SUFFIXES,
         group_sep=GROUP_SEP,
-        default_level=0,   # e.g. color "raw" or unknown langs consistently
+        default_level=0,
         linewidth=2.5,
     )
-    
-    cwb_legend(
+
+    categorized_variant_legend(
         ax,
         level_to_rgba=level_palette,
+        category_label=CATEGORY_LABEL,
+        baseline_label=BASELINE_LABEL,
+        baseline_marker=BASELINE_MARKER,
+        category_marker=CATEGORY_MARKER,
         variant_title="",
         taxonomy_title="Resource level",
         taxonomy_loc="upper right",
     )
+
     center_x_axis_at_zero(ax)
     ax.set_xlim(-0.1, 1.75)
     ax.tick_params(axis="y", pad=10)

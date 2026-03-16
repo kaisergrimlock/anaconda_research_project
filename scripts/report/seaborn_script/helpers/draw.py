@@ -1,19 +1,20 @@
 # helpers/draw.py
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, Mapping, Optional, Tuple, Callable, List
-from settings import apply_paper_fmt
-import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from matplotlib.collections import LineCollection, PathCollection
+from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-# Use settings.py from the same folder (helpers/)
 import sys
-from settings import apply_paper_fmt  # keep only this here
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.axes import Axes
+from matplotlib.collections import LineCollection, PathCollection
+from matplotlib.figure import Figure
+from matplotlib.lines import Line2D
+
+from settings import apply_paper_fmt
+
 
 # make sure the script directory is on sys.path so "helpers" is importable
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -25,59 +26,76 @@ RGBA = Tuple[float, float, float, float]
 
 
 # =========================
-# Public helpers
+# Public CSV loaders
 # =========================
 def load_lang_taxonomy(csv_path: Path) -> Dict[str, int]:
     """
     Read a CSV with columns: lang,taxonomy (taxonomy is an int).
-    Returns: dict like {"eng": 5, "vi": 4, ...}
+    Returns a dict like:
+        {"eng": 5, "vi": 4, ...}
     """
     df = pd.read_csv(csv_path)
-    if "lang" not in df.columns or "taxonomy" not in df.columns:
-        raise ValueError(
-            f"Expected columns lang,taxonomy in {csv_path}. Got {list(df.columns)}"
-        )
-
-    out: Dict[str, int] = {}
-    for _, r in df.iterrows():
-        lang = str(r["lang"]).strip()
-        lvl = int(r["taxonomy"])
-        out[lang] = lvl
-    return out
-
-from matplotlib.lines import Line2D
-
-
-def load_lang_cwb(csv_path: Path) -> Dict[str, int]:
-    """
-    Read a CSV with columns: lang,taxonomy.
-    Returns a dict keyed by the base language = first 2 letters.
-
-    Examples:
-      eng      -> en
-      engcwb   -> en
-      vicwb    -> vi
-      zh       -> zh
-
-    If both normal and cwb forms exist, the later row in the CSV wins.
-    """
-    df = pd.read_csv(csv_path)
-
-    required = {"lang", "taxonomy"}
-    missing = required - set(df.columns)
-    if missing:
-        raise ValueError(f"Missing columns {sorted(missing)} in {csv_path}")
+    _validate_taxonomy_csv(df, csv_path)
 
     out: Dict[str, int] = {}
     for _, row in df.iterrows():
-        lang = str(row["lang"]).strip().lower()
-        if lang.endswith("cwb"):
-            lang = lang[:-3]
-        base = lang[:2]
-        out[base] = int(row["taxonomy"])
+        lang = str(row["lang"]).strip()
+        out[lang] = int(row["taxonomy"])
     return out
 
 
+def load_categorized_lang_taxonomy(
+    csv_path: Path,
+    *,
+    category_suffixes: Sequence[str] = (),
+    extra_strip_suffixes: Sequence[str] = (),
+    base_len: int = 2,
+) -> Dict[str, int]:
+    """
+    Read a CSV with columns: lang,taxonomy and return a dict keyed by the
+    normalized base language.
+
+    This is intended for categorized variants such as:
+        engcwb
+        vi_word
+        ar_phrase
+        engcwb_wo
+
+    The caller supplies the category suffixes and any extra suffixes to strip.
+
+    Example:
+        category_suffixes=("cwb",)
+        category_suffixes=("_word",)
+        category_suffixes=("_word", "_phrase")
+        extra_strip_suffixes=("_wo",)
+
+    Normalization examples:
+        eng       -> en
+        engcwb    -> en
+        vi_word   -> vi
+        engcwb_wo -> en
+    """
+    df = pd.read_csv(csv_path)
+    _validate_taxonomy_csv(df, csv_path)
+
+    strip_suffixes = tuple(category_suffixes) + tuple(extra_strip_suffixes)
+
+    out: Dict[str, int] = {}
+    for _, row in df.iterrows():
+        lang_raw = str(row["lang"])
+        key = normalize_categorized_language(
+            lang_raw,
+            category_suffixes=category_suffixes,
+            extra_strip_suffixes=extra_strip_suffixes,
+            base_len=base_len,
+        )
+        out[key] = int(row["taxonomy"])
+    return out
+
+
+# =========================
+# Legends
+# =========================
 def taxonomy_legend(
     ax: Axes,
     *,
@@ -93,9 +111,13 @@ def taxonomy_legend(
 
     handles = []
     for lvl, rgba in sorted(level_to_rgba.items()):
-        label = "Baseline" if lvl == 0 else f"Level {lvl}"
-        handles.append(Patch(color=rgba, label=label))
-    
+        if lvl == 0:
+            continue
+        handles.append(Patch(facecolor=rgba, edgecolor="none", label=f"Level {lvl}"))
+
+    if not handles:
+        return
+
     ax.legend(
         handles=handles,
         title=title,
@@ -105,29 +127,42 @@ def taxonomy_legend(
         fontsize="small",
         title_fontsize="medium",
     )
-    
 
-from matplotlib.lines import Line2D
-
-
-def cwb_legend(
+def categorized_variant_legend(
     ax: Axes,
     *,
     level_to_rgba: Dict[int, RGBA],
-    variant_title: str = "Variant",
+    category_label: str,
+    baseline_label: str = "Before Passage",
+    baseline_marker: str = "^",
+    category_marker: str = "+",
+    raw_band_label: str = "Baseline",
+    raw_band_color: RGBA | str = "#7ec8e3",
+    variant_title: str = "",
     taxonomy_title: str = "Taxonomy level",
     taxonomy_loc: str = "upper left",
+    variant_bbox_to_anchor: Tuple[float, float] = (0.5, -0.12),
 ) -> None:
+    """
+    Generic legend for categorized content.
+
+    - Taxonomy legend shows only taxonomy levels.
+    - Variant legend shows:
+        ^ baseline marker
+        x/+ categorized marker
+        colored square for raw baseline band
+    """
+    from matplotlib.patches import Patch
+
     if not level_to_rgba:
         return
 
     levels = sorted(level_to_rgba.keys())
-    # -------------------------
-    # Legend 1: taxonomy colors
-    # -------------------------
+
     taxonomy_handles = []
     for lvl in levels:
-        label = "Baseline" if lvl == 0 else f"Level {lvl}"
+        if lvl == 0:
+            continue
         taxonomy_handles.append(
             Line2D(
                 [0], [0],
@@ -136,42 +171,45 @@ def cwb_legend(
                 linestyle="-",
                 linewidth=2.0,
                 markersize=7,
-                label=label,
+                label=f"Level {lvl}",
             )
         )
 
-    legend_tax = ax.legend(
-        handles=taxonomy_handles,
-        title=taxonomy_title,
-        loc=taxonomy_loc,
-        framealpha=0.9,
-        edgecolor="black",
-        fontsize="small",
-        title_fontsize="medium",
-    )
-    ax.add_artist(legend_tax)
+    if taxonomy_handles:
+        legend_tax = ax.legend(
+            handles=taxonomy_handles,
+            title=taxonomy_title,
+            loc=taxonomy_loc,
+            framealpha=0.9,
+            edgecolor="black",
+            fontsize="small",
+            title_fontsize="medium",
+        )
+        ax.add_artist(legend_tax)
 
-    # -------------------------
-    # Legend 2: CWB vs Default
-    # placed BELOW x-axis
-    # -------------------------
     variant_handles = [
         Line2D(
             [0], [0],
             color="black",
-            marker="^",
+            marker=baseline_marker,
             linestyle="None",
             markersize=10,
-            label="Default",
+            label=baseline_label,
         ),
         Line2D(
             [0], [0],
             color="black",
-            marker="+",
+            marker=category_marker,
             linestyle="None",
             markersize=12,
             markeredgewidth=1.8,
-            label="CWB",
+            label=category_label,
+        ),
+        Patch(
+            facecolor=raw_band_color,
+            edgecolor="none",
+            alpha=0.22,
+            label=raw_band_label,
         ),
     ]
 
@@ -179,40 +217,19 @@ def cwb_legend(
         handles=variant_handles,
         title=variant_title,
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.12),   # move below x-axis
-        ncol=2,
+        bbox_to_anchor=variant_bbox_to_anchor,
+        ncol=3,
         frameon=False,
         fontsize="medium",
         title_fontsize="medium",
         handletextpad=0.8,
-        columnspacing=2.5,
+        columnspacing=2.0,
         borderaxespad=0.0,
     )
 
-def language_legend(
-    ax: Axes,
-    *,
-    lang_to_rgba: Dict[str, RGBA],
-    title: str = "Language",
-    loc: str = "lower right",
-) -> None:
-    from matplotlib.patches import Patch
-
-    if not lang_to_rgba:
-        return
-
-    handles = [Patch(color=rgba, label=lang) for lang, rgba in sorted(lang_to_rgba.items())]
-    ax.legend(
-        handles=handles,
-        title=title,
-        loc=loc,
-        framealpha=0.9,
-        edgecolor="black",
-        fontsize="small",
-        title_fontsize="medium",
-    )
-
-
+# =========================
+# Axis helpers
+# =========================
 def center_x_axis_at_zero(ax: Axes) -> None:
     xmin, xmax = ax.get_xlim()
     m = max(abs(xmin), abs(xmax))
@@ -233,8 +250,6 @@ def add_model_separators(
     Draw horizontal separator lines between model blocks in a Tukey
     plot_simultaneous chart, assuming y tick labels look like:
         "<model>|<lang>"
-
-    Uses the *actual* y tick positions, so it matches statsmodels' layout.
     """
     fig.canvas.draw()
 
@@ -244,7 +259,12 @@ def add_model_separators(
 
     for (y0, lab0), (y1, lab1) in zip(pairs[:-1], pairs[1:]):
         if _model_of(lab0, group_sep) != _model_of(lab1, group_sep):
-            ax.axhline((y0 + y1) / 2.0, linewidth=linewidth, alpha=alpha, linestyle=linestyle)
+            ax.axhline(
+                (y0 + y1) / 2.0,
+                linewidth=linewidth,
+                alpha=alpha,
+                linestyle=linestyle,
+            )
 
 
 def add_model_prefix_labels(
@@ -259,8 +279,8 @@ def add_model_prefix_labels(
     color: str = "black",
 ) -> None:
     """
-    Add a single model label per contiguous block, positioned parallel to the y axis.
-    Assumes y tick labels look like "<model>|<lang>".
+    Add a single model label per contiguous block, positioned parallel to
+    the y axis. Assumes y tick labels look like "<model>|<lang>".
     """
     fig.canvas.draw()
 
@@ -270,8 +290,8 @@ def add_model_prefix_labels(
 
     i = 0
     while i < len(pairs):
-        y_start, lab = pairs[i]
-        model = _model_of(lab, group_sep)
+        y_start, label = pairs[i]
+        model = _model_of(label, group_sep)
 
         y_end = y_start
         j = i + 1
@@ -311,18 +331,18 @@ def color_tukey_by_taxonomy(
     apply_style: bool = True,
 ) -> Dict[int, RGBA]:
     """
-    After tukey.plot_simultaneous(ax=ax), color:
-      - y tick labels
-      - CI bars (LineCollection segments)
-      - mean dots (PathCollection), if present
-    using taxonomy levels loaded from taxonomy_csv.
-
-    Group labels are assumed to end with: "<model>|<lang>"
+    Color a Tukey plot directly from exact language labels in taxonomy_csv.
     """
     if apply_style:
         apply_paper_fmt()
 
     lang_to_level = load_lang_taxonomy(taxonomy_csv)
+
+    seen_levels: set[int] = set(lang_to_level.values())
+    if default_level is not None:
+        seen_levels.add(default_level)
+
+    level_to_rgba = _build_level_palette(seen_levels)
 
     def lang_to_color(label_lang: str) -> Optional[RGBA]:
         if label_lang in lang_to_level:
@@ -333,18 +353,10 @@ def color_tukey_by_taxonomy(
             return None
         return level_to_rgba[lvl]
 
-    # compute palette AFTER we know which levels can appear
-    seen_levels: set[int] = set(lang_to_level.values())
-    if default_level is not None:
-        seen_levels.add(default_level)
-
-    level_to_rgba = _build_level_palette(seen_levels)
-
     y_to_rgba = _color_ticks_and_build_y_map(
         fig,
         ax,
         group_sep=group_sep,
-        eps=eps,
         color_for_lang=lang_to_color,
     )
     if not y_to_rgba:
@@ -353,54 +365,58 @@ def color_tukey_by_taxonomy(
     _color_tukey_collections(ax, y_to_rgba=y_to_rgba, linewidth=linewidth, eps=eps)
     return level_to_rgba
 
-def color_tukey_by_cwb(
+
+def color_tukey_by_categorized_taxonomy(
     fig: Figure,
     ax: Axes,
     *,
     taxonomy_csv: Path,
+    category_suffixes: Sequence[str],
+    extra_strip_suffixes: Sequence[str] = ("_wo",),
     group_sep: str = "|",
     default_level: Optional[int] = None,
     linewidth: float = 2.5,
     eps: float = 1e-6,
     apply_style: bool = True,
+    base_len: int = 2,
 ) -> Dict[int, RGBA]:
     """
-    Color a Tukey plot using CWB taxonomy.
+    Generic taxonomy coloring for categorized content.
 
-    Works for either:
-      - full labels like "model|engcwb"
-      - collapsed labels like "ENG", "FR", "VI"
+    The caller supplies the category suffixes and this function handles:
+      - normalization of labels
+      - loading the taxonomy CSV
+      - coloring ticks / CI bars / mean markers
 
-    Taxonomy matching is done via normalized base language:
-      eng        -> en
-      engcwb     -> en
-      engcwb_wo  -> en
-      ENG        -> en
-      fr         -> fr
+    Examples:
+        color_tukey_by_categorized_taxonomy(
+            fig, ax,
+            taxonomy_csv=taxonomy_csv,
+            category_suffixes=("cwb",),
+        )
+
+        color_tukey_by_categorized_taxonomy(
+            fig, ax,
+            taxonomy_csv=taxonomy_csv,
+            category_suffixes=("_word",),
+        )
+
+        color_tukey_by_categorized_taxonomy(
+            fig, ax,
+            taxonomy_csv=taxonomy_csv,
+            category_suffixes=("_word", "_phrase"),
+        )
     """
     if apply_style:
         apply_paper_fmt()
 
-    lang_to_level = load_lang_cwb(taxonomy_csv)
+    lang_to_level = load_categorized_lang_taxonomy(
+        taxonomy_csv,
+        category_suffixes=category_suffixes,
+        extra_strip_suffixes=extra_strip_suffixes,
+        base_len=base_len,
+    )
 
-    def normalize_lang(label_lang: str) -> str:
-        s = str(label_lang).strip().lower()
-
-        # if label looks like model|lang, keep only lang
-        if group_sep in s:
-            s = s.split(group_sep, 1)[1]
-
-        # remove common suffix variants
-        if s.endswith("_wo"):
-            s = s[:-3]
-
-        if s.endswith("cwb"):
-            s = s[:-3]
-
-        # keep first 2 letters only
-        return s[:2]
-
-    # compute palette AFTER we know which levels may appear
     seen_levels: set[int] = set(lang_to_level.values())
     if default_level is not None:
         seen_levels.add(default_level)
@@ -408,7 +424,13 @@ def color_tukey_by_cwb(
     level_to_rgba = _build_level_palette(seen_levels)
 
     def lang_to_color(label_lang: str) -> Optional[RGBA]:
-        key = normalize_lang(label_lang)
+        key = normalize_categorized_language(
+            label_lang,
+            group_sep=group_sep,
+            category_suffixes=category_suffixes,
+            extra_strip_suffixes=extra_strip_suffixes,
+            base_len=base_len,
+        )
 
         if key in lang_to_level:
             lvl = lang_to_level[key]
@@ -423,7 +445,6 @@ def color_tukey_by_cwb(
         fig,
         ax,
         group_sep=group_sep,
-        eps=eps,
         color_for_lang=lang_to_color,
     )
     if not y_to_rgba:
@@ -443,18 +464,19 @@ def color_tukey_by_language(
     apply_style: bool = True,
 ) -> Dict[str, RGBA]:
     """
-    Color Tukey plot elements by base language. For example, "vi" and "vi_word"
-    share the same color.
+    Color Tukey plot elements by base language.
+    For example, vi and vi_word share the same color.
     """
     if apply_style:
         apply_paper_fmt()
 
-    # build palette over base languages present in tick labels
     fig.canvas.draw()
+
     base_langs: List[str] = []
     for tick in ax.get_yticklabels():
         lang = _lang_of(tick.get_text(), group_sep)
         base_langs.append(_base_language(lang))
+
     if not base_langs:
         return {}
 
@@ -467,7 +489,6 @@ def color_tukey_by_language(
         fig,
         ax,
         group_sep=group_sep,
-        eps=eps,
         color_for_lang=lang_to_color,
     )
     if not y_to_rgba:
@@ -480,8 +501,17 @@ def color_tukey_by_language(
 # =========================
 # Internals
 # =========================
+def _validate_taxonomy_csv(df: pd.DataFrame, csv_path: Path) -> None:
+    required = {"lang", "taxonomy"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(
+            f"Expected columns {sorted(required)} in {csv_path}. "
+            f"Got {list(df.columns)}"
+        )
+
+
 def _build_level_palette(levels: Iterable[int]) -> Dict[int, RGBA]:
-    """Map taxonomy levels -> RGBA using a categorical colormap."""
     ordered = sorted(set(levels))
     cmap = plt.get_cmap("tab10")
     return {lvl: cmap(i % cmap.N) for i, lvl in enumerate(ordered)}
@@ -497,8 +527,56 @@ def _base_language(lang: str) -> str:
     return lang.split("_", 1)[0].strip()
 
 
+def normalize_categorized_language(
+    label_lang: str,
+    *,
+    group_sep: str = "|",
+    category_suffixes: Sequence[str] = (),
+    extra_strip_suffixes: Sequence[str] = (),
+    base_len: int = 2,
+) -> str:
+    """
+    Normalize a categorized language label into a base key.
+
+    This is the core robust method:
+      - optionally strip model prefix before '|'
+      - repeatedly strip known category suffixes
+      - repeatedly strip known extra suffixes
+      - return the first `base_len` letters
+
+    Examples:
+        normalize_categorized_language("model|engcwb", category_suffixes=("cwb",))
+            -> "en"
+
+        normalize_categorized_language("model|vi_word", category_suffixes=("_word",))
+            -> "vi"
+
+        normalize_categorized_language(
+            "model|engcwb_wo",
+            category_suffixes=("cwb",),
+            extra_strip_suffixes=("_wo",),
+        )
+            -> "en"
+    """
+    s = str(label_lang).strip().lower()
+
+    if group_sep in s:
+        s = s.split(group_sep, 1)[1]
+
+    suffixes = tuple(category_suffixes) + tuple(extra_strip_suffixes)
+
+    changed = True
+    while changed:
+        changed = False
+        for suffix in suffixes:
+            if suffix and s.endswith(suffix):
+                s = s[: -len(suffix)]
+                changed = True
+
+    return s[:base_len]
+
+
 def _lang_of(label: str, group_sep: str) -> str:
-    # "<model>|<lang>" -> "<lang>" (or whole label if no sep)
     return label.split(group_sep)[-1].strip()
 
 
@@ -510,9 +588,13 @@ def _model_of(label: str, group_sep: str) -> str:
 
 def _sorted_tick_pairs(ax: Axes) -> List[Tuple[float, str]]:
     yticks = list(ax.get_yticks())
-    ylabels = [t.get_text() for t in ax.get_yticklabels()]
-    pairs = [(float(y), str(lab)) for y, lab in zip(yticks, ylabels) if str(lab).strip() != ""]
-    pairs.sort(key=lambda t: t[0])
+    ylabels = [tick.get_text() for tick in ax.get_yticklabels()]
+    pairs = [
+        (float(y), str(label))
+        for y, label in zip(yticks, ylabels)
+        if str(label).strip()
+    ]
+    pairs.sort(key=lambda pair: pair[0])
     return pairs
 
 
@@ -521,12 +603,10 @@ def _color_ticks_and_build_y_map(
     ax: Axes,
     *,
     group_sep: str,
-    eps: float,
     color_for_lang: Callable[[str], Optional[RGBA] | RGBA],
 ) -> Dict[float, RGBA]:
     """
     Color y tick labels and return {tick_y: rgba} for matching plot artists.
-    Uses the *actual* tick y positions (after draw).
     """
     fig.canvas.draw()
 
@@ -539,9 +619,7 @@ def _color_ticks_and_build_y_map(
             continue
 
         tick.set_color(rgba)
-        y = float(tick.get_position()[1])
-        # store exact y; matching uses eps later
-        y_to_rgba[y] = rgba
+        y_to_rgba[float(tick.get_position()[1])] = rgba
 
     return y_to_rgba
 
@@ -555,10 +633,9 @@ def _color_tukey_collections(
 ) -> None:
     """
     Apply y->color mapping to:
-      - LineCollection segments (CIs)
+      - LineCollection segments (confidence intervals)
       - PathCollection facecolors (means)
     """
-    # 1) CI bars: LineCollections
     for coll in ax.collections:
         if not isinstance(coll, LineCollection):
             continue
@@ -580,7 +657,6 @@ def _color_tukey_collections(
         coll.set_color(colors)
         coll.set_linewidth(linewidth)
 
-    # 2) mean dots: PathCollections
     for coll in ax.collections:
         if not isinstance(coll, PathCollection):
             continue
@@ -604,7 +680,11 @@ def _color_tukey_collections(
         coll.set_facecolors(facecolors)
 
 
-def _lookup_y_color(y: float, y_to_rgba: Mapping[float, RGBA], eps: float) -> Optional[RGBA]:
+def _lookup_y_color(
+    y: float,
+    y_to_rgba: Mapping[float, RGBA],
+    eps: float,
+) -> Optional[RGBA]:
     for ty, rgba in y_to_rgba.items():
         if abs(y - ty) < eps:
             return rgba

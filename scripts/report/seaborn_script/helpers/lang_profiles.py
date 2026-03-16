@@ -7,14 +7,16 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng_brackets", "ru_brackets", "vi_brackets", "sw_brackets", "ga_brackets", "th_brackets",
     ],
     "last": [
-        "raw", "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last",
+        "raw", "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga",
+        "eng_last", "fr_last", "ru_last", "ar_last", "he_last", "vi_last", "th_last", "sw_last", "ga_last", "zh_last", "he_last", "hi_last",
     ],
     "first": [
-        "raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first",
+        "raw", "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga",
+        "raw", "eng_first", "fr_first", "ru_first", "ar_first", "he_first", "vi_first", "th_first", "sw_first", "ga_first", "zh_first", "hi_first",
     ],
     "word": [
-        "raw", "eng", "ru", "ar", "vi", "th", "sw",
-        "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word",
+        "raw", "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi",
+        "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word", "he_word", "zh_word", "fr_word", "hi_word",
     ],
     "crit": [
         "raw", "raw_crit",
