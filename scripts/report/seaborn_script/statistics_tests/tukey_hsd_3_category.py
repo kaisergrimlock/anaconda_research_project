@@ -39,14 +39,14 @@ from helpers.output_writer import write_df
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANG_PROFILE = "lang"
+LANG_PROFILE = "cwb_instruct"
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
 
-CATEGORY_SUFFIXES: Sequence[str] = ("_first",)
+CATEGORY_SUFFIXES: Sequence[str] = ("cwb_instruct",)
 EXTRA_STRIP_SUFFIXES: Sequence[str] = ("_wo",)
-CATEGORY_LABEL = ""
-CATEGORY_MARKER = ""
+CATEGORY_LABEL = "Rand CWB_instruct"
+CATEGORY_MARKER = "x"
 BASELINE_LABEL = "Rand QP"
 BASELINE_MARKER = "^"
 

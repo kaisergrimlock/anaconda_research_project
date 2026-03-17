@@ -19,27 +19,25 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word", "he_word", "zh_word", "fr_word", "hi_word",
     ],
     "crit": [
-        "raw", "raw_crit",
-        "eng", "eng_crit",
-        "ar", "ar_crit",
-        "fr", "fr_crit",
-        "ru", "ru_crit",
-        "zh", "zh_crit",
-        "vi", "vi_crit",
-        "hi", "hi_crit",
-        "he", "he_crit",
-        "th", "th_crit",
-        "sw", "sw_crit",
-        "ga", "ga_crit",
+        "raw", "eng", "ar", "fr", "ru", "zh", "vi", "hi", "he", "th", "sw", "ga",
+        "raw_crit", "eng_crit", "ar_crit", "fr_crit", "ru_crit", "zh_crit", "vi_crit",
+        "hi_crit", "he_crit", "th_crit", "sw_crit", "ga_crit",
     ],
     "crit_subset": ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"],
     "lang": ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"],
-    "corrected": ["vi", "vi_corrected", "th", "th_corrected", "he", "he_corrected", "ar", "ar_corrected"],
     "mult": ["eng", "eng_mult", "eng_mult_2", "eng_mult_3"],
-    "low": ["eng", "th", "uk", "el", "ha", "sw", "ga", "hi", "raw"],
-    "mid": ["eng", "eng_mid", "vi", "vi_mid"],
     "script": ["eng", "fr", "ru", "uk", "zh", "ja", "ar", "ur"],
-    "cwb": ["eng", "engcwb", "raw", "vi", "vicwb", "th", "thcwb", "fr", "frcwb", "ru", "rucwb", "he", "hecwb", "sw", "swcwb", "ga", "gacwb", "hi", "hicwb", "zh", "zhcwb"]
+    "cwb": [
+        "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+        "engcwb", "vicwb", "thcwb", "frcwb", "rucwb", "hecwb", "swcwb", "gacwb", "hicwb", "zhcwb",
+    ],
+    
+    "cwb_instruct": [
+        "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+        "engcwb_instruct", "vicwb_instruct", "thcwb_instruct", "frcwb_instruct", "rucwb_instruct",
+        "hecwb_instruct", "swcwb_instruct", "gacwb_instruct", "hicwb_instruct", "zhcwb_instruct",
+    ],
+
 }
 
 def get_langs(profile: str) -> List[str]:
