@@ -25,7 +25,7 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     "crit_subset": ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"],
     "lang": ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"],
-    "mult": ["eng", "eng_mult", "eng_mult_2", "eng_mult_3"],
+    "mult": ["raw", "eng", "eng_mult_2", "eng_mult_3"],
     "script": ["eng", "fr", "ru", "uk", "zh", "ja", "ar", "ur"],
     "cwb": [
         "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",

@@ -1,0 +1,76 @@
+\begin{table}
+\caption{Tukey HSD across (model,lang_group) for mean_diff, FWER=0.05.}
+\label{tab:tukey_langgroups_mean_diff}
+\begin{tabular}{l l r r r r l}
+\toprule
+group1 & group2 & meandiff & p-adj & lower & upper & reject \\
+\midrule
+gpt-oss-20b|eng & gpt-oss-20b|eng_mult_2 & -0.1456 & 0 & -0.2375 & -0.0537 & True \\
+gpt-oss-20b|eng & gpt-oss-20b|eng_mult_3 & -0.2301 & 0 & -0.322 & -0.1382 & True \\
+gpt-oss-20b|eng & gpt-oss-20b|eng_raw & -0.0531 & 0.7662 & -0.1451 & 0.0388 & False \\
+gpt-oss-20b|eng & llama3-8b-instruct|eng & 0.3686 & 0 & 0.2767 & 0.4605 & True \\
+gpt-oss-20b|eng & llama3-8b-instruct|eng_mult_2 & 0.2331 & 0 & 0.1411 & 0.325 & True \\
+gpt-oss-20b|eng & llama3-8b-instruct|eng_mult_3 & 0.2665 & 0 & 0.1746 & 0.3584 & True \\
+gpt-oss-20b|eng & llama3-8b-instruct|eng_raw & 0.1172 & 0.0019 & 0.0252 & 0.2091 & True \\
+gpt-oss-20b|eng & qwen3-32b-v1|eng & 0.3151 & 0 & 0.2231 & 0.407 & True \\
+gpt-oss-20b|eng & qwen3-32b-v1|eng_mult_2 & 0.1762 & 0 & 0.0842 & 0.2681 & True \\
+gpt-oss-20b|eng & qwen3-32b-v1|eng_mult_3 & 0.0377 & 0.9741 & -0.0543 & 0.1296 & False \\
+gpt-oss-20b|eng & qwen3-32b-v1|eng_raw & 0.1197 & 0.0013 & 0.0277 & 0.2116 & True \\
+gpt-oss-20b|eng_mult_2 & gpt-oss-20b|eng_mult_3 & -0.0845 & 0.107 & -0.1764 & 0.0074 & False \\
+gpt-oss-20b|eng_mult_2 & gpt-oss-20b|eng_raw & 0.0925 & 0.0471 & 0.0005 & 0.1844 & True \\
+gpt-oss-20b|eng_mult_2 & llama3-8b-instruct|eng & 0.5142 & 0 & 0.4223 & 0.6061 & True \\
+gpt-oss-20b|eng_mult_2 & llama3-8b-instruct|eng_mult_2 & 0.3787 & 0 & 0.2867 & 0.4706 & True \\
+gpt-oss-20b|eng_mult_2 & llama3-8b-instruct|eng_mult_3 & 0.4121 & 0 & 0.3202 & 0.5041 & True \\
+gpt-oss-20b|eng_mult_2 & llama3-8b-instruct|eng_raw & 0.2628 & 0 & 0.1708 & 0.3547 & True \\
+gpt-oss-20b|eng_mult_2 & qwen3-32b-v1|eng & 0.4607 & 0 & 0.3687 & 0.5526 & True \\
+gpt-oss-20b|eng_mult_2 & qwen3-32b-v1|eng_mult_2 & 0.3218 & 0 & 0.2298 & 0.4137 & True \\
+gpt-oss-20b|eng_mult_2 & qwen3-32b-v1|eng_mult_3 & 0.1833 & 0 & 0.0913 & 0.2752 & True \\
+gpt-oss-20b|eng_mult_2 & qwen3-32b-v1|eng_raw & 0.2653 & 0 & 0.1734 & 0.3572 & True \\
+gpt-oss-20b|eng_mult_3 & gpt-oss-20b|eng_raw & 0.177 & 0 & 0.0851 & 0.2689 & True \\
+gpt-oss-20b|eng_mult_3 & llama3-8b-instruct|eng & 0.5987 & 0 & 0.5068 & 0.6907 & True \\
+gpt-oss-20b|eng_mult_3 & llama3-8b-instruct|eng_mult_2 & 0.4632 & 0 & 0.3713 & 0.5551 & True \\
+gpt-oss-20b|eng_mult_3 & llama3-8b-instruct|eng_mult_3 & 0.4967 & 0 & 0.4047 & 0.5886 & True \\
+gpt-oss-20b|eng_mult_3 & llama3-8b-instruct|eng_raw & 0.3473 & 0 & 0.2554 & 0.4392 & True \\
+gpt-oss-20b|eng_mult_3 & qwen3-32b-v1|eng & 0.5452 & 0 & 0.4533 & 0.6371 & True \\
+gpt-oss-20b|eng_mult_3 & qwen3-32b-v1|eng_mult_2 & 0.4063 & 0 & 0.3144 & 0.4982 & True \\
+gpt-oss-20b|eng_mult_3 & qwen3-32b-v1|eng_mult_3 & 0.2678 & 0 & 0.1759 & 0.3597 & True \\
+gpt-oss-20b|eng_mult_3 & qwen3-32b-v1|eng_raw & 0.3498 & 0 & 0.2579 & 0.4417 & True \\
+gpt-oss-20b|eng_raw & llama3-8b-instruct|eng & 0.4218 & 0 & 0.3298 & 0.5137 & True \\
+gpt-oss-20b|eng_raw & llama3-8b-instruct|eng_mult_2 & 0.2862 & 0 & 0.1943 & 0.3781 & True \\
+gpt-oss-20b|eng_raw & llama3-8b-instruct|eng_mult_3 & 0.3197 & 0 & 0.2277 & 0.4116 & True \\
+gpt-oss-20b|eng_raw & llama3-8b-instruct|eng_raw & 0.1703 & 0 & 0.0784 & 0.2622 & True \\
+gpt-oss-20b|eng_raw & qwen3-32b-v1|eng & 0.3682 & 0 & 0.2763 & 0.4601 & True \\
+gpt-oss-20b|eng_raw & qwen3-32b-v1|eng_mult_2 & 0.2293 & 0 & 0.1374 & 0.3212 & True \\
+gpt-oss-20b|eng_raw & qwen3-32b-v1|eng_mult_3 & 0.0908 & 0.0565 & -0.0011 & 0.1827 & False \\
+gpt-oss-20b|eng_raw & qwen3-32b-v1|eng_raw & 0.1728 & 0 & 0.0809 & 0.2647 & True \\
+llama3-8b-instruct|eng & llama3-8b-instruct|eng_mult_2 & -0.1356 & 0.0001 & -0.2275 & -0.0436 & True \\
+llama3-8b-instruct|eng & llama3-8b-instruct|eng_mult_3 & -0.1021 & 0.015 & -0.194 & -0.0102 & True \\
+llama3-8b-instruct|eng & llama3-8b-instruct|eng_raw & -0.2515 & 0 & -0.3434 & -0.1595 & True \\
+llama3-8b-instruct|eng & qwen3-32b-v1|eng & -0.0536 & 0.7569 & -0.1455 & 0.0384 & False \\
+llama3-8b-instruct|eng & qwen3-32b-v1|eng_mult_2 & -0.1925 & 0 & -0.2844 & -0.1005 & True \\
+llama3-8b-instruct|eng & qwen3-32b-v1|eng_mult_3 & -0.331 & 0 & -0.4229 & -0.239 & True \\
+llama3-8b-instruct|eng & qwen3-32b-v1|eng_raw & -0.249 & 0 & -0.3409 & -0.157 & True \\
+llama3-8b-instruct|eng_mult_2 & llama3-8b-instruct|eng_mult_3 & 0.0335 & 0.9898 & -0.0584 & 0.1254 & False \\
+llama3-8b-instruct|eng_mult_2 & llama3-8b-instruct|eng_raw & -0.1159 & 0.0022 & -0.2078 & -0.024 & True \\
+llama3-8b-instruct|eng_mult_2 & qwen3-32b-v1|eng & 0.082 & 0.1352 & -0.0099 & 0.1739 & False \\
+llama3-8b-instruct|eng_mult_2 & qwen3-32b-v1|eng_mult_2 & -0.0569 & 0.6775 & -0.1488 & 0.035 & False \\
+llama3-8b-instruct|eng_mult_2 & qwen3-32b-v1|eng_mult_3 & -0.1954 & 0 & -0.2873 & -0.1035 & True \\
+llama3-8b-instruct|eng_mult_2 & qwen3-32b-v1|eng_raw & -0.1134 & 0.0032 & -0.2053 & -0.0215 & True \\
+llama3-8b-instruct|eng_mult_3 & llama3-8b-instruct|eng_raw & -0.1494 & 0 & -0.2413 & -0.0575 & True \\
+llama3-8b-instruct|eng_mult_3 & qwen3-32b-v1|eng & 0.0485 & 0.8567 & -0.0434 & 0.1405 & False \\
+llama3-8b-instruct|eng_mult_3 & qwen3-32b-v1|eng_mult_2 & -0.0904 & 0.0591 & -0.1823 & 0.0015 & False \\
+llama3-8b-instruct|eng_mult_3 & qwen3-32b-v1|eng_mult_3 & -0.2289 & 0 & -0.3208 & -0.1369 & True \\
+llama3-8b-instruct|eng_mult_3 & qwen3-32b-v1|eng_raw & -0.1469 & 0 & -0.2388 & -0.0549 & True \\
+llama3-8b-instruct|eng_raw & qwen3-32b-v1|eng & 0.1979 & 0 & 0.106 & 0.2898 & True \\
+llama3-8b-instruct|eng_raw & qwen3-32b-v1|eng_mult_2 & 0.059 & 0.6246 & -0.0329 & 0.1509 & False \\
+llama3-8b-instruct|eng_raw & qwen3-32b-v1|eng_mult_3 & -0.0795 & 0.1687 & -0.1714 & 0.0124 & False \\
+llama3-8b-instruct|eng_raw & qwen3-32b-v1|eng_raw & 0.0025 & 1 & -0.0894 & 0.0944 & False \\
+qwen3-32b-v1|eng & qwen3-32b-v1|eng_mult_2 & -0.1389 & 0.0001 & -0.2308 & -0.047 & True \\
+qwen3-32b-v1|eng & qwen3-32b-v1|eng_mult_3 & -0.2774 & 0 & -0.3693 & -0.1855 & True \\
+qwen3-32b-v1|eng & qwen3-32b-v1|eng_raw & -0.1954 & 0 & -0.2873 & -0.1035 & True \\
+qwen3-32b-v1|eng_mult_2 & qwen3-32b-v1|eng_mult_3 & -0.1385 & 0.0001 & -0.2304 & -0.0466 & True \\
+qwen3-32b-v1|eng_mult_2 & qwen3-32b-v1|eng_raw & -0.0565 & 0.6879 & -0.1484 & 0.0354 & False \\
+qwen3-32b-v1|eng_mult_3 & qwen3-32b-v1|eng_raw & 0.082 & 0.1352 & -0.0099 & 0.1739 & False \\
+\bottomrule
+\end{tabular}
+\end{table}

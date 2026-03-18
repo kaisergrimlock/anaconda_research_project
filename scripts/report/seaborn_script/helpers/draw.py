@@ -43,7 +43,6 @@ def load_lang_taxonomy(csv_path: Path) -> Dict[str, int]:
         out[lang] = int(row["taxonomy"])
     return out
 
-
 def load_categorized_lang_taxonomy(
     csv_path: Path,
     *,
@@ -51,30 +50,6 @@ def load_categorized_lang_taxonomy(
     extra_strip_suffixes: Sequence[str] = (),
     base_len: int = 2,
 ) -> Dict[str, int]:
-    """
-    Read a CSV with columns: lang,taxonomy and return a dict keyed by the
-    normalized base language.
-
-    This is intended for categorized variants such as:
-        engcwb
-        vi_word
-        ar_phrase
-        engcwb_wo
-
-    The caller supplies the category suffixes and any extra suffixes to strip.
-
-    Example:
-        category_suffixes=("cwb",)
-        category_suffixes=("_word",)
-        category_suffixes=("_word", "_phrase")
-        extra_strip_suffixes=("_wo",)
-
-    Normalization examples:
-        eng       -> en
-        engcwb    -> en
-        vi_word   -> vi
-        engcwb_wo -> en
-    """
     df = pd.read_csv(csv_path)
     _validate_taxonomy_csv(df, csv_path)
 
@@ -91,7 +66,6 @@ def load_categorized_lang_taxonomy(
         )
         out[key] = int(row["taxonomy"])
     return out
-
 
 # =========================
 # Legends
@@ -236,7 +210,6 @@ def center_x_axis_at_zero(ax: Axes) -> None:
     ax.set_xlim(-m, m)
     ax.axvline(0, linewidth=1)
 
-
 def add_model_separators(
     fig: Figure,
     ax: Axes,
@@ -265,7 +238,6 @@ def add_model_separators(
                 alpha=alpha,
                 linestyle=linestyle,
             )
-
 
 def add_model_prefix_labels(
     fig: Figure,
@@ -314,7 +286,6 @@ def add_model_prefix_labels(
             clip_on=False,
         )
         i = j
-
 
 # =========================
 # Tukey plot coloring
@@ -380,33 +351,7 @@ def color_tukey_by_categorized_taxonomy(
     apply_style: bool = True,
     base_len: int = 2,
 ) -> Dict[int, RGBA]:
-    """
-    Generic taxonomy coloring for categorized content.
 
-    The caller supplies the category suffixes and this function handles:
-      - normalization of labels
-      - loading the taxonomy CSV
-      - coloring ticks / CI bars / mean markers
-
-    Examples:
-        color_tukey_by_categorized_taxonomy(
-            fig, ax,
-            taxonomy_csv=taxonomy_csv,
-            category_suffixes=("cwb",),
-        )
-
-        color_tukey_by_categorized_taxonomy(
-            fig, ax,
-            taxonomy_csv=taxonomy_csv,
-            category_suffixes=("_word",),
-        )
-
-        color_tukey_by_categorized_taxonomy(
-            fig, ax,
-            taxonomy_csv=taxonomy_csv,
-            category_suffixes=("_word", "_phrase"),
-        )
-    """
     if apply_style:
         apply_paper_fmt()
 
@@ -453,7 +398,6 @@ def color_tukey_by_categorized_taxonomy(
     _color_tukey_collections(ax, y_to_rgba=y_to_rgba, linewidth=linewidth, eps=eps)
     return level_to_rgba
 
-
 def color_tukey_by_language(
     fig: Figure,
     ax: Axes,
@@ -463,10 +407,7 @@ def color_tukey_by_language(
     eps: float = 1e-6,
     apply_style: bool = True,
 ) -> Dict[str, RGBA]:
-    """
-    Color Tukey plot elements by base language.
-    For example, vi and vi_word share the same color.
-    """
+
     if apply_style:
         apply_paper_fmt()
 
@@ -510,7 +451,6 @@ def _validate_taxonomy_csv(df: pd.DataFrame, csv_path: Path) -> None:
             f"Got {list(df.columns)}"
         )
 
-
 def _build_level_palette(levels: Iterable[int]) -> Dict[int, RGBA]:
     ordered = sorted(set(levels))
     cmap = plt.get_cmap("tab10")
@@ -522,42 +462,18 @@ def _build_item_palette(items: Iterable[str]) -> Dict[str, RGBA]:
     cmap = plt.get_cmap("tab10")
     return {item: cmap(i % cmap.N) for i, item in enumerate(ordered)}
 
-
 def _base_language(lang: str) -> str:
     return lang.split("_", 1)[0].strip()
 
-
 def normalize_categorized_language(
-    label_lang: str,
-    *,
-    group_sep: str = "|",
-    category_suffixes: Sequence[str] = (),
-    extra_strip_suffixes: Sequence[str] = (),
-    base_len: int = 2,
-) -> str:
-    """
-    Normalize a categorized language label into a base key.
+        label_lang: str,
+        *,
+        group_sep: str = "|",
+        category_suffixes: Sequence[str] = (),
+        extra_strip_suffixes: Sequence[str] = (),
+        base_len: int = 2,
+    ) -> str:
 
-    This is the core robust method:
-      - optionally strip model prefix before '|'
-      - repeatedly strip known category suffixes
-      - repeatedly strip known extra suffixes
-      - return the first `base_len` letters
-
-    Examples:
-        normalize_categorized_language("model|engcwb", category_suffixes=("cwb",))
-            -> "en"
-
-        normalize_categorized_language("model|vi_word", category_suffixes=("_word",))
-            -> "vi"
-
-        normalize_categorized_language(
-            "model|engcwb_wo",
-            category_suffixes=("cwb",),
-            extra_strip_suffixes=("_wo",),
-        )
-            -> "en"
-    """
     s = str(label_lang).strip().lower()
 
     if group_sep in s:
@@ -575,16 +491,13 @@ def normalize_categorized_language(
 
     return s[:base_len]
 
-
 def _lang_of(label: str, group_sep: str) -> str:
     return label.split(group_sep)[-1].strip()
-
 
 def _model_of(label: str, group_sep: str) -> str:
     if group_sep in label:
         return label.split(group_sep, 1)[0].strip()
     return label.strip()
-
 
 def _sorted_tick_pairs(ax: Axes) -> List[Tuple[float, str]]:
     yticks = list(ax.get_yticks())
@@ -596,7 +509,6 @@ def _sorted_tick_pairs(ax: Axes) -> List[Tuple[float, str]]:
     ]
     pairs.sort(key=lambda pair: pair[0])
     return pairs
-
 
 def _color_ticks_and_build_y_map(
     fig: Figure,
@@ -622,7 +534,6 @@ def _color_ticks_and_build_y_map(
         y_to_rgba[float(tick.get_position()[1])] = rgba
 
     return y_to_rgba
-
 
 def _color_tukey_collections(
     ax: Axes,
@@ -678,7 +589,6 @@ def _color_tukey_collections(
                 facecolors[i] = rgba
 
         coll.set_facecolors(facecolors)
-
 
 def _lookup_y_color(
     y: float,
