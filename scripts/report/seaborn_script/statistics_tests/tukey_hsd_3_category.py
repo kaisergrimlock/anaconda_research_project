@@ -39,11 +39,11 @@ from helpers.output_writer import write_df
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANG_PROFILE = "cwb_instruct"
+LANG_PROFILE = "instruct"
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
 
-CATEGORY_SUFFIXES: Sequence[str] = ("cwb_instruct",)
+CATEGORY_SUFFIXES: Sequence[str] = ("_instruct",)
 EXTRA_STRIP_SUFFIXES: Sequence[str] = ("_wo",)
 CATEGORY_LABEL = "Rand CWB_instruct"
 CATEGORY_MARKER = "x"
@@ -625,7 +625,7 @@ def main() -> None:
     )
 
     center_x_axis_at_zero(ax)
-    ax.set_xlim(-0.1, 1.75)
+    ax.set_xlim(-0.1, 3.0)
     ax.tick_params(axis="y", pad=10)
 
     ax.grid(axis="x", linestyle="--", linewidth=0.7, alpha=0.6)
