@@ -44,7 +44,7 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     
     "instruct_defended":[
-        "eng", "eng_instruct_defended", "eng_instruct"
+        "eng", "eng_instruct_defended", "eng_instruct", "raw"
     ]
 
 }

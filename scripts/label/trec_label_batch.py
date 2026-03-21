@@ -17,12 +17,17 @@ LANGUAGES = [
     "ru_instruct",
     "zh_instruct",
     "ga_instruct",
-    "ar_instruct"
+    "ar_instruct",
+    "fr_instruct",
+    "vi_instruct",
+    "sw_instruct",
+    "ga_instruct",
+    "eng_instruct"
 ]
 
 # Shared part range for all languages
-START_PART = 0
-END_PART = 0
+START_PART = 1
+END_PART = 6
 
 # =========================================================
 # Load target script dynamically

@@ -37,7 +37,7 @@ from helpers.output_writer import write_df
 # ========================
 # Parameters
 # ========================
-ALPHA = 0.05
+ALPHA = 0.25
 LABELS = [0, 1, 2, 3]
 LANG_PROFILE = "instruct"
 LANGS: List[str] = get_langs(LANG_PROFILE)

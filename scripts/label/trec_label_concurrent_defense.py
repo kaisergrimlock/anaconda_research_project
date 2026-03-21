@@ -63,8 +63,8 @@ DEFENSE_FILE = Path(f"prompts/{PROMPT_TYPE}/defense/defense.txt")
 
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng_instruct"          # target language file to label
-DEFEND_LANG = "raw"              # source language file used to build original/base prompt
+LANG = "eng"          # target language file to label
+DEFEND_LANG = "judged"              # source language file used to build original/base prompt
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"

@@ -29,7 +29,11 @@ LANGUAGES = [
     "ru_instruct",
     "zh_instruct",
     "ga_instruct",
-    "ar_instruct"
+    "ar_instruct",
+    "fr_instruct",
+    "vi_instruct",
+    "sw_instruct",
+    "ga_instruct",
 ]
 
 

@@ -57,18 +57,19 @@ PROMPT_TYPE = "label"
 PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
+ALLOW_BLANK_OVERWRITE = True
 
-LANG = "eng_instruct"          # "raw", "vi", "enclosed", ...
+LANG = "fr_instruct"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"
 MODE = "replace"           # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]
-INFERENCE_CONFIG = {"maxTokens": 10000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -320,8 +321,11 @@ def _label_single_part_file_blocking(
             # Build output row
             row_values = [row_out_map.get(col, "") for col in header_in]
             if "llm_relevance" in header_in:
-                # Overwrite in place
-                row_values[-1] = score
+                old_score = row_out_map.get("llm_relevance", "")
+                if ALLOW_BLANK_OVERWRITE:
+                    row_values[-1] = score
+                else:
+                    row_values[-1] = score if str(score).strip() != "" else old_score
             else:
                 row_values.append(score)
 

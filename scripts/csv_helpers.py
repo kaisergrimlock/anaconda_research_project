@@ -391,6 +391,10 @@ def write_combined_dynamic(
                             f"[REPLACE] line={line_no} key={k} "
                             f"llm_relevance: {old_llm!r} -> {new_llm!r}"
                         )
+                    # print(
+                    #     f"[REPLACE] line={line_no} key={k} "
+                    #     f"llm_relevance: {old_llm!r} -> {new_llm!r}"
+                    # )
                 else:
                     print(f"[REPLACE] line={line_no} key={k}")
 
