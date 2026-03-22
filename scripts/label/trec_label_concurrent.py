@@ -62,7 +62,7 @@ ALLOW_BLANK_OVERWRITE = True
 LANG = "hi_instruct"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"           # "append" or "replace"
 
 # Models
