@@ -162,6 +162,12 @@ def categorized_variant_legend(
         ax.add_artist(legend_tax)
 
     variant_handles = [
+        Patch(
+            facecolor=raw_band_color,
+            edgecolor="none",
+            alpha=0.22,
+            label=raw_band_label,
+        ),
         Line2D(
             [0], [0],
             color="black",
@@ -178,12 +184,6 @@ def categorized_variant_legend(
             markersize=12,
             markeredgewidth=1.8,
             label=category_label,
-        ),
-        Patch(
-            facecolor=raw_band_color,
-            edgecolor="none",
-            alpha=0.22,
-            label=raw_band_label,
         ),
     ]
 

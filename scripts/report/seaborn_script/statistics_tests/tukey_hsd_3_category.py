@@ -619,6 +619,7 @@ def main() -> None:
         baseline_label=BASELINE_LABEL,
         baseline_marker=BASELINE_MARKER,
         category_marker=CATEGORY_MARKER,
+        raw_band_label="Baseline",
         variant_title="",
         taxonomy_title="Resource level",
         taxonomy_loc="upper right",
