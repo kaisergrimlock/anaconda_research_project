@@ -22,8 +22,8 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.csv_helpers import bump_field_limit
 
 # -------- Config --------
-TREC_DL_YEAR = "2021"
-# MODEL = "qwen3-32b-v1"
+TREC_DL_YEAR = "2022"
+#MODEL = "qwen3-32b-v1"
 MODEL = "gpt-oss-20b"
 
 LANGUAGES = [
