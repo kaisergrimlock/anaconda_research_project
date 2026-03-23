@@ -9,10 +9,9 @@ import sys
 import threading
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-from queue import Queue
+from queue import Queue, Empty
 from threading import Lock
 
-import boto3
 from botocore.config import Config
 
 # ===== repo imports =====
@@ -24,34 +23,53 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.csv_helpers import (
     bump_field_limit,
     ensure_csv_with_header,
-    pick_passage_for_lang,
     model_short_name,
     _inspect_header,
     write_combined_dynamic,
 )
 from scripts.log_helpers import timestamp_id
+from scripts.bedrock_client import (
+    make_bedrock_runtime_client,
+    converse_prompt,
+)
 
 # ===============================================================
 # Config
 # ===============================================================
-#Finished qwen
 
-TREC_DL_YEAR = "2022"
-# LANGS = ["raw", "eng", "fr", "ru", "ar", "zh"]   # Batch class-5
-LANGS = ["he"]  # Full set
+TREC_DL_YEAR = "2021"
+LANGS = [
+    # "ru",
+    # "th",
+    # "zh",
+    # "ga",
+    # "ar",
+    # "fr",
+    # "vi",
+    # "sw",
+    # "ga",
+    # "eng",
+    "hi",
+    "he",
+]
+
+#LANGS = ["he"]
 START_PART = 1
 END_PART = 6
 MODE = "replace"
-MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 
 CRITERIA = ["contextuality", "coverage", "exactness", "topicality"]
-RELEVANCE_COL = "relevance"  # in criterion files
+RELEVANCE_COL = "relevance"
 
 FORCE_REBUILD_CACHE = False
 
 PROMPT_TYPE = "criterion"
-PROMPT_NAME = "composition"
+PROMPT_NAME = "composition_2"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
+OUTPUT_SUFFIX = "crit_2"
 
 cfg = Config(
     region_name="us-west-2",
@@ -70,14 +88,16 @@ OUTPUT_ROOT_BASE = PROJECT_ROOT / "outputs" / "llm_label" / f"trec_dl_{TREC_DL_Y
 LOG_ROOT_DIR = PROJECT_ROOT / "logs"
 
 # ===============================================================
-# Concurrency knobs (NEW)
+# Concurrency knobs
 # ===============================================================
-# Part-file concurrency (cache parts in flight)
-PART_CONCURRENCY = 6
 
-# Row-level concurrency inside each cache part file (Bedrock calls)
+PART_CONCURRENCY = 6
 ROW_CONCURRENCY = 50
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
+
+if MODELS[0].startswith("meta.llama3"):
+    ROW_CONCURRENCY = 1
+    ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 bump_field_limit()
 
@@ -133,11 +153,11 @@ def load_criterion_into_dict(
                 f"Available columns: {fieldnames}"
             )
 
-        last_col_name = fieldnames[-1]  # criterion score column
+        last_col_name = fieldnames[-1]
 
         for row in reader:
             qid = (row.get("qid", "") or "").strip()
-            pid = (row.get("pid", "") or "").strip()  # adjust if needed
+            pid = (row.get("pid", "") or "").strip()
             query = row.get("query", "") or ""
 
             if lang == "raw":
@@ -213,7 +233,7 @@ def write_cache_parts_for_short(
                 w.writerow(out_row)
 
         out_paths.append(part_path)
-        print(f"[CACHE] Wrote {part_path.name}  rows {start}..{end-1}")
+        print(f"[CACHE] Wrote {part_path.name} rows {start}..{end-1}")
 
     return out_paths
 
@@ -228,7 +248,7 @@ def ensure_cache_exists(short: str, lang: str) -> None:
         return
 
     if existing and FORCE_REBUILD_CACHE:
-        print(f"[CACHE] FORCE_REBUILD_CACHE=True, deleting old cache parts...")
+        print("[CACHE] FORCE_REBUILD_CACHE=True, deleting old cache parts...")
         for p in existing:
             p.unlink(missing_ok=True)
 
@@ -252,24 +272,64 @@ def parse_llm_text_to_score(text: str) -> str:
     return m.group(1) if m else ""
 
 
-def extract_text_from_resp(model_id: str, resp: dict) -> str:
-    try:
-        blocks = resp["output"]["message"]["content"]
-        if not blocks:
-            return ""
-        return blocks[-1].get("text", "") or ""
-    except Exception:
+def extract_text_from_helper_result(result: Any) -> str:
+    if result is None:
         return ""
+    if isinstance(result, str):
+        return result
+    for attr in ("text", "response_text", "output_text", "answer"):
+        if hasattr(result, attr):
+            val = getattr(result, attr)
+            if isinstance(val, str):
+                return val
+    if isinstance(result, dict):
+        for key in ("text", "response_text", "output_text", "answer"):
+            val = result.get(key)
+            if isinstance(val, str):
+                return val
+    return str(result)
 
 
-def extract_reasoning_from_resp(model_id: str, resp: dict) -> str:
-    try:
-        blocks = resp["output"]["message"]["content"]
-        if len(blocks) > 1:
-            return "\n".join(b.get("text", "") for b in blocks[:-1])
+def extract_reasoning_from_helper_result(result: Any) -> str:
+    if result is None:
         return ""
-    except Exception:
-        return ""
+    for attr in ("reasoning", "analysis", "thoughts"):
+        if hasattr(result, attr):
+            val = getattr(result, attr)
+            if isinstance(val, str):
+                return val
+    if isinstance(result, dict):
+        for key in ("reasoning", "analysis", "thoughts"):
+            val = result.get(key)
+            if isinstance(val, str):
+                return val
+    return ""
+
+
+def extract_usage_from_helper_result(result: Any) -> tuple[int, int]:
+    if result is None:
+        return 0, 0
+
+    for in_attr, out_attr in [
+        ("input_tokens", "output_tokens"),
+        ("inputTokens", "outputTokens"),
+    ]:
+        if hasattr(result, in_attr) or hasattr(result, out_attr):
+            return int(getattr(result, in_attr, 0) or 0), int(getattr(result, out_attr, 0) or 0)
+
+    if isinstance(result, dict):
+        usage = result.get("usage")
+        if isinstance(usage, dict):
+            return (
+                int(usage.get("input", usage.get("inputTokens", 0)) or 0),
+                int(usage.get("output", usage.get("outputTokens", 0)) or 0),
+            )
+        return (
+            int(result.get("input_tokens", result.get("inputTokens", 0)) or 0),
+            int(result.get("output_tokens", result.get("outputTokens", 0)) or 0),
+        )
+
+    return 0, 0
 
 
 def read_rows(path: Path):
@@ -296,6 +356,11 @@ def start_stop_key_listener(loop, stop_event):
     return t
 
 
+def signal_stop(stop_event: Optional[asyncio.Event]) -> None:
+    if stop_event is not None:
+        stop_event.set()
+
+
 # =========================
 # ROW-CONCURRENT labeling
 # =========================
@@ -312,26 +377,25 @@ def _label_single_part_file_blocking(
     safe_model = model_id.replace(":", "_")
     header_in = _inspect_header(part_csv)
 
-    required_cols = ["query", "passage" if lang == "raw" else "passage_injected"]
+    # composition_2 only needs criterion columns
+    required_cols = CRITERIA
     missing = [c for c in required_cols if c not in header_in]
     if missing:
-        print(f"[FATAL] {part_csv} missing required {missing}")
-        sys.exit(2)
+        raise RuntimeError(f"{part_csv} missing required columns: {missing}")
 
     header_out = header_in + (["llm_relevance"] if "llm_relevance" not in header_in else [])
 
     labels_path = out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
-    bedrock = boto3.client("bedrock-runtime", config=cfg)
+    bedrock = make_bedrock_runtime_client(cfg)
 
     n_rows = count_rows(part_csv)
     print(f"[LOAD] {part_csv.name}: {n_rows} rows | row_workers={ROW_CONCURRENCY}")
 
     lock = Lock()
-    row_queue: "Queue[Optional[Tuple[int, Dict[str, str]]]]" = Queue(maxsize=ROW_QUEUE_MAXSIZE)
+    row_queue: Queue[Optional[Tuple[int, Dict[str, str]]]] = Queue(maxsize=ROW_QUEUE_MAXSIZE)
 
-    # deterministic output
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
     done_count = 0
@@ -340,11 +404,7 @@ def _label_single_part_file_blocking(
     total_out = 0
     logs_json: List[Dict[str, Any]] = []
 
-    SYSTEM_PROMPT = (
-        "You are a search-quality rater.\n"
-        "Given query and passage, output ONLY a relevance score 0-3.\n"
-        "0 = irrelevant, 1 = related, 2 = highly relevant, 3 = perfectly relevant.\n"
-    )
+    fatal_error: List[Optional[BaseException]] = [None]
 
     def append_row_csv(new_row: List[str]) -> None:
         with labels_path.open("a", encoding="utf-8", newline="") as f:
@@ -368,10 +428,26 @@ def _label_single_part_file_blocking(
             )
             next_to_write += 1
 
+    def fail_fast(exc: BaseException) -> None:
+        with lock:
+            if fatal_error[0] is None:
+                fatal_error[0] = exc
+                signal_stop(stop_event)
+
     def worker():
         nonlocal done_count
+
         while True:
-            item = row_queue.get()
+            if fatal_error[0] is not None:
+                break
+
+            try:
+                item = row_queue.get(timeout=0.25)
+            except Empty:
+                if stop_event and stop_event.is_set():
+                    break
+                continue
+
             if item is None:
                 row_queue.task_done()
                 break
@@ -384,8 +460,6 @@ def _label_single_part_file_blocking(
 
             row_out_map = dict(row)
             pid_resolved = (row.get("pid_resolved") or row.get("pid") or "").strip()
-            query = (row_out_map.get("query", "") or "").strip()
-            passage = pick_passage_for_lang(row_out_map, lang)
 
             exactness = (row_out_map.get("exactness", "") or "").strip()
             topicality = (row_out_map.get("topicality", "") or "").strip()
@@ -393,43 +467,36 @@ def _label_single_part_file_blocking(
             contextual = (row_out_map.get("contextuality", "") or "").strip()
 
             score = (row_out_map.get("relevance", "") or "").strip()
+            prompt = ""
 
             try:
-                try:
-                    prompt = prompt_template.format(
-                        query=query,
-                        passage=passage,
-                        exactness=exactness,
-                        topicality=topicality,
-                        coverage=coverage,
-                        contextual=contextual,
-                    )
-                except KeyError:
-                    prompt = prompt_template.format(query=query, passage=passage)
+                prompt = prompt_template.format(
+                    exactness=exactness,
+                    topicality=topicality,
+                    coverage=coverage,
+                    contextual=contextual,
+                )
 
-                messages = [{"role": "user", "content": [{"text": prompt}]}]
-                kwargs = {
-                    "modelId": model_id,
-                    "messages": messages,
-                    "inferenceConfig": INFERENCE_CONFIG,
-                    "system": [{"text": SYSTEM_PROMPT}],
-                }
+                result = converse_prompt(
+                    bedrock,
+                    model_id=model_id,
+                    prompt=prompt,
+                    inference_config=INFERENCE_CONFIG,
+                )
 
-                resp = bedrock.converse(**kwargs)
-                txt = extract_text_from_resp(model_id, resp)
+                txt = extract_text_from_helper_result(result)
                 parsed = parse_llm_text_to_score(txt)
                 if parsed != "":
                     score = parsed
 
-                in_tok = int(resp.get("usage", {}).get("inputTokens", 0) or 0)
-                out_tok = int(resp.get("usage", {}).get("outputTokens", 0) or 0)
-                reasoning = extract_reasoning_from_resp(model_id, resp)
+                in_tok, out_tok = extract_usage_from_helper_result(result)
+                reasoning = extract_reasoning_from_helper_result(result)
 
             except Exception as e:
+                row_queue.task_done()
                 print(f"\n[ERR] API failed on row {idx}: {e}")
-                txt = ""
-                reasoning = ""
-                in_tok = out_tok = 0
+                fail_fast(RuntimeError(f"Bedrock call failed for {part_csv.name} row {idx}: {e}"))
+                break
 
             row_values = [row_out_map.get(col, "") for col in header_out]
             try:
@@ -441,7 +508,7 @@ def _label_single_part_file_blocking(
             log_obj = {
                 "qid": row_out_map.get("qid"),
                 "pid_resolved": pid_resolved,
-                "prompt": prompt if "prompt" in locals() else "",
+                "prompt": prompt,
                 "response_text": txt,
                 "llm_relevance": score,
                 "reasoning": reasoning,
@@ -455,31 +522,33 @@ def _label_single_part_file_blocking(
 
             row_queue.task_done()
 
-    # Start row workers
     workers: List[threading.Thread] = []
     for _ in range(max(1, ROW_CONCURRENCY)):
         t = threading.Thread(target=worker, daemon=True)
         t.start()
         workers.append(t)
 
-    # Feed rows
-    for idx, row in enumerate(read_rows(part_csv), start=1):
-        if stop_event and stop_event.is_set():
-            print("\n[STOP] Early termination.")
-            break
-        row_queue.put((idx, row))
+    try:
+        for idx, row in enumerate(read_rows(part_csv), start=1):
+            if fatal_error[0] is not None:
+                break
+            if stop_event and stop_event.is_set():
+                print("\n[STOP] Early termination.")
+                break
+            row_queue.put((idx, row))
+    finally:
+        for _ in workers:
+            row_queue.put(None)
 
-    # Shutdown
-    for _ in workers:
-        row_queue.put(None)
+        for t in workers:
+            t.join()
 
-    row_queue.join()
+    if fatal_error[0] is not None:
+        raise fatal_error[0]
 
-    # Final flush
     with lock:
         flush_ready_locked()
 
-    # Write logs
     log_file = logs_dir / f"{run_id}_{safe_model}_{part_csv.stem}.json"
     log_file.write_text(json.dumps(logs_json, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -498,7 +567,7 @@ async def label_single_part_file(*args, **kwargs):
 
 
 def write_combined(per_file_csvs, header_out, short, lang, year, mode, out_dir):
-    lang_tag = f"{lang}_crit"
+    lang_tag = f"{lang}_{OUTPUT_SUFFIX}"
     return write_combined_dynamic(
         per_file_labels=per_file_csvs,
         header_out=header_out,
@@ -514,7 +583,6 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
 
-    # Ensure cache exists for THIS model
     ensure_cache_exists(short, lang)
 
     part_dir = cache_dir_for_short(short, lang)
@@ -553,18 +621,35 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
 
     tasks = [asyncio.create_task(task(p)) for p in part_files]
 
-    for t in asyncio.as_completed(tasks):
-        if stop_event.is_set():
-            for tt in tasks:
-                if not tt.done():
-                    tt.cancel()
-            await asyncio.gather(*tasks, return_exceptions=True)
-            print("[STOP] Cancelled remaining parts.")
-            break
+    try:
+        for t in asyncio.as_completed(tasks):
+            if stop_event.is_set():
+                for tt in tasks:
+                    if not tt.done():
+                        tt.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                print("[STOP] Cancelled remaining parts.")
+                break
 
-        r = await t
-        if r:
-            results.append(r)
+            try:
+                r = await t
+                if r:
+                    results.append(r)
+            except Exception as e:
+                print(f"[FATAL] {e}")
+                stop_event.set()
+                for tt in tasks:
+                    if not tt.done():
+                        tt.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                print("[ABORT] Stopping before merge because API call failed.")
+                return
+    finally:
+        pass
+
+    if stop_event.is_set():
+        print("[ABORT] Stopping before merge because stop event is set.")
+        return
 
     if not results:
         print("[INFO] No results to merge.")

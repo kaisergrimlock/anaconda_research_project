@@ -20,9 +20,16 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     "crit": [
         "raw", "eng", "ar", "fr", "ru", "zh", "vi", "hi", "he", "th", "sw", "ga",
-        "raw_crit", "eng_crit", "ar_crit", "fr_crit", "ru_crit", "zh_crit", "vi_crit",
+        "eng_crit", "ar_crit", "fr_crit", "ru_crit", "zh_crit", "vi_crit",
         "hi_crit", "he_crit", "th_crit", "sw_crit", "ga_crit",
     ],
+
+    "crit_2": [
+        "raw", "eng", "ar", "fr", "ru", "zh", "vi", "hi", "he", "th", "sw", "ga",
+        "eng_crit_2", "ar_crit_2", "fr_crit_2", "ru_crit_2", "zh_crit_2", "vi_crit_2",
+        "hi_crit_2", "he_crit_2", "th_crit_2", "sw_crit_2", "ga_crit_2",
+    ],
+
     "crit_subset": ["vi", "vi_crit", "th", "th_crit", "sw", "sw_crit", "ga", "ga_crit", "zh", "zh_crit"],
     "lang": ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"],
     "mult": ["raw", "eng", "eng_mult_2", "eng_mult_3"],
