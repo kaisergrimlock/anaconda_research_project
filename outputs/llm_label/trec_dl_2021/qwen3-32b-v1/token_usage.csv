@@ -356,3 +356,8 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260326_145821,2026-03-26T14:59:24,qwen.qwen3-32b-v1:0,24,8436,418,8854,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_hi_instruct_defended_labels.csv,(see logs index)
 20260326_145924,2026-03-26T15:00:36,qwen.qwen3-32b-v1:0,24,8040,422,8462,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_ga_instruct_defended_labels.csv,(see logs index)
 20260326_161238,2026-03-26T16:15:50,qwen.qwen3-32b-v1:0,2549,822743,45593,868336,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_ru_instruct_defended_labels.csv,(see logs index)
+20260327_032900,2026-03-27T03:34:58,qwen.qwen3-32b-v1:0,2549,0,0,0,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_rucwb_labels.csv,(see logs index)
+20260327_033458,2026-03-27T03:40:17,qwen.qwen3-32b-v1:0,2549,0,0,0,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_zhcwb_labels.csv,(see logs index)
+20260327_034017,2026-03-27T03:45:50,qwen.qwen3-32b-v1:0,2549,0,0,0,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_gacwb_labels.csv,(see logs index)
+20260327_034550,2026-03-27T03:51:22,qwen.qwen3-32b-v1:0,2549,0,0,0,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_arcwb_labels.csv,(see logs index)
+20260327_035123,2026-03-27T03:56:39,qwen.qwen3-32b-v1:0,2549,0,0,0,0.000000,outputs\llm_label\trec_dl_2021\qwen3-32b-v1\qwen3-32b-v1_trecdl_2021_frcwb_labels.csv,(see logs index)
