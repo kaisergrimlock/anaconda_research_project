@@ -67,7 +67,7 @@ LANG = "eng"          # target language file to label
 DEFEND_LANG = "judged"              # source language file used to build original/base prompt
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"              # "append" or "replace"
 
 FINAL_OUTPUT_SUFFIX = ""

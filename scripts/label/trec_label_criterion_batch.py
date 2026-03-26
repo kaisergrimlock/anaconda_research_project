@@ -39,6 +39,11 @@ from scripts.log_helpers import (
 # =========================
 # Bedrock / prompt config
 # =========================
+from scripts.bedrock_client import (
+    make_bedrock_runtime_client,
+    converse_prompt,
+)
+
 cfg = Config(
     region_name="us-west-2",
     connect_timeout=10,
@@ -63,21 +68,21 @@ RELEVANCE_COL = "relevance"   # change if needed
 # Data / run config
 # =========================
 # Batch languages (e.g. ["raw", "vi", ...])
-LANGS = ["he", "ar"]
-START_PART = 0
-END_PART = 0
+LANGS = ["he_instruct"]
+START_PART = 1
+END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["exactness"]
+CRITERION_KEYS = ["exactness", "topicality", "contextuality", "coverage"]
 
 # Input part files
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Models
 MODELS = ["openai.gpt-oss-20b-1:0"]
-INFERENCE_CONFIG = {"maxTokens": 128000, "temperature": 0.0, "topP": 1.0}
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
@@ -510,7 +515,7 @@ def _label_single_part_file_blocking(
     output_file = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}_{CRITERION_KEY}.csv"
     ensure_csv_with_header(output_file, header_out)
 
-    bedrock = boto3.client("bedrock-runtime", config=cfg)
+    bedrock = make_bedrock_runtime_client(cfg)
 
     total_rows = count_data_rows(part_csv)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")

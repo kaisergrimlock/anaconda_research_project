@@ -110,7 +110,7 @@ def categorized_variant_legend(
     baseline_label: str = "Before Passage",
     baseline_marker: str = "^",
     category_marker: str = "+",
-    raw_band_label: str = "Baseline",
+    raw_band_label: str = "No Injection",
     raw_band_color: RGBA | str = "#7ec8e3",
     variant_title: str = "",
     taxonomy_title: str = "Taxonomy level",
