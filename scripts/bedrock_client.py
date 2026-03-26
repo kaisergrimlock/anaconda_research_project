@@ -35,23 +35,45 @@ def make_bedrock_runtime_client(cfg: Config):
 
 def parse_llm_text_to_score(text: str) -> str:
     """
-    Parse the model's JSON text into a score, expecting an 'O' field.
-    Matches your current behavior.
+    Parse the model's text and return the 'O' score as a string.
+    Accepts either raw JSON or JSON embedded inside surrounding text/code fences.
     """
+    if not text:
+        return ""
+
+    text = text.strip()
+
+    # First try direct parse in case the whole response is already JSON
     try:
         parsed = json.loads(text)
-        if isinstance(parsed, dict) and "O" in parsed:
+        if isinstance(parsed, dict) and isinstance(parsed.get("O"), int) and 0 <= parsed["O"] <= 3:
             return str(parsed["O"])
         if isinstance(parsed, list):
             for item in parsed:
-                if isinstance(item, dict) and "O" in item:
+                if (
+                    isinstance(item, dict)
+                    and isinstance(item.get("O"), int)
+                    and 0 <= item["O"] <= 3
+                ):
                     return str(item["O"])
     except Exception:
-        # Don't print here by default; keep this module quiet.
-        return ""
+        pass
+
+    # Fallback: find JSON-like objects inside the text
+    import re
+
+    candidates = re.findall(r'\{[^{}]*\}', text)
+    for candidate in candidates:
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict) and isinstance(parsed.get("O"), int) and 0 <= parsed["O"] <= 3:
+                return str(parsed["O"])
+        except Exception:
+            continue
+
     return ""
 
-
+    
 def extract_text_from_resp(model_id: str, resp: dict) -> str:
     """
     Return the main text content from the model's response.

@@ -62,7 +62,7 @@ RELEVANCE_COL = "relevance"   # change if needed
 # =========================
 # Data / run config
 # =========================
-LANG = "cwb"          # "raw", "vi", ...
+LANG = "eng_instruct"          # "raw", "vi", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"
