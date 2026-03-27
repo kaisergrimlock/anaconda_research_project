@@ -27,18 +27,19 @@ TREC_DL_YEAR = "2022"
 MODEL = "gpt-oss-20b"
 
 LANGUAGES = [
-    "ru_instruct_defended",
-    "zh_instruct_defended",
-    "ga_instruct_defended",
-    "ar_instruct_defended",
-    "fr_instruct_defended",
-    "vi_instruct_defended",
-    "sw_instruct_defended",
-    "ga_instruct_defended",
-    "eng_instruct_defended",
-    "hi_instruct_defended",
-    "he_instruct_defended",
-    "th_instruct_defended",
+    # "ru_instruct_defended",
+    # "zh_instruct_defended",
+    # "ga_instruct_defended",
+    # "ar_instruct_defended",
+    # "fr_instruct_defended",
+    # "vi_instruct_defended",
+    # "sw_instruct_defended",
+    # "ga_instruct_defended",
+    # "eng_instruct_defended",
+    # "hi_instruct_defended",
+    # "he_instruct_defended",
+    # "th_instruct_defended",
+    "eng_instruct" 
 ]
 
 
