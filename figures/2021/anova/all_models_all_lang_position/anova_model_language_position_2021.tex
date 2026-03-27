@@ -1,0 +1,19 @@
+\begin{table}
+\caption{Three-way ANOVA for mean_diff with model, language, and injection position as factors on TREC-DL 2021. Omega squared is reported as an effect size estimate.}
+\label{tab:anova_model_language_position_mean_diff_2021}
+\begin{tabular}{l r r r r r r}
+\toprule
+term & sum_sq & df & F & PR(>F) & mean_sq & omega_sq \\
+\midrule
+Intercept & 1831.16 & 1 & 1930.24 & 0 & 1831.16 & 0.0118307 \\
+C(model) & 56.5057 & 2 & 29.7816 & 1.17074e-13 & 28.2529 & 0.000352996 \\
+C(lang) & 150.571 & 10 & 15.8718 & 6.17628e-29 & 15.0571 & 0.000911988 \\
+C(position) & 7.39414 & 1 & 7.79423 & 0.00524196 & 7.39414 & 4.16644e-05 \\
+C(model):C(lang) & 2260.99 & 20 & 119.166 & 0 & 113.049 & 0.0144927 \\
+C(model):C(position) & 28.8757 & 2 & 15.2191 & 2.46078e-07 & 14.4379 & 0.000174392 \\
+C(lang):C(position) & 59.9655 & 10 & 6.32101 & 8.94699e-10 & 5.99655 & 0.000326301 \\
+C(model):C(lang):C(position) & 723.172 & 20 & 38.1151 & 3.37949e-148 & 36.1586 & 0.00455203 \\
+Residual & 149580 & 157674 &  &  & 0.948668 &  \\
+\bottomrule
+\end{tabular}
+\end{table}

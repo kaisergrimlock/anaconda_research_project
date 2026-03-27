@@ -68,7 +68,21 @@ RELEVANCE_COL = "relevance"   # change if needed
 # Data / run config
 # =========================
 # Batch languages (e.g. ["raw", "vi", ...])
-LANGS = ["he_instruct"]
+LANGS = [
+    "ru_instruct",
+    "zh_instruct",
+    "ga_instruct",
+    "ar_instruct",
+    "fr_instruct",
+    "vi_instruct",
+    "sw_instruct",
+    "ga_instruct",
+    "eng_instruct",
+    "hi_instruct",
+    "he_instruct",
+    "th_instruct",
+
+]
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
@@ -81,7 +95,7 @@ CRITERION_KEYS = ["exactness", "topicality", "contextuality", "coverage"]
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
@@ -94,7 +108,7 @@ LOG_ROOT_DIR = Path("logs")
 # =========================
 # Part-level concurrency is controlled in run_for_model via asyncio semaphore.
 # Row-level concurrency accelerates Bedrock calls within each part file.
-ROW_CONCURRENCY = 50
+ROW_CONCURRENCY = 2
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 # Allow large CSV fields
