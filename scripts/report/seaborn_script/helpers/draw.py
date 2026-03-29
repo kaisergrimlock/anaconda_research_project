@@ -316,6 +316,8 @@ def color_tukey_by_taxonomy(
     level_to_rgba = _build_level_palette(seen_levels)
 
     def lang_to_color(label_lang: str) -> Optional[RGBA]:
+        if label_lang.lower() in ("en", "eng"):
+            return (0.0, 0.0, 0.0, 1.0)
         if label_lang in lang_to_level:
             lvl = lang_to_level[label_lang]
         elif default_level is not None:
@@ -377,6 +379,9 @@ def color_tukey_by_categorized_taxonomy(
             base_len=base_len,
         )
 
+        if key.lower() in ("en", "eng"):
+            return (0.0, 0.0, 0.0, 1.0)
+
         if key in lang_to_level:
             lvl = lang_to_level[key]
         elif default_level is not None:
@@ -424,7 +429,10 @@ def color_tukey_by_language(
     lang_to_rgba = _build_item_palette(base_langs)
 
     def lang_to_color(label_lang: str) -> RGBA:
-        return lang_to_rgba[_base_language(label_lang)]
+        base = _base_language(label_lang).lower()
+        if base in ("en", "eng"):
+            return (0.0, 0.0, 0.0, 1.0)
+        return lang_to_rgba[base]
 
     y_to_rgba = _color_ticks_and_build_y_map(
         fig,
