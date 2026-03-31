@@ -59,10 +59,10 @@ PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
-LANG = "arwb_instruct"          # "raw", "vi", "enclosed", ...
+LANG = "ar"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"           # "append" or "replace"
 
 # Models
