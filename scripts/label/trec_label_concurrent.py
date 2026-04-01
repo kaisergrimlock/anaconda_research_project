@@ -60,15 +60,15 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
 LANG = "hicwb_instruct"          # "raw", "vi", "enclosed", ...
-START_PART = 1
-END_PART = 6
-TREC_DL_YEAR = "2021"
+START_PART = 0
+END_PART = 0
+TREC_DL_YEAR = "2022"
 MODE = "replace"           # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
