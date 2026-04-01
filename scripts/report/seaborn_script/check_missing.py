@@ -22,7 +22,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.csv_helpers import bump_field_limit
 
 # -------- Config --------
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 #MODEL = "qwen3-32b-v1"
 MODEL = "gpt-oss-20b"
 
@@ -39,7 +39,18 @@ LANGUAGES = [
     # "hi_instruct_defended",
     # "he_instruct_defended",
     # "th_instruct_defended",
-    "eng_instruct" 
+    
+    "engcwb_instruct",
+    "arcwb_instruct",
+    "frcwb_instruct",
+    "rucwb_instruct",
+    "zhcwb_instruct",
+    "vicwb_instruct",
+    "hecwb_instruct",
+    "hicwb_instruct",
+    "thcwb_instruct",
+    "swcwb_instruct",
+    "gacwb_instruct", 
 ]
 
 
