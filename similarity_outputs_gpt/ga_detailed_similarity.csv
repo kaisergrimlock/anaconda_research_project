@@ -1,0 +1,34 @@
+key,mt_text,reference_text,jaccard,bleu,rouge_l_precision,rouge_l_recall,rouge_l_f1,rouge_l_lcs,mt_token_count,reference_token_count,token_overlap_count
+1000,,"Bhuel, tá baint agam le rudaí eile seachas fisic",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,9,0
+5000,"Fírinne, is mó anois i rudaí eile.","I bhfirínne, in ábhair seachas fisic is mó faoi láthair.",0.214286,0.094692,0.285714,0.200000,0.235294,2,7,10,3
+7000,,Tá rud amháin faoi leith i dteangacha an chine daonna.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,10,0
+12000,"Agus na teangeolaí gairmiúla, stairiúla sa Mheán-Aire.","Déanann teangeolaithe gairmiúla, stairiúla sna SAM",0.166667,0.110448,0.250000,0.333333,0.285714,2,8,6,2
+16000,"agus i hEorpa Thiar, is minic a dhéanann siad iarracht a bheith i bhfad",agus in Iarthar na hEorpa iarracht chun,0.187500,0.037374,0.214286,0.428571,0.285714,3,14,7,3
+19000,"Ó aon chaidreamh fada, grúpaí móra,","cianchaidrimh a sheachaint; grúpaí móra,",0.222222,0.162334,0.333333,0.400000,0.363636,2,6,5,2
+23000,,grúpaí a théann i bhfad siar,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,6,0
+26000,fada ná na teaghlaí coitianta.,níos faide siar ná na teaghlaigh teanga cailiúla.,0.181818,0.117250,0.400000,0.250000,0.307692,2,5,8,2
+29000,,"Cha dtaitníonn sé sin leo; síleann gur raiméis í. Ach, ní shílim gur amhlaidh atá.",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,15,0
+33000,,"Agus tá roinnt mhaith teangeolaithe iontacha, Rúisigh is mó,",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,9,0
+36000,"a bhfuil ag obair ar sin, ag an Institiúid Santa Fe agus i Moscó","atá ag déanamh staidéir air sin ag Institiúd Santa Fe agus i Moscó,",0.388889,0.316149,0.571429,0.615385,0.592593,8,14,13,7
+40000,agus ba mhaith liom a fheiceáil cá bhfuil sé ag dul.,agus ba bhreá liom na torthaí a fheiceáil.,0.357143,0.112085,0.454545,0.625000,0.526316,5,11,8,5
+44000,,An dtéann sé i bhfad siar go sinsear amháin,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,9,0
+47000,"cúpla 20, 25,000 bliain ó shin?","20,000 nó 25,000 bliain ó shin?",0.750000,0.557800,0.857143,0.750000,0.800000,6,7,8,6
+50000,"Agus cad é má téimid siar thar an aicearra amháin sin,","Agus cad é a tharlaíonn má théann muid níos faide siar roimh an tsinsir amháin sin,",0.421053,0.125230,0.727273,0.500000,0.592593,8,11,16,8
+53000,,nuair is dócha go raibh iomaíocht idir roinnt mhaith teangacha?,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,10,0
+57000,Cé chomh fada a théann sé?  Cé chomh fada a théann an teanga nua-aimseartha?,Cé chomh fada siar a théann sé sin? Cé chomh fada siar a théann teangacha an lae inniu?,0.466667,0.203891,0.800000,0.666667,0.727273,12,15,18,7
+61000,Cé mhéad de mhíle bliain a théann sé ar ais?,Cá mhéad mílte bliain a théann sé siar?,0.384615,0.277762,0.500000,0.625000,0.555556,5,10,8,5
+64000,Chris Anderson: An bhfuil aon mhothú nó dóchas agat faoi cad is é an freagra sin?,Chris Anderson: An bhfuil cliú nó smaoineamh ar an fhreagra a bhfaighfear?,0.238095,0.169436,0.375000,0.500000,0.428571,6,16,12,5
+67000,,"Murray Gell-Mann: Bhuel, mheasfainn go gcaithfidh teangacha an lae inniu a bheith níos sine",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,15,0
+70000,,ná na pictiúir agus an ghreanadóireacht agus na dealraimh a tchítear sna huaimheanna,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,13,0
+74000,,agus lorg coise ó rincí a fágadh i gcré bhog uaimheanna in Iarthar na hEorpa.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,15,0
+79000,,"sa Tréimhse Aragnaisiúnach timpeall 35,000 bliain ó shin, nó níos túisce.",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,12,0
+85000,,Cha dtig liom a chreidbheáil go ndearna siad na rudaí seo go léir agus nach raibh cumas acu i dteanga nua-aimseartha.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,22,0
+88000,,"Mar sin mheasfainn ar a laghad go dtéann na fréamhacha comh fada siar sin, agus b'fhéidr níos faide arís.",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,20,0
+93000,,"Ach, chan ionann é sin is a rá nach dtig leis na teangacha uilig,",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,14,0
+96000,de na teangaí atá léirithe inniu níor d'fhéadfadh siad ídithe b'fhéidir,"nó cuid mhaith acu, nó an chuid is mó acu, a bheith tagtha ó",0.000000,0.000000,0.000000,0.000000,0.000000,0,13,14,0
+100000,"ó ceann atá níos óige ná sin, mar shampla 20,000 bliain,","abraimis, 20,000 bliain ó shin,",0.285714,0.135460,0.250000,0.500000,0.333333,3,12,6,4
+104000,,nó rud éigin cosúil leis sin. Tugaimid caolas teanga air sin.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,11,0
+108000,"CA: Bua, d'fhéadfadh go raibh Philip Anderson ceart.","CA: Bhuel, b'fhéidir go raibh an ceart ag Philip Anderson.",0.428571,0.119500,0.555556,0.454545,0.500000,5,9,11,6
+109000,,B'fhéidir go bhfuil níos mó eolais agatsa ar achan rud ná duine ar bith eile.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,16,0
+112000,"Mar sin, bhí sé ina honóra. Go raibh maith agat, Murray Gell-Mann.","Mar sin, ónóir a bhí ann domhsa. Go raibh maith agat a Mhurray Gell-Mann.",0.500000,0.230737,0.692308,0.600000,0.642857,9,13,15,9
+114000,(clochán),(Bualadh bos),0.000000,0.000000,0.000000,0.000000,0.000000,0,1,2,0

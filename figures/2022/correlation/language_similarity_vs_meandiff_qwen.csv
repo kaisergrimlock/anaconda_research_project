@@ -1,0 +1,10 @@
+model_filter,model,base_lang,label_lang,similarity_file,label_file,avg_bleu,avg_rouge_l_f1,avg_mean_diff
+qwen,qwen3-32b-v1,ar,ar,similarity_outputs_qwen\ar_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_ar_labels.csv,0.2173482823529412,0.4242812352941177,0.8026365348399247
+qwen,qwen3-32b-v1,fr,fr,similarity_outputs_qwen\fr_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_fr_labels.csv,0.4615026352941176,0.7024950117647059,0.8135593220338984
+qwen,qwen3-32b-v1,ga,ga,similarity_outputs_qwen\ga_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_ga_labels.csv,0.07877606060606061,0.2637199696969697,0.7032015065913371
+qwen,qwen3-32b-v1,he,he,similarity_outputs_qwen\he_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_he_labels.csv,0.21724283529411761,0.4084478235294117,0.815442561205273
+qwen,qwen3-32b-v1,hi,hi,similarity_outputs_qwen\hi_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_hi_labels.csv,0.30046795294117645,0.5444563647058824,0.8463276836158192
+qwen,qwen3-32b-v1,ru,ru,similarity_outputs_qwen\ru_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_ru_labels.csv,0.28841849411764703,0.5043003764705882,0.8278719397363465
+qwen,qwen3-32b-v1,sw,sw,similarity_outputs_qwen\sw_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_sw_labels.csv,0.0891203076923077,0.22457528846153846,0.7050847457627119
+qwen,qwen3-32b-v1,vi,vi,similarity_outputs_qwen\vi_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_vi_labels.csv,0.22884007058823524,0.5369821529411765,0.8305084745762712
+qwen,qwen3-32b-v1,zh,zh,similarity_outputs_qwen\zh_detailed_similarity.csv,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_zh_labels.csv,0.2970517529411764,0.5515882117647058,0.8824858757062147

@@ -1,0 +1,86 @@
+key,mt_text,reference_text,jaccard,bleu,rouge_l_precision,rouge_l_recall,rouge_l_f1,mt_token_count,reference_token_count
+928,Mọi thứ được kết nối với nhau.,Ngày nay mọi thứ đều có sự liên kết nhất định với nhau.,0.333333,0.083350,0.818182,0.473684,0.600000,7,13
+4012,"Là một người Ấn Độ Shinnecock, tôi được nuôi dạy để biết điều này.","Là một người Anh-điêng Shinnecock, tôi đã được nuôi dạy để học được điều đó.",0.526316,0.255044,0.750000,0.714286,0.731707,14,16
+7538,Chúng tôi là một bộ lạc đánh cá nhỏ,Chúng tôi là một bộ tộc đánh bắt cá nhỏ,0.727273,0.474955,0.923077,0.800000,0.857143,9,10
+9561,nằm ở mũi đông nam của Long Island,sống ở vùng Đông Bắc đảo Long Island,0.333333,0.131345,0.400000,0.400000,0.400000,8,8
+12745,gần thị trấn Southampton ở New York.,gần thị trấn Southampton thuộc New York.,0.750000,0.488923,1.000000,0.800000,0.888889,7,7
+15910,"Khi tôi còn là một cô bé,","Khi tôi còn nhỏ,",0.375000,0.244462,0.500000,0.833333,0.625000,7,4
+18380,ông tôi đưa tôi ngồi ngoài trời dưới ánh mặt trời vào một ngày hè nóng nực.,"vào một ngày hè nắng nóng, tôi cùng ông nội ngồi dưới ánh nắng mặt trời",0.666667,0.214091,0.433333,0.448276,0.440678,17,16
+23728,Không có mây trên bầu trời.,Bầu trời trong không một gợn mây.,0.444444,0.163412,0.363636,0.307692,0.333333,6,7
+27282,Và sau một thời gian tôi bắt đầu đổ mồ hôi.,Và chỉ sau một lúc tôi đã bắt đầu đổ mồ hôi.,0.642857,0.392354,0.800000,0.800000,0.800000,11,12
+30453,"Và ông chỉ lên trời, và ông nói,",Rồi ông tôi chỉ lên bầu trời và nói:,0.666667,0.152549,0.818182,0.600000,0.692308,8,9
+33979,"“Nhìn xem, bạn có thấy điều đó không?",""" Kìa, cháu có nhìn thấy không?",0.400000,0.078098,0.500000,0.545455,0.521739,8,6
+36827,Đó là một phần của bạn ở trên đó.,Trên đó là một phần của cháu đó,0.666667,0.513345,0.636364,0.636364,0.636364,9,8
+38946,Đó là nước của bạn giúp tạo ra đám mây,Chính nguồn nước của cháu đã tạo nên những đám mây,0.312500,0.113551,0.600000,0.473684,0.529412,10,11
+41861,mà trở thành cơn mưa nuôi cây,rồi chúng lại biến thành mưa tưới nước cho cây,0.214286,0.056304,0.583333,0.368421,0.451613,7,10
+46134,làm thức ăn cho động vật.”,"và nuôi sống động vật""",0.222222,0.162334,0.333333,0.375000,0.352941,6,5
+49920,Trong quá trình khám phá liên tục của tôi về các chủ đề trong tự nhiên,Trong quá trình khám phá về những vấn đề về tự nhiên,0.529412,0.280395,0.521739,0.750000,0.615385,16,12
+52912,"có khả năng minh họa sự kết nối của tất cả sự sống,","cái mà có khả năng chỉ ra những mối liên hệ trong cuộc sống của chúng ta,",0.208333,0.096047,0.450000,0.346154,0.391304,13,17
+57328,Tôi bắt đầu đuổi theo bão vào năm 2008,Tôi bắt đầu theo đuổi những cơn bão từ năm 2008,0.666667,0.200974,0.800000,0.666667,0.727273,9,11
+60029,"sau khi con gái tôi nói, “Mẹ, mẹ nên làm điều đó.”","sau khi nghe con gái tôi nói, "" Mẹ. mẹ nên làm như vậy""",0.642857,0.616819,0.882353,0.789474,0.833333,12,13
+63897,"Và như vậy ba ngày sau, lái xe rất nhanh,","Và 3 ngày sau, khi đang lái xe rất nhanh,",0.538462,0.324668,0.714286,0.769231,0.740741,10,10
+70108,"Tôi thấy mình đang rình rập một loại đám mây khổng lồ duy nhất được gọi là siêu tế bào,",tôi nhận ra mình đang cuốn theo rất nhanh một đám mây kì lạ to khổng lồ,0.275862,0.071270,0.424242,0.560000,0.482759,20,17
+77368,có khả năng tạo ra mưa đá cỡ bưởi,cái có khả năng sản sinh ra những viên đá to như những quả bóng nhỏ,0.263158,0.092643,0.500000,0.272727,0.352941,9,16
+81819,"và lốc xoáy ngoạn mục,","và những cơn lốc xoáy vô cùng ngoạn mục,",0.555556,0.143548,1.000000,0.562500,0.720000,5,9
+83812,Mặc dù chỉ có hai phần trăm thực sự làm được.,mặc dù khả năng xảy ra điều đó chỉ là 2%.,0.157895,0.082952,0.312500,0.357143,0.333333,11,11
+90118,"Những đám mây này có thể phát triển rất lớn, rộng tới 50 dặm","Những đám mây như vậy có thể trở nên rất lớn, với chiều rộng lên tới 50 dặm",0.523810,0.172044,0.833333,0.666667,0.740741,14,18
+95262,và đạt tới 65.000 feet vào bầu khí quyển.,và nó chiếm một khoảng không lên tới 65000 feet.,0.176471,0.055224,0.357143,0.312500,0.333333,10,10
+99328,"Chúng có thể phát triển rất lớn, chặn mọi ánh sáng ban ngày,","Chúng có thể to đến mức che đi mọi ánh sáng,",0.333333,0.193385,0.454545,0.666667,0.540541,13,11
+101702,làm cho nó rất tối và đáng ngại khi đứng dưới họ.,và sẽ rất tối tăm và đáng sợ nếu bạn đứng dưới sự bao trùm rộng lớn cúa chúng.,0.250000,0.065464,0.529412,0.300000,0.382979,12,19
+106826,Đuổi theo bão là một trải nghiệm rất xúc giác.,Săn đuổi những cơn bão là những trải nghiệm đầy tính xúc giác.,0.466667,0.111914,0.777778,0.583333,0.666667,10,13
+109728,"Có một cơn gió ấm áp, ẩm ướt thổi ở phía sau bạn",Kèm theo nó là từng đợt gió nóng ẩm thổi ập đằng sau lưng bạn,0.217391,0.039605,0.529412,0.428571,0.473684,13,15
+113995,"và mùi của trái đất, lúa mì, cỏ, các hạt tích điện.","mùi vị của mặt đất, của lúa mì, cỏ và cả vô vàn những hạt tích điện li ti nữa.",0.476190,0.123675,0.800000,0.516129,0.627451,12,20
+120697,Và sau đó là những màu sắc trong những đám mây,Và sau đó sẽ xuất hiện những đám mây đầy màu sắc.,0.571429,0.243418,0.533333,0.470588,0.500000,11,12
+124094,"hình thành mưa đá, màu xanh lá cây và màu xanh ngọc lam.","với hình dạng những viên đá, hầu hết là màu xanh lục và xanh ngọc lam.",0.368421,0.129105,0.684211,0.520000,0.590909,13,16
+129284,Tôi đã học cách tôn trọng tia chớp.,Tôi đã biết được sự đáng sợ của những tia sấm sét.,0.176471,0.074137,0.461538,0.352941,0.400000,8,12
+132562,Tóc tôi từng thẳng.,Ngày trước tóc tôi từng là tóc thẳng.,0.571429,0.235054,1.000000,0.533333,0.695652,4,8
+134696,(Laughter),(Cười),0.000000,0.000000,0.000000,0.000000,0.000000,1,1
+136120,Tôi chỉ đùa thôi.,Tôi chỉ đùa chút thôi.,0.800000,0.497609,1.000000,0.750000,0.857143,4,5
+137744,(Laughter),(Cười),0.000000,0.000000,0.000000,0.000000,0.000000,1,1
+139886,Điều gì thực sự khiến tôi phấn khích về những cơn bão này,Điều mà khiến tôi thực sự thích thú về những cơn bão như thế này,0.555556,0.236895,0.695652,0.666667,0.680851,13,15
+143062,"là chuyển động của chúng, cách chúng xoáy và quay và nhấp nhô,","đó là sự chuyển động của chúng, cách chúng xoáy tròn rồi uốn lượn",0.411765,0.450330,0.700000,0.608696,0.651163,13,14
+147279,với những đám mây mammatus giống như đèn dung nham của chúng.,với những đám mây dung nham cuộn tròn từng đợt như hình những chiếc đèn.,0.444444,0.210993,0.555556,0.416667,0.476190,12,15
+151297,Họ trở thành những con quái vật đáng yêu.,Chúng giống như những con quái vật đáng yêu.,0.500000,0.587395,0.785714,0.733333,0.758621,9,9
+154029,"Khi tôi chụp ảnh chúng,","Mỗi khi tôi chụp được những bức ảnh của chúng,",0.500000,0.166208,1.000000,0.470588,0.640000,5,10
+156562,Tôi không thể không nhớ lại bài học của ông tôi.,tôi lại bất chợt nhớ đến lời dạy của ông mình.,0.333333,0.094252,0.473684,0.473684,0.473684,11,11
+160295,"Khi tôi đứng dưới họ,","Vào khoảnh khắc tôi đứng bên dưới chúng,",0.300000,0.129758,0.714286,0.333333,0.454545,5,8
+162287,"Tôi không chỉ thấy một đám mây,","Cái tôi nhìn thấy không chỉ đơn thuần là những đám mây,",0.461538,0.100634,0.666667,0.400000,0.500000,7,12
+164494,nhưng hiểu rằng những gì tôi có đặc quyền được chứng kiến,mà tôi đã hiểu rằng điều tôi đang rất may mắn được chứng kiến giờ đây,0.285714,0.118875,0.600000,0.500000,0.545455,12,16
+167377,"là cùng một lực, cùng một quá trình trong một phiên bản quy mô nhỏ",giống như một phiên bản thu nhỏ,0.266667,0.105118,0.375000,0.818182,0.514286,15,7
+171827,"đã giúp tạo ra thiên hà của chúng ta, hệ mặt trời của chúng ta, mặt trời của chúng ta","của quá trình hình thành nên dải ngân hà, hệ mặt trời hay mặt trời",0.250000,0.097481,0.375000,0.461538,0.413793,20,15
+178145,và ngay cả hành tinh này.,và thậm chí là cả hành tinh chúng ta đang sống.,0.307692,0.141100,0.625000,0.333333,0.434783,6,11
+182703,Tất cả các mối quan hệ của tôi. Cảm ơn bạn.,Với tất cả sự thân thiết của tôi dành cho các bạn. Xin cảm ơn!!,0.444444,0.096978,0.555556,0.400000,0.465116,11,15
+185160,(Applause),( Vỗ tay),0.000000,0.000000,0.000000,0.000000,0.000000,1,2
+1000,"Chà, tôi tham gia vào những thứ khác, ngoài vật lý.","Nào, tôi tham gia vào khá nhiều các hoạt động khác ngoài lĩnh vực vật lý.",0.421053,0.201226,0.823529,0.518519,0.636364,11,16
+5000,"Trên thực tế, chủ yếu là bây giờ trong những thứ khác.","Thực tế, hiện giờ đa phần là các hoạt động khác.",0.277778,0.085166,0.388889,0.411765,0.400000,12,11
+7000,Một điều là mối quan hệ xa xôi giữa các ngôn ngữ của con người.,Một trong số đó là về những mối quan hệ tương đồng nào đấy giữa các ngôn ngữ của nhân loại.,0.384615,0.233215,0.708333,0.548387,0.618182,15,21
+12000,Và các nhà ngôn ngữ học lịch sử chuyên nghiệp ở Hoa Kỳ,Và đa phần các chuyên gia về lịch sử ngôn ngữ học tại Mỹ,0.421053,0.150577,0.444444,0.380952,0.410256,13,14
+16000,và ở Tây Âu chủ yếu cố gắng tránh xa,và Tây Âu đã cố gắng nhằm không đụng đến,0.333333,0.125493,0.615385,0.615385,0.615385,10,10
+19000,"từ bất kỳ mối quan hệ đường dài nào, các nhóm lớn,","bất kỳ một mối quan hệ tương đồng xa nào; những nhóm lớn,",0.470588,0.176252,0.736842,0.666667,0.700000,12,13
+23000,"những nhóm đã có từ rất lâu,","những nhóm này đã lùi lại một thời gian khá dài,",0.200000,0.082086,0.500000,0.277778,0.357143,7,11
+26000,lâu hơn những gia đình quen thuộc.,lâu hơn cả những gia tộc lâu đời.,0.400000,0.161023,0.727273,0.615385,0.666667,7,8
+29000,Họ không thích điều đó. Họ nghĩ rằng đó là một con quái vật. Tôi không nghĩ nó là quái vật.,Họ không thích thế; họ nghĩ đó là một ý tưởng kì quặc. Tôi cho rằng không phải vậy.,0.409091,0.139885,0.566667,0.629630,0.596491,21,19
+33000,"Và có một số nhà ngôn ngữ học xuất sắc, chủ yếu là người Nga,","Một số các nhà ngôn ngữ học thông minh, hầu hết là người Nga,",0.450000,0.265181,0.636364,0.636364,0.636364,15,14
+36000,"những người đang làm việc về điều đó, tại Viện Santa Fe và ở Moscow,","đang nghiên cứu đề tài này tại Viện Santa Fe ở Matxcova,",0.285714,0.182071,0.450000,0.562500,0.500000,15,12
+40000,và tôi rất muốn xem điều đó dẫn đến đâu.,và tôi thực sự trông chờ xem việc này sẽ dẫn đến đâu.,0.352941,0.152288,0.571429,0.421053,0.484848,10,13
+44000,Nó có thực sự dẫn đến một tổ tiên duy nhất,Phải chăng nó thực sự sẽ dẫn đến một ông tổ chung duy nhất nào đó,0.500000,0.138589,0.812500,0.590909,0.684211,11,16
+47000,"khoảng 20, 25.000 năm trước?",sống cách đây khoảng vài 20 hay 25 nghìn năm?,0.333333,0.058934,0.666667,0.375000,0.480000,6,10
+50000,"Và điều gì sẽ xảy ra nếu chúng ta quay trở lại bên ngoài tổ tiên duy nhất đó,",Và chuyện gì xảy ra nếu chúng ta lùi lại quá khứ xa hơn vị tổ tiên chung đó,0.407407,0.244051,0.592593,0.615385,0.603774,19,19
+53000,khi có lẽ có sự cạnh tranh giữa nhiều ngôn ngữ?,khi mà có lẽ đã có một sự cạnh tranh giữa nhiều ngôn ngữ?,0.769231,0.505539,1.000000,0.833333,0.909091,11,14
+57000,Điều đó quay trở lại bao xa? Ngôn ngữ hiện đại quay trở lại bao xa?,Điều này sẽ đi xa được đến đâu? Ngôn ngữ hiện đại có thể lùi xa về quá khứ bao nhiêu nữa?,0.280000,0.125135,0.650000,0.448276,0.530612,16,22
+61000,Nó quay trở lại bao nhiêu chục nghìn năm?,Nó có thể quay lại bao nhiêu vạn năm nữa đây?,0.428571,0.168998,0.714286,0.625000,0.666667,9,11
+64000,Chris Anderson: Bạn có linh cảm hay hy vọng về câu trả lời cho điều đó là gì không?,Chris Anderson: Liệu ông có một linh cảm hay hi vọng nào về câu trả lời cho vấn đề này là gì không?,0.555556,0.281193,0.800000,0.625000,0.701754,19,23
+67000,"Murray Gell-Mann: Chà, tôi đoán rằng ngôn ngữ hiện đại phải cũ hơn","Murray Gell-Mann: Được thôi, tôi đoán rằng ngôn ngữ hiện đại phải nhiều niên đại",0.611111,0.534223,0.857143,0.720000,0.782609,14,16
+70000,hơn là các bức tranh hang động và bản khắc hang động và tác phẩm điêu khắc hang động,hơn cả những bức tranh vẽ hay tranh khắc hay những bức tượng,0.222222,0.048150,0.428571,0.600000,0.500000,19,13
+74000,"và nhảy các bước trong đất sét mềm trong các hang động ở Tây Âu,",và những bước nhảy trên lớp đất sét mềm trong các hang động tại Tây Âu,0.705882,0.445183,0.809524,0.653846,0.723404,15,16
+79000,"trong Thời kỳ Aurignacian khoảng 35.000 năm trước, hoặc sớm hơn.","thuộc thời kỳ Ô-ry-nhắc cách đây vài 35 nghìn năm, hay hơn nữa.",0.227273,0.066327,0.421053,0.347826,0.380952,12,15
+85000,Tôi không thể tin rằng họ đã làm tất cả những điều đó và cũng không có ngôn ngữ hiện đại.,Tôi không thể tin nổi họ đã làm được tất cả mà vẫn không có được một thứ ngôn ngữ hiện đại,0.538462,0.304806,0.733333,0.709677,0.721311,21,22
+88000,"Vì vậy, tôi đoán rằng nguồn gốc thực tế ít nhất đã quay trở lại xa đó và có thể xa hơn.","Vậy nên tôi cho rằng, nguồn gốc thực sự phải được hình thành lâu ít nhất là như vậy và có lẽ là xa hơn nữa.",0.363636,0.141098,0.700000,0.512195,0.591549,22,26
+93000,"Nhưng điều đó không có nghĩa là tất cả, hoặc nhiều, hoặc hầu hết","Nhưng điều đó không có nghĩa rằng tất cả, hay phần nhiều",0.562500,0.405259,0.608696,0.736842,0.666667,14,12
+96000,Các ngôn ngữ được chứng thực ngày nay có lẽ không thể hạ xuống,các loại ngôn ngữ đã được chứng nhận ngày nay không thể được phát triển,0.473684,0.108923,0.666667,0.608696,0.636364,14,15
+100000,"từ một người trẻ hơn thế nhiều, ví dụ như 20.000 năm,","từ một ai đó trẻ hơn khá nhiều, như là cách đây khoảng 20 nghìn năm",0.380952,0.082491,0.666667,0.545455,0.600000,13,16
+104000,hoặc một cái gì đó thuộc loại đó. Đó là cái mà chúng ta gọi là nút thắt.,chẳng hạn. Chúng ta gọi đó là một cái cổ chai.,0.388889,0.117503,0.280000,0.437500,0.341463,18,11
+108000,"CA: Chà, Philip Anderson có thể đã đúng.",CA: Có lẽ Philip Anderson đã đúng.,0.666667,0.172860,0.571429,0.666667,0.615385,8,7
+109000,Bạn có thể biết nhiều về mọi thứ hơn bất cứ ai.,Dường như ông chính là người biết rõ về mọi thứ hơn bất kì ai.,0.350000,0.268565,0.611111,0.500000,0.550000,12,15
+112000,"Vì vậy, đó là một vinh dự. Cảm ơn Murray Gell-Mann.",Thật vô cùng vinh hạnh. Cảm ơn Murray Gell-Mann.,0.375000,0.331808,0.571429,0.571429,0.571429,12,10
+114000,(Applause),(Vỗ tay),0.000000,0.000000,0.000000,0.000000,0.000000,1,2

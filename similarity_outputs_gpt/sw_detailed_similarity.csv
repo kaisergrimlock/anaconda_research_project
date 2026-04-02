@@ -1,0 +1,53 @@
+key,mt_text,reference_text,jaccard,bleu,rouge_l_precision,rouge_l_recall,rouge_l_f1,rouge_l_lcs,mt_token_count,reference_token_count,token_overlap_count
+928,Kila kitu kinahusiana.,KIla kitu kinahusiana na kingine,0.600000,0.513417,1.000000,0.600000,0.750000,3,3,5,3
+4012,"Kama mwanaswidi wa Shinnecock, nilililishwa kujua hili.","Kama muhindi, nilikuzwa kujua hili",0.333333,0.145358,0.428571,0.600000,0.500000,3,7,5,3
+7538,Sisi ni kabila kidogo cha udongo,Sisi ni kabila dogo la wavuvi,0.333333,0.302138,0.500000,0.500000,0.500000,3,6,6,3
+9561,imepangwa kwenye kona ya kusini mashariki ya Long Island,Katika ncha ya kusini mashariki mwa kisiwa cha Long,0.307692,0.190708,0.444444,0.444444,0.444444,4,9,9,4
+12745,karibu mji wa Southampton huko New York,karibu na mji wa Southampton katika jiji la New York.,0.545455,0.209587,0.857143,0.600000,0.705882,6,7,10,6
+15910,"Nilipokuwa msichana mdogo,","Nilipokuwa msichana mdogo,",1.000000,1.000000,1.000000,1.000000,1.000000,3,3,3,3
+18380,,Babu yangu alinichukua kukaa naye juani katika wakati wa majira ya joto.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,12,0
+23728,Hakuna mawingu angani.,Hakukuwa na mawingu angani.,0.400000,0.394322,0.666667,0.500000,0.571429,2,3,4,2
+27282,"Na baada ya muda, nikaanza kutetemeka.",na baada ya muda mfupi nikaanza kutoka jasho.,0.555556,0.384982,0.833333,0.625000,0.714286,5,6,8,5
+30453,"Na alishika juu ya anga, na alisema,","na akanionyesha angani na kusema,",0.111111,0.078098,0.285714,0.400000,0.333333,2,7,5,1
+33979,"Tazama, unavyoona?","""Angalia,unaona kile?",0.000000,0.000000,0.000000,0.000000,0.000000,0,2,3,0
+36827,Hilo ni sehemu yako hapo juu.,Ile ni sehemu yako kule juu.,0.500000,0.324668,0.666667,0.666667,0.666667,4,6,6,4
+38946,Hiyo ni maji yako yanayosaidia kutengeneza wolio,Yale ni maji yako yanayosaidia kutengeneza mawingu,0.555556,0.614788,0.714286,0.714286,0.714286,5,7,7,5
+41861,ambaye inakuwa mvua inayovuna mimea,yanayokuwa mvua inayonywesha mimea,0.285714,0.127033,0.400000,0.500000,0.444444,2,5,4,2
+46134,,"ambayo inalisha wanyama.""",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,3,0
+49920,Katika utafiti wangu unaoendelea wa mada katika asili,katika utafiti wangu wa mambo haya,0.444444,0.220896,0.500000,0.666667,0.571429,4,8,6,4
+52912,"ambao wana uwezo wa kuonyesha uhusiano wa maisha yote,","ambayo yanaonyesha uhusiano katika maisha,",0.181818,0.056698,0.222222,0.400000,0.285714,2,9,5,2
+57328,Nilianza kufuatia vicheko mwaka 2008.,Nilianza kukimbiza vimbunga mwaka 2008,0.428571,0.236435,0.600000,0.600000,0.600000,3,5,5,3
+60029,"Baada ya binti yangu kusema, 'Mama, unapaswa kufanya hivyo.'","baada ya binti yangu kusema, "" Mama, ni lazima ufanye hivyo.""",0.583333,0.546276,0.777778,0.700000,0.736842,7,9,10,7
+63897,"Na hivyo siku tatu baadaye, ukigawa haraka sana,","siku tatu baadaye,nikiendesha gari kwa kasi sana,",0.333333,0.220896,0.500000,0.500000,0.500000,4,8,8,4
+70108,"Nilijua mimi nikichimbia aina moja ya wolio kubwa linaloitwa super cell,","nikajikuta nafuatilia aina moja ya wingu kubwa sana,",0.266667,0.149911,0.363636,0.500000,0.421053,4,11,8,4
+77368,inayo uwezo wa kutengeneza mavu kwa ukubwa wa tamarindi,lenye uwezo wa kutengeneza mvua ua mawe kubwa,0.230769,0.177474,0.333333,0.375000,0.352941,3,9,8,3
+81819,,"na vimbunga vya ajabu,",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,4,0
+83812,walakini tu asilimia mbili tu zinakifanya kwa kweli,ingawa ni asilimia mbili tu hufanya hivyo.,0.272727,0.205567,0.375000,0.428571,0.400000,3,8,7,3
+90118,,"mawingu haya yanaweza kuwa makubwa sana, mpaka maili 50 kwa upana",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,11,0
+95262,,"na yanaweza yakaenda mpaka futi 65,000 juu angani.",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,9,0
+99328,"Wanaweza kukua sana, kuzuia mwanga wote,","yanaweza yakawa makubwa sana kiasi cha kuzuia mwanga wa mchana,",0.230769,0.092236,0.500000,0.300000,0.375000,3,6,10,3
+101702,,kufanya ukisimama chini yake kuwa peusi sana.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,7,0
+106826,Kukimbiza mafuriko ni uzoefu wa hisia sana.,Kukimbiza vimbunga ni kitu chenye mguso wa kipekee.,0.250000,0.074924,0.428571,0.375000,0.400000,3,7,8,3
+109728,,unakuta kuna upepo mnyevu wa joto unaopuliza mgongoni kwako,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,9,0
+113995,"na harufu ya ardhi, mahindi, nyasi, vibina vilivyoshawishi","haufu ya mchanga,ngano na majani.",0.166667,0.065673,0.125000,0.166667,0.142857,1,8,6,2
+120697,Na kisha kuna rangi katika mawingu,halafu pia kuna rangi mbalimbali katika mawingu,0.444444,0.194331,0.666667,0.571429,0.615385,4,6,7,4
+124094,,"ya mvua ya mawe, ya kijani na bluu.",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,8,0
+129284,Nimejifunza kuheshimu mwanga wa mwendo.,nimejifunza kuiheshimu radi.,0.142857,0.106822,0.200000,0.333333,0.250000,1,5,3,1
+132562,,Nywele zangu zilikuwa hazijajikunja ziko moja kwa moja.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,8,0
+134696,(Kicheko),(vicheko),0.000000,0.000000,0.000000,0.000000,0.000000,0,1,1,0
+136120,Niko tu kuchekesha.,ninatania.,0.000000,0.000000,0.000000,0.000000,0.000000,0,3,1,0
+137744,(Kicheko),(vicheko),0.000000,0.000000,0.000000,0.000000,0.000000,0,1,1,0
+139886,Nini hasa kunifurahisha kuhusu vimbu hizi,kinachonifurahisha mimi kuhusu vimbunga hivi,0.100000,0.081167,0.166667,0.200000,0.181818,1,6,5,1
+143062,"ni harakati zao, njia wanavyozunguka, kuzunguka na kuenea,","ni jinsi vinavyotembea,vinavyozunguka,",0.090909,0.055224,0.125000,0.250000,0.166667,1,8,4,1
+147279,,na mawingu yenye vitu kama miale ya moto.,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,8,0
+151297,Wanakuwa wanyama wanyamu.,yanakuwa ni madude yanayotisha huku yakipendeza pia.,0.000000,0.000000,0.000000,0.000000,0.000000,0,3,7,0
+154029,,"ninapoyapiga picha,",0.000000,0.000000,0.000000,0.000000,0.000000,0,0,2,0
+156562,Siwezi kukataa kumbuka mafunzo ya babu yangu.,nashindwa kujizuia kukumbuka mafundisho ya babu yangu.,0.272727,0.244462,0.428571,0.428571,0.428571,3,7,7,3
+160295,Nikiwa nipo chini yao,"na ninasimama chini yake,",0.142857,0.159736,0.250000,0.250000,0.250000,1,4,4,1
+162287,"Ninavyoona si tu mawingu,","naona sio tu wingu,",0.142857,0.159736,0.250000,0.250000,0.250000,1,4,4,1
+164494,,lakini na kuelewa pia nina bahati ya kushuhudia,0.000000,0.000000,0.000000,0.000000,0.000000,0,0,8,0
+167377,"ni nguvu sawa, mchakato sawa katika toleo duni","nguvu zile zile ,mchakato ule ule, katika hali ndogo",0.272727,0.064139,0.375000,0.333333,0.352941,3,8,9,3
+171827,"ambaye alisaidia kuunda galaksi yetu, mfumo wetu wa jua, jua letu","ambavyo vilitengeneza anga letu,mfumo wa jua,jua letu",0.307692,0.248084,0.454545,0.555556,0.500000,5,11,9,4
+178145,na hata sayari hii sana,na hata sayari hii.,0.800000,0.668740,0.800000,1.000000,0.888889,4,5,4,4
+182703,Wote wa familia yangu. Asante.,na mahusiano yote yangu. Asante sana.,0.222222,0.174917,0.400000,0.333333,0.363636,2,5,6,2
+185160,,(Shangwe),0.000000,0.000000,0.000000,0.000000,0.000000,0,0,1,0
