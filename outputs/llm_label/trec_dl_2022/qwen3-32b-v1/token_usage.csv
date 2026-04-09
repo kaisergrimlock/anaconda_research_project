@@ -369,3 +369,4 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260331_020318,2026-03-31T02:08:50,qwen.qwen3-32b-v1:0,3067,2148896,49185,2198081,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_hicwb_labels.csv,(see logs index)
 20260331_020851,2026-03-31T02:13:56,qwen.qwen3-32b-v1:0,3067,1416447,50107,1466554,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_hecwb_labels.csv,(see logs index)
 20260331_021357,2026-03-31T02:18:49,qwen.qwen3-32b-v1:0,3067,1360683,50370,1411053,0.000000,outputs\llm_label\trec_dl_2022\qwen3-32b-v1\qwen3-32b-v1_trecdl_2022_thcwb_labels.csv,(see logs index)
+20260409_225217,2026-04-09T22:52:31,qwen.qwen3-32b-v1:0,83,38063,1593,39656,0.000000,outputs/llm_label/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_hicwb_instruct_labels.csv,(see logs index)
