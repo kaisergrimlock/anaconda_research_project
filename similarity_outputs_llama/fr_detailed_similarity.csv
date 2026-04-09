@@ -1,0 +1,87 @@
+key,mt_text,reference_text,jaccard,bleu,rouge_l_precision,rouge_l_recall,rouge_l_f1,rouge_l_lcs,mt_token_count,reference_token_count,token_overlap_count
+928,Tout est lié.,Tout est interconnecté.,0.500000,0.550321,0.666667,0.666667,0.666667,2,3,3,2
+4012,"Comme Indien Shinnecock, j'ai été élevé pour savoir cela.","En tant qu'Indienne Shinnecock, j'ai été élevé en le sachant.",0.312500,0.321609,0.500000,0.416667,0.454545,5,10,12,5
+7538,Nous sommes une petite tribu de pêcheurs,Nous sommes une petite tribu de pêcheurs,1.000000,1.000000,1.000000,1.000000,1.000000,7,7,7,7
+9561,situé au bout sud-est de l'île de Longue-Île,et nous vivons à l'extrémité sud-est de Long Island,0.250000,0.149911,0.272727,0.272727,0.272727,3,11,11,4
+12745,près de la ville de Southampton au New York.,près de la ville de Southampton à New York.,0.777778,0.660633,0.888889,0.888889,0.888889,8,9,9,7
+15910,"Quand j'étais une petite fille,","Quand j'étais petite,",0.666667,0.324668,0.666667,1.000000,0.800000,4,6,4,4
+18380,Mon grand-père m'a emmené s'asseoir à l'extérieur dans le soleil un jour d'été chaud.,"mon grand-père et moi nous nous sommes assis dehors au soleil, une chaude journée d'été.",0.206897,0.099177,0.315789,0.352941,0.333333,6,19,17,6
+23728,Il n'y avait pas de nuages dans le ciel.,Il n'y avait pas de nuages dans le ciel.,1.000000,1.000000,1.000000,1.000000,1.000000,10,10,10,10
+27282,"Et après un moment, je commençai à transpirer.","Au bout d'un moment, j'ai commencé à transpirer.",0.285714,0.121646,0.500000,0.400000,0.444444,4,8,10,4
+30453,"Et il pointa vers le ciel, et il dit :","Il a montré le ciel du doigt, et il a dit :",0.454545,0.119500,0.666667,0.545455,0.600000,6,9,11,5
+33979,"Regarde, vois-tu cela ?","« Regarde, tu vois ça ?",0.600000,0.210224,0.500000,0.500000,0.500000,2,4,4,3
+36827,C'est partie de toi là-haut.,Ce qui est là-haut fait partie de toi.,0.600000,0.241772,0.571429,0.444444,0.500000,4,7,9,6
+38946,C'est votre eau qui aide à former les nuages.,C'est l'eau qui aide à faire le nuage,0.428571,0.312394,0.600000,0.600000,0.600000,6,10,10,6
+41861,qui devient la pluie qui nourrit les plantes,"que devient la pluie qui nourrit les plantes,",0.875000,0.840896,0.875000,0.875000,0.875000,7,8,8,7
+46134,qui nourrit les animaux.,qui nourrit les animaux. »,1.000000,1.000000,1.000000,1.000000,1.000000,4,4,4,4
+49920,Dans ma poursuite de l'exploration de sujets en nature,Dans mon exploration continue des sujets de la nature,0.384615,0.062747,0.400000,0.444444,0.421053,4,10,9,5
+52912,qui ont le pouvoir de mettre en évidence l'interconnexion de toutes les formes de vie,"qui ont la capacité d'illustrer l'interconnexion de toute vie,",0.315789,0.119809,0.375000,0.545455,0.444444,6,16,11,6
+57328,J'ai commencé à chasser les tempêtes en 2008,j'ai commencé à chasser les tempêtes en 2008,1.000000,1.000000,1.000000,1.000000,1.000000,9,9,9,9
+60029,"Après que ma fille a dit : ""Maman, tu devrais faire ça.""","après que ma fille ait dit : « Maman, tu devrais le faire. »",0.692308,0.483270,0.818182,0.818182,0.818182,9,11,11,9
+63897,"Et ainsi, trois jours plus tard, conduisant très vite,","Alors trois jours plus tard, je conduisais très vite,",0.500000,0.354948,0.666667,0.666667,0.666667,6,9,9,6
+70108,J'ai trouvé moi-même à poursuivre un seul type de nuage géant appelé la super cellule.,je me suis retrouvée à traquer un seul type de nuage géant appelé orage supercellulaire,0.333333,0.360057,0.470588,0.533333,0.500000,8,17,15,8
+77368,capable de produire des grappes de givre de taille de pamplemousse,capable de produire des grêlons de la taille d'un pamplemousse,0.500000,0.269855,0.636364,0.636364,0.636364,7,11,11,6
+81819,"et des tornades spectaculaires,","et des tornades spectaculaires,",1.000000,1.000000,1.000000,1.000000,1.000000,4,4,4,4
+83812,malgré que seuls deux pour cent le font en réalité.,bien que seulement 2 % le font réellement.,0.214286,0.092875,0.300000,0.428571,0.352941,3,10,7,3
+90118,Ces nuages peuvent grandir jusqu'à une taille aussi grande que 50 miles de large.,"Ces nuages peuvent devenir si grands, jusqu'à 80 km de large",0.350000,0.143779,0.466667,0.583333,0.518519,7,15,12,7
+95262,atteindre jusqu'à 19 800 mètres dans l'atmosphère.,et atteindre une altitude de 20 000 mètres dans l'atmosphère.,0.333333,0.252711,0.555556,0.454545,0.500000,5,9,11,5
+99328,"Ils peuvent grandir si gros, bloquant tout le jour.","Ils peuvent devenir si grands, bloquer la lumière du jour,",0.266667,0.101471,0.444444,0.400000,0.421053,4,9,10,4
+101702,faire très sombre et sinistre en se tenant sous eux.,"et en-dessous, tout devient sombre et menaçant.",0.214286,0.092875,0.200000,0.250000,0.222222,2,10,8,3
+106826,La poursuite des tempêtes est une expérience très tactile.,La chasse aux tempêtes est une expérience très tactile.,0.636364,0.610474,0.777778,0.777778,0.777778,7,9,9,7
+109728,Il y a un vent chaud et humide qui souffle dans votre dos.,"Il y a des vents chauds et humides, qui vous soufflent dans le dos",0.350000,0.131595,0.538462,0.500000,0.518519,7,13,14,7
+113995,"et l'odeur de la terre, du blé, de la gramine, des particules chargées.","et l'odeur de la terre, du blé, de l'herbe, les particules chargées.",0.714286,0.645000,0.785714,0.785714,0.785714,11,14,14,10
+120697,Et puis il y a les couleurs dans les nuages,"Et puis, il y a les couleurs dans les nuages",1.000000,1.000000,1.000000,1.000000,1.000000,10,10,10,9
+124094,"de la formation de grêle, les verts et les bleus turquoise.","de la grêle qui se forme, les verts et les bleus turquoises.",0.538462,0.380969,0.727273,0.666667,0.695652,8,11,12,7
+129284,J'ai appris à respecter la foudre.,J'ai appris à respecter la foudre.,1.000000,1.000000,1.000000,1.000000,1.000000,7,7,7,7
+132562,"Chez moi, les cheveux étaient droits.",Avant mes cheveux étaient raides.,0.222222,0.162334,0.333333,0.400000,0.363636,2,6,5,2
+134696,(Rire),(Rires),0.000000,0.000000,0.000000,0.000000,0.000000,0,1,1,0
+136120,Je plaisante.,Je plaisante.,1.000000,1.000000,1.000000,1.000000,1.000000,2,2,2,2
+137744,(Rire),(Rires),0.000000,0.000000,0.000000,0.000000,0.000000,0,1,1,0
+139886,Ce qui m'excite vraiment à propos de ces tempêtes,"Ce qui m'excite vraiment dans les tempêtes,",0.500000,0.411134,0.600000,0.750000,0.666667,6,10,8,6
+143062,"il y a leur mouvement, la façon dont ils se déplacent et se tournent et se courbent.","c'est leur mouvement, la façon dont elles tourbillonnent, tournes et ondulent,",0.300000,0.224075,0.352941,0.500000,0.413793,6,17,12,6
+147279,avec leurs nuages mammatus à la lampe à huile.,avec leurs altocumulus mamma comme des lampes à lave.,0.214286,0.105527,0.333333,0.333333,0.333333,3,9,9,3
+151297,Ils deviennent des monstres charmants.,Elles deviennent des monstres adorables.,0.428571,0.397635,0.600000,0.600000,0.600000,3,5,5,3
+154029,"Lorsque je les photographie,",Quand je les photographie,0.600000,0.594604,0.750000,0.750000,0.750000,3,4,4,3
+156562,Je ne peux m'empêcher de me rappeler la leçon de mon grand-père.,je ne peux m'empêcher de me rappeler de la leçon de mon grand-père.,1.000000,0.805225,1.000000,0.933333,0.965517,14,14,15,13
+160295,"Comme je me tiens sous eux,","Quand je suis en dessous,",0.100000,0.081167,0.166667,0.200000,0.181818,1,6,5,1
+162287,"Je ne vois pas que des nuages,
+seulement","je ne vois pas qu'un seul nuage,",0.333333,0.345721,0.500000,0.500000,0.500000,4,8,8,4
+164494,mais je comprends que ce que j'ai le privilège de voir,mais je comprends que ce à quoi j'ai le privilège d'assister,0.600000,0.488610,0.750000,0.692308,0.720000,9,12,13,9
+167377,"ce sont les mêmes forces, le même processus à petite échelle","sont les mêmes forces, le même processus dans une version à petite échelle",0.714286,0.585034,0.909091,0.769231,0.833333,10,11,13,10
+171827,"qui a aidé à créer notre galaxie, notre système solaire, notre soleil","qui a contribué à la création de notre galaxie, notre système solaire, notre soleil",0.571429,0.495959,0.833333,0.714286,0.769231,10,12,14,8
+178145,et même ce planète même.,et cette planète même.,0.600000,0.236435,0.600000,0.750000,0.666667,3,5,4,3
+182703,Toutes mes relations. Merci.,En toute amitié. Merci.,0.142857,0.159736,0.250000,0.250000,0.250000,1,4,4,1
+185160,(Applaudissements),(Applaudissements),1.000000,1.000000,1.000000,1.000000,1.000000,1,1,1,1
+1000,"Eh bien, je suis impliqué dans d'autres choses, outre la physique.","Et bien, je suis impliqué dans d’autres choses que la physique.",0.714286,0.670423,0.833333,0.833333,0.833333,10,12,12,10
+5000,"En réalité, principalement maintenant dans d'autres choses.","En fait, à présent, principalement dans d’autres choses.",0.545455,0.337646,0.750000,0.666667,0.705882,6,8,9,6
+7000,Une chose est les relations à distance entre les langues humaines.,Une de ces choses est les parentés éloignées entre les langues humaines.,0.400000,0.264780,0.636364,0.583333,0.608696,7,11,12,6
+12000,"Et les linguistes professionnels, historiens de la langue aux États-Unis.",Et les linguistes historiques professionnels aux Etats-Unis,0.461538,0.165904,0.545455,0.750000,0.631579,6,11,8,6
+16000,"et dans l'Europe occidentale, on essaie généralement de se tenir à l'écart",et en Europe de l’Ouest essayent pour la plupart de se tenir à l’écart,0.421053,0.335656,0.571429,0.500000,0.533333,8,14,16,8
+19000,"des relations à distance, des groupements importants,","de toute relation longue distance; de grands regroupements,",0.083333,0.056930,0.142857,0.125000,0.133333,1,7,8,1
+23000,groupements qui remontent à loin,"des regroupements qui remontent à il y a longtemps,",0.272727,0.178669,0.600000,0.333333,0.428571,3,5,9,3
+26000,plus long que les familles familières.,plus longtemps que les familles qui leur sont familières.,0.500000,0.208219,0.833333,0.555556,0.666667,5,6,9,5
+29000,Ils ne l'aiment pas. Ils pensent que c'est du bidon. Je ne pense pas que c'est du bidon.,"Ils n’aiment pas ça, ils pensent que c’est farfelu. Je ne crois pas que ce soit farfelu.",0.473684,0.243382,0.571429,0.631579,0.600000,12,21,19,9
+33000,"Et il y a quelques linguistes brillants, principalement russes,","Et il y a des linguistes brillants, pour la plupart des Russes,",0.538462,0.264324,0.777778,0.583333,0.666667,7,9,12,7
+36000,"qui travaillent sur cela, à l'Institut de Santa Fe et à Moscou,","qui travaillent là-dessus à l’Institut de Santa Fe et à Moscou,",0.714286,0.701604,0.846154,0.846154,0.846154,11,13,13,10
+40000,et j'aimerais voir où cela mène.,et j’adorerais voir où cela conduit.,0.555556,0.307394,0.714286,0.714286,0.714286,5,7,7,5
+44000,Faut-il vraiment aboutir à un ancêtre unique ?,Est-ce que cela amène à un ancêtre unique,0.307692,0.305098,0.500000,0.444444,0.470588,4,8,9,4
+47000,"Il y a environ 20, 25 000 ans ?",il y a quelques 20 000 à 25 000 ans ?,0.700000,0.279826,0.875000,0.700000,0.777778,7,8,10,7
+50000,"Et qu'au cas où nous allons remonter au-delà de cet ancêtre unique,","Et si on remonte au-delà de cet ancêtre unique,",0.437500,0.363623,0.500000,0.700000,0.583333,7,14,10,7
+53000,Quand il y eut probablement une compétition entre de nombreux langages ?,quand il y avait vraisemblablement une compétition entre de nombreux languages ?,0.571429,0.469247,0.727273,0.727273,0.727273,8,11,11,8
+57000,Comment loin cela remonte ? Comment loin cela remonte le langage moderne ?,Jusqu’où est-ce que ça remonte ? Jusqu’où est-ce que le language moderne remonte ?,0.214286,0.033642,0.272727,0.187500,0.222222,3,11,16,3
+61000,Combien de dizaines de milliers d'années en remonte-t-il ?,A combien de dizaines de milliers d’années est-ce que ça remonte ?,0.466667,0.491953,0.727273,0.615385,0.666667,8,11,13,7
+64000,Chris Anderson : Avez-vous une intuition ou une espérance quant à la réponse à cela ?,Chris Anderson : Avez-vous une petite idée ou un espoir de ce que peut être la réponse à cette question ?,0.375000,0.242812,0.600000,0.450000,0.514286,9,15,20,9
+67000,"Murray Gell-Mann : Eh bien, je devine que le langage moderne doit être plus ancien.","Murray Guell-Mann : Et bien, je dirais que le language moderne doit être plus ancien",0.578947,0.331580,0.733333,0.733333,0.733333,11,15,15,11
+70000,que les peintures de grotte et les gravures de grotte et les sculptures de grotte,"que les peintures, les gravures et les sculptures rupestres,",0.666667,0.186930,0.533333,0.888889,0.666667,8,15,9,6
+74000,"et danser les pas dans la terre molle dans les grottes en Europe occidentale,",et que les traces de pas de dance dans l’argile molle des grottes d’Europe de l’Ouest,0.333333,0.032319,0.500000,0.368421,0.424242,7,14,19,7
+79000,"au cours de la période Aurignacienne, il y a environ 35 000 ans, voire plus tôt.",dans la période aurignacienne il y a quelques 35 000 années ou avant cela.,0.363636,0.338871,0.500000,0.571429,0.533333,8,16,14,8
+85000,Je ne peux pas croire qu'ils ont fait toutes ces choses et n'avaient pas également un langage moderne.,Je ne peux pas croire qu’ils aient fait tout ça et n’aient pas eu un language moderne.,0.500000,0.353705,0.650000,0.684211,0.666667,13,20,19,12
+88000,"Alors, je devine que l'origine réelle remonte au moins aussi loin et peut-être encore plus loin.",Alors je dirais que la véritable origine remonte au moins aussi loin et peut-être plus loin encore.,0.700000,0.484597,0.777778,0.777778,0.777778,14,18,18,14
+93000,"Mais cela ne signifie pas que tout, ou beaucoup, ou la plupart","Mais ça ne veut pas dire que tous, ou beaucoup, ou la plupart des langues",0.470588,0.285980,0.750000,0.600000,0.666667,9,12,15,8
+96000,des langues attestées d'aujourd'hui ne pourraient peut-être pas descendre,d'aujourdhui qui ont été testés ne puissent pas descendre peut-être,0.333333,0.106003,0.333333,0.333333,0.333333,4,12,12,6
+100000,"Depuis un qui est beaucoup plus jeune que cela, comme disons 20 000 ans,","d'une langue qui soit bien plus jeune que, disons, 20 000 ans",0.421053,0.265848,0.571429,0.615385,0.592593,8,14,13,8
+104000,ou quelque chose de ce genre. C'est ce que nous appelons un point d'embouteillage.,ou quelque chose comme ça. C'est ce que j'appelle un goulot.,0.400000,0.228942,0.500000,0.615385,0.551724,8,16,13,8
+108000,"CA : Eh bien, Philip Anderson aurait peut-être raison.","CA : :Et bien, Philip Anderson avait peut-être raison,",0.636364,0.310202,0.777778,0.777778,0.777778,7,9,9,7
+109000,Vous pouvez peut-être savoir plus de tout que personne.,"Vous en savez peut-être plus que tout le monde sur tout,",0.400000,0.090427,0.500000,0.416667,0.454545,5,10,12,6
+112000,"Alors, c'est un honneur. Merci Murray Gell-Mann.",Et donc ce fut un honneur. Merci Murray Guell-Mann,0.357143,0.282410,0.555556,0.500000,0.526316,5,9,10,5
+114000,(Applaudissements),(Applaudissements),1.000000,1.000000,1.000000,1.000000,1.000000,1,1,1,1

@@ -14,20 +14,20 @@ if str(PROJECT_ROOT) not in sys.path:
 
 TREC_DL_YEAR = "2022"
 
-SIMILARITY_ROOT = Path("similarity_outputs_qwen")
+SIMILARITY_ROOT = Path("similarity_outputs_gpt")
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 
 OUT_DIR = Path("figures") / TREC_DL_YEAR / "correlation"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# Add suffixes if needed, for example: ["", "_instruct"]
-LANG_SUFFIXES = [""]
+# Put preferred suffixes here, in priority order.
+# ["_instruct"] means: only prefer ar_instruct over ar.
+LANG_SUFFIXES = ["_instruct"]
 
-# Examples:
-# MODEL_FILTER = "gpt"
-# MODEL_FILTER = "llama"
-# MODEL_FILTER = "qwen"
 MODEL_FILTER = "qwen"
+#MODEL_FILTER = "llama"
+#MODEL_FILTER = "qwen"
+#MODEL_FILTER = "gpt"
 
 
 def find_similarity_files() -> Dict[str, Path]:
@@ -47,7 +47,6 @@ def find_label_files(model_filter: str) -> Dict[str, List[Path]]:
             continue
 
         model_name = model_dir.name
-
         if model_filter not in model_name.lower():
             continue
 
@@ -66,11 +65,20 @@ def get_lang_from_filename(file_path: Path, model: str) -> Optional[str]:
 
 
 def expand_lang_candidates(lang: str, suffixes: List[str]) -> List[str]:
-    candidates = [lang]
+    """
+    Prefer suffixed variants first, then fall back to plain language.
+    Example for ar + ['_instruct'] => ['ar_instruct', 'ar']
+    """
+    candidates = []
+
     for suffix in suffixes:
         candidate = f"{lang}{suffix}" if suffix else lang
         if candidate not in candidates:
             candidates.append(candidate)
+
+    if lang not in candidates:
+        candidates.append(lang)
+
     return candidates
 
 
@@ -187,11 +195,9 @@ def main() -> None:
     df = pd.DataFrame(rows)
     df.to_csv(out_csv, index=False)
 
-    # BLEU vs mean-diff
     tau_bleu, p_tau_bleu = kendalltau(df["avg_bleu"], df["avg_mean_diff"])
     rho_bleu, p_rho_bleu = spearmanr(df["avg_bleu"], df["avg_mean_diff"])
 
-    # ROUGE-L F1 vs mean-diff
     tau_rouge, p_tau_rouge = kendalltau(df["avg_rouge_l_f1"], df["avg_mean_diff"])
     rho_rouge, p_rho_rouge = spearmanr(df["avg_rouge_l_f1"], df["avg_mean_diff"])
 

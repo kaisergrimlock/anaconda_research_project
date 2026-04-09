@@ -1,0 +1,34 @@
+key,mt_text,reference_text,jaccard,bleu,rouge_l_precision,rouge_l_recall,rouge_l_f1,rouge_l_lcs,mt_token_count,reference_token_count,token_overlap_count
+1000,"Táim tar éis rud éigin eile a dhéanamh, seachas fisic.","Bhuel, tá baint agam le rudaí eile seachas fisic",0.187500,0.092875,0.300000,0.333333,0.315789,3,10,9,3
+5000,"Go bunús, go daithí anois i dtreallaí eile.","I bhfirínne, in ábhair seachas fisic is mó faoi láthair.",0.062500,0.043008,0.125000,0.100000,0.111111,1,8,10,1
+7000,Ceann amháin atá i gcónaí na comhpháirtíochtaí a dhúchas don teangacha daonna.,Tá rud amháin faoi leith i dteangacha an chine daonna.,0.157895,0.044569,0.250000,0.300000,0.272727,3,12,10,3
+12000,"Agus na linguithíodóirí stairiúla, teangeolaíochtaí proifisiúnta sna Stáit Aontaithe.","Déanann teangeolaithe gairmiúla, stairiúla sna SAM",0.153846,0.056698,0.222222,0.333333,0.266667,2,9,6,2
+16000,agus i gcuid is mó i nEorpa Thiar go bhfuilimid ag dul as a chéile,agus in Iarthar na hEorpa iarracht chun,0.050000,0.026280,0.066667,0.142857,0.090909,1,15,7,1
+19000,"ó dhíth as comhpháirtíochtaí fad-dhúthcha, grúpaí móra,","cianchaidrimh a sheachaint; grúpaí móra,",0.181818,0.110448,0.250000,0.400000,0.307692,2,8,5,2
+23000,grúpaí a bhfuil siad ag dul siar go fóill,grúpaí a théann i bhfad siar,0.250000,0.105527,0.333333,0.500000,0.400000,3,9,6,3
+26000,fada ná na teagmhálacha teagmhálach.,níos faide siar ná na teaghlaigh teanga cailiúla.,0.181818,0.117250,0.400000,0.250000,0.307692,2,5,8,2
+29000,Níor mhaith leo sin. Táimid ag creidiúint gur scannach é. Ní creidiúim gur scannach é.,"Cha dtaitníonn sé sin leo; síleann gur raiméis í. Ach, ní shílim gur amhlaidh atá.",0.181818,0.039297,0.266667,0.266667,0.266667,4,15,15,4
+33000,"Agus tá cuid den líonúlaí bréan, iad as Rúiseach,","Agus tá roinnt mhaith teangeolaithe iontacha, Rúisigh is mó,",0.125000,0.095354,0.222222,0.222222,0.222222,2,9,9,2
+36000,"Tá siad ag obair ar sin, i Institiúid Santa Fe agus i Moscó.","atá ag déanamh staidéir air sin ag Institiúd Santa Fe agus i Moscó,",0.411765,0.314556,0.538462,0.538462,0.538462,7,13,13,7
+40000,agus ba mhaith liom faoi sin a fheiceáil cén chaoi a mbeadh sé.,agus ba bhreá liom na torthaí a fheiceáil.,0.333333,0.092384,0.384615,0.625000,0.476190,5,13,8,5
+44000,Ar éiríonn sé go fíor don athair aon?,An dtéann sé i bhfad siar go sinsear amháin,0.133333,0.057956,0.250000,0.222222,0.235294,2,8,9,2
+47000,"Céadta a fiche, 25,000 bliain ó shin?","20,000 nó 25,000 bliain ó shin?",0.500000,0.516973,0.625000,0.625000,0.625000,5,8,8,5
+50000,"Agus cad é má théimid siar ar aghaidh sin, seachas sin a aon athair úd?","Agus cad é a tharlaíonn má théann muid níos faide siar roimh an tsinsir amháin sin,",0.304348,0.113106,0.400000,0.375000,0.387097,6,15,16,7
+53000,Nuair a bhí comórtas ábhartha i measc go leor teangacha?,nuair is dócha go raibh iomaíocht idir roinnt mhaith teangacha?,0.176471,0.055224,0.300000,0.300000,0.300000,3,10,10,3
+57000,Céard atá ann don áit sin? Céard atá ann don teanga nua?,Cé chomh fada siar a théann sé sin? Cé chomh fada siar a théann teangacha an lae inniu?,0.052632,0.020540,0.083333,0.055556,0.066667,1,12,18,1
+61000,Céadta a dhéag mílte bliain síos?,Cá mhéad mílte bliain a théann sé siar?,0.272727,0.128726,0.333333,0.250000,0.285714,2,6,8,3
+64000,Chris Anderson: Tá aon tuiscint nó tuairisc a bhfuil sé dóchasach duit go bhfuil sé?,Chris Anderson: An bhfuil cliú nó smaoineamh ar an fhreagra a bhfaighfear?,0.263158,0.066090,0.266667,0.333333,0.296296,4,15,12,5
+67000,Murray Gell-Mann: Táim dóchasach go bhfuil teanga na linne seo a chéile níos sine.,"Murray Gell-Mann: Bhuel, mheasfainn go gcaithfidh teangacha an lae inniu a bheith níos sine",0.304348,0.133802,0.466667,0.466667,0.466667,7,15,15,7
+70000,Níos mó ná na píosaí i gcarraige agus na gréine i gcarraige agus na scileanna i gcarraige,ná na pictiúir agus an ghreanadóireacht agus na dealraimh a tchítear sna huaimheanna,0.166667,0.068396,0.294118,0.384615,0.333333,5,17,13,3
+74000,agus ceol siúlóideanna i gclúdach láidir i súthchaintí i nGorua an Eorpa.,agus lorg coise ó rincí a fágadh i gcré bhog uaimheanna in Iarthar na hEorpa.,0.086957,0.031364,0.166667,0.133333,0.148148,2,12,15,2
+79000,"sa ré Imeachtaí Aurignacian nuair a bhí sé 35,000 bliain ó shin, nó níos luaithe.","sa Tréimhse Aragnaisiúnach timpeall 35,000 bliain ó shin, nó níos túisce.",0.400000,0.385032,0.500000,0.666667,0.571429,8,16,12,8
+85000,Níor smaoineann mise go raibh siad in ann dócha na rudanna sin a dhéanamh agus nach raibh teanga nua-aimseartha acu freisin.,Cha dtig liom a chreidbheáil go ndearna siad na rudaí seo go léir agus nach raibh cumas acu i dteanga nua-aimseartha.,0.312500,0.096143,0.363636,0.363636,0.363636,8,22,22,10
+88000,"Táim dóchasach go bhfuil cruthú na fáinne sin siar ó shin i gcónaí, agus faoi deacair é a bheith tar éis.","Mar sin mheasfainn ar a laghad go dtéann na fréamhacha comh fada siar sin, agus b'fhéidr níos faide arís.",0.176471,0.028423,0.190476,0.200000,0.195122,4,21,20,6
+93000,"Ní mean go bhfuil gach, ná mó, ná móra.","Ach, chan ionann é sin is a rá nach dtig leis na teangacha uilig,",0.000000,0.000000,0.000000,0.000000,0.000000,0,9,14,0
+96000,níorbh faoi deisceart líon na teangacha atá á dtuarascáil inniu d'fhéin,"nó cuid mhaith acu, nó an chuid is mó acu, a bheith tagtha ó",0.000000,0.000000,0.000000,0.000000,0.000000,0,12,14,0
+100000,"ó dh'fhánach a bhfuil sé ó shin, mar shampla 20,000 bliain.","abraimis, 20,000 bliain ó shin,",0.384615,0.144589,0.230769,0.500000,0.315789,3,13,6,5
+104000,nó rud den chéile. Is é sin a thugtar bottleneck.,nó rud éigin cosúil leis sin. Tugaimid caolas teanga air sin.,0.176471,0.084037,0.300000,0.272727,0.285714,3,10,11,3
+108000,"CA: Tá Philip Anderson réidh, mar sin.","CA: Bhuel, b'fhéidir go raibh an ceart ag Philip Anderson.",0.200000,0.082086,0.428571,0.272727,0.333333,3,7,11,3
+109000,Is féidir gur fhéachann tú níos mó faoi gach rud ná aon duine.,B'fhéidir go bhfuil níos mó eolais agatsa ar achan rud ná duine ar bith eile.,0.217391,0.073346,0.384615,0.312500,0.344828,5,13,16,5
+112000,Tá sé sin ábhar ónóir. Go raibh maith ag Murray Gell-Mann.,"Mar sin, ónóir a bhí ann domhsa. Go raibh maith agat a Mhurray Gell-Mann.",0.368421,0.134283,0.583333,0.466667,0.518519,7,12,15,7
+114000,Tá brón orm!,(Bualadh bos),0.000000,0.000000,0.000000,0.000000,0.000000,0,3,2,0

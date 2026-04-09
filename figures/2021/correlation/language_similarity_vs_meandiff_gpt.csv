@@ -1,0 +1,10 @@
+model_filter,model,base_lang,label_lang,similarity_file,label_file,avg_bleu,avg_rouge_l_f1,avg_mean_diff
+gpt,gpt-oss-20b,ar,ar_instruct,similarity_outputs_gpt\ar_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ar_instruct_labels.csv,0.23285501176470588,0.4396711882352941,0.6707062264939406
+gpt,gpt-oss-20b,fr,fr_instruct,similarity_outputs_gpt\fr_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_fr_instruct_labels.csv,0.5152518352941177,0.7365859647058824,0.82839248434238
+gpt,gpt-oss-20b,ga,ga_instruct,similarity_outputs_gpt\ga_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ga_instruct_labels.csv,0.08394387878787879,0.21748915151515155,0.5189979123173277
+gpt,gpt-oss-20b,he,he_instruct,similarity_outputs_gpt\he_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_he_instruct_labels.csv,0.2295873411764706,0.3927807294117648,0.8151759220008478
+gpt,gpt-oss-20b,hi,hi_instruct,similarity_outputs_gpt\hi_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_hi_instruct_labels.csv,0.4049956588235294,0.635177611764706,0.6826397646069777
+gpt,gpt-oss-20b,ru,ru_instruct,similarity_outputs_gpt\ru_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_ru_instruct_labels.csv,0.2932298823529412,0.5173359529411765,1.065608023401588
+gpt,gpt-oss-20b,sw,sw_instruct,similarity_outputs_gpt\sw_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_sw_instruct_labels.csv,0.16325851923076926,0.31497142307692305,0.3919765984120351
+gpt,gpt-oss-20b,vi,vi_instruct,similarity_outputs_gpt\vi_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_vi_instruct_labels.csv,0.2151766470588235,0.5109584,0.8288100208768268
+gpt,gpt-oss-20b,zh,zh_instruct,similarity_outputs_gpt\zh_detailed_similarity.csv,outputs\llm_label\trec_dl_2021\gpt-oss-20b\gpt-oss-20b_trecdl_2021_zh_instruct_labels.csv,0.2565279764705882,0.5125964705882353,0.6800334168755221
