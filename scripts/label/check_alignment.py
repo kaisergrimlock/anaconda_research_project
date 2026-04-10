@@ -52,7 +52,7 @@ ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker.txt")
 UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng"          # "raw", "vi", "enclosed", ...
+LANG = "eng_instruct"          # "raw", "vi", "enclosed", ...
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"
