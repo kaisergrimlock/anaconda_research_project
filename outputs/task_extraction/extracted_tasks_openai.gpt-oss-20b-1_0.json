@@ -1,0 +1,30 @@
+[
+    {
+        "Task": "Score Relevance",
+        "Description": "Assign a relevance score to the passage for the given query on a scale of 0 to 3, using the following definitions: 3 = perfectly relevant (exact answer), 2 = highly relevant (answer present but unclear or buried), 1 = related (some connection but no answer), 0 = irrelevant (no connection)."
+    },
+    {
+        "Task": "Assume Report Context",
+        "Description": "Treat the evaluation as if you are writing a report on the subject of the topic."
+    },
+    {
+        "Task": "Use Query Input",
+        "Description": "Take the query that a person typed into a search engine as the input query."
+    },
+    {
+        "Task": "Use Passage Input",
+        "Description": "Consider the provided passage as the content to evaluate."
+    },
+    {
+        "Task": "Split Evaluation into Steps",
+        "Description": "1) Identify the underlying intent of the search. 2) Measure how well the content matches that intent (M). 3) Measure the trustworthiness of the web page (T). 4) Combine M and T, considering their relative importance, to decide on a final overall score (O)."
+    },
+    {
+        "Task": "Output Format",
+        "Description": "Strictly produce a JSON array containing the scores for M, T, and O only, with no reasoning or additional text before or after the array."
+    },
+    {
+        "Task": "Follow Example Structure",
+        "Description": "Use the example format: {\"M\": score, \"T\": score, \"O\": score} for the JSON output."
+    }
+]

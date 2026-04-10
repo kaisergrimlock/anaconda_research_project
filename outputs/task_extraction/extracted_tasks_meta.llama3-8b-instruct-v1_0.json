@@ -1,0 +1,23 @@
+
+[
+    {
+        "Task": "Consider the underlying intent of the search",
+        "Description": "Understand the purpose behind the user's query '{query}'"
+    },
+    {
+        "Task": "Measure how well the content matches a likely intent of the query (M)",
+        "Description": "Evaluate the relevance of the passage '{passage}' to the user's query"
+    },
+    {
+        "Task": "Measure how trustworthy the web page is (T)",
+        "Description": "Assess the credibility of the passage '{passage}'"
+    },
+    {
+        "Task": "Consider the aspects above and the relative importance of each, and decide on a final score (O)",
+        "Description": "Combine the results of M and T to produce a final score for the passage"
+    },
+    {
+        "Task": "Strictly produce a JSON array of scores without providing any reasoning",
+        "Description": "Output a JSON array in the format {{\"M\": score, \"T\": score, \"O\": score}}"
+    }
+]

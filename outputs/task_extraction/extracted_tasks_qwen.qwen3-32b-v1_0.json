@@ -1,0 +1,22 @@
+[
+    {
+        "Task": "Determine the underlying intent of the search query",
+        "Description": "Analyze the query to understand the user's likely intent behind the search."
+    },
+    {
+        "Task": "Measure how well the passage matches the likely intent of the query",
+        "Description": "Evaluate the relevance of the passage to the query's intent and assign a score (M) on a scale of 0 to 3."
+    },
+    {
+        "Task": "Measure the trustworthiness of the web page containing the passage",
+        "Description": "Assess the credibility and reliability of the source of the passage and assign a score (T) on a scale of 0 to 3."
+    },
+    {
+        "Task": "Decide on the final overall score",
+        "Description": "Based on the scores for match (M) and trustworthiness (T), determine the final overall score (O) on a scale of 0 to 3."
+    },
+    {
+        "Task": "Produce a JSON array of the scores",
+        "Description": "Strictly output a JSON array containing the scores for M, T, and O without any additional text or explanation."
+    }
+]
