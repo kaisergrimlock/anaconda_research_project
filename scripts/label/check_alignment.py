@@ -62,8 +62,13 @@ MODE = "replace"       # "append" or "replace"
 MODELS = ['openai.gpt-oss-20b-1:0']
 INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.0, "topP": 1.0}
 
+# Debug options
+DEBUG_PRINT_PROMPT = True
+DEBUG_PROMPT_CHAR_LIMIT = None   # Set to an int like 3000 to truncate printed prompt
+
 # ===== functions =====
 bump_field_limit()  # Allow large fields to accommodate passages
+
 
 def iter_part_files(part_dir: Path, start: int, end: int, year: str):
     part_pattern = f"all_topics_trecdl_{year}_part{{n}}.csv"
@@ -119,11 +124,40 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
     return t
 
 
+def print_prompt_debug(
+    prompt: str,
+    model_id: str,
+    part_csv: Path,
+    idx: int,
+    pr: str,
+    inference_config: Dict[str, Any],
+) -> None:
+    if not DEBUG_PRINT_PROMPT:
+        return
+
+    shown_prompt = prompt
+    if DEBUG_PROMPT_CHAR_LIMIT is not None:
+        shown_prompt = prompt[:DEBUG_PROMPT_CHAR_LIMIT]
+        if len(prompt) > DEBUG_PROMPT_CHAR_LIMIT:
+            shown_prompt += "\n\n[DEBUG] ... prompt truncated ..."
+
+    print("\n" + "=" * 80)
+    print(
+        f"[DEBUG] Sending prompt to LLM | model={model_id} | "
+        f"file={part_csv.name} | row={idx} | pid_resolved={pr}"
+    )
+    print(f"[DEBUG] inference_config={inference_config}")
+    print("=" * 80)
+    print(shown_prompt)
+    print("=" * 80 + "\n")
+
+
 def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
     alignment_checker_template: str,
     utility_template: str,
+    extracted_task_str: str,
     lang: str,
     run_id: str,
     per_file_out_dir: Path,
@@ -204,8 +238,26 @@ def _label_single_part_file_blocking(
             print(f"[FATAL] {part_csv.name}: could not find passage for lang='{lang}' at row {idx}.")
             sys.exit(3)
 
-        prompt_with_query_and_passage = utility_template.format(query=q_for_prompt, passage=p_for_prompt)
-        prompt = f"{alignment_checker_template}\n\nPrompt:\n{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
+        prompt_with_query_and_passage = utility_template.format(
+            query=q_for_prompt,
+            passage=p_for_prompt
+        )
+        
+        prompt_content = f"{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
+        
+        prompt = alignment_checker_template.format(
+            extracted_task=extracted_task_str,
+            prompt=prompt_content
+        )
+
+        print_prompt_debug(
+            prompt=prompt,
+            model_id=model_id,
+            part_csv=part_csv,
+            idx=idx,
+            pr=pr,
+            inference_config=INFERENCE_CONFIG,
+        )
 
         text = ""
         reasoning = ""
@@ -221,9 +273,8 @@ def _label_single_part_file_blocking(
             )
             text = result.text or ""
             reasoning = result.reasoning or ""
-            # parse the JSON to get the alignment value if possible. Or we might just use the raw text if parse fails.
+
             try:
-                # The model is expected to output: { "alignment": 1 }
                 import ast
                 parsed_dict = ast.literal_eval(text.strip())
                 if isinstance(parsed_dict, dict) and "alignment" in parsed_dict:
@@ -301,14 +352,30 @@ def _label_single_part_file_blocking(
         "header_out": header_out,
     }
 
+
 async def label_single_part_file(*args, **kwargs) -> dict:
     return await asyncio.to_thread(_label_single_part_file_blocking, *args, **kwargs)
+
 
 async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mode: str):
     alignment_checker_template = ALIGNMENT_CHECKER_PROMPT_FILE.read_text(encoding="utf-8")
     utility_template = UTILITY_PROMPT_FILE.read_text(encoding="utf-8")
-    
+
     short = model_short_name(model_id)
+    safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
+    task_file = Path(f"outputs/task_extraction/extracted_tasks_{safe_model}.json")
+    
+    extracted_task_str = ""
+    if task_file.exists():
+        with open(task_file, "r", encoding="utf-8") as f:
+            try:
+                tasks_data = json.load(f)
+                for t in tasks_data:
+                    extracted_task_str += f"\n- {t.get('Task', '')}: {t.get('Description', '')}"
+            except Exception as e:
+                print(f"[WARN] Failed to parse target task_extraction json: {e}")
+    else:
+        print(f"[WARN] Extracted tasks file not found: {task_file}")
 
     MODEL_OUT_DIR = Path(f"outputs/alignment_checker/trec_dl_{TREC_DL_YEAR}/{short}/")
     MODEL_LOGS_DIR = Path("logs/alignment_checker") / short
@@ -343,7 +410,16 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
             if stop_event.is_set():
                 return None
             return await label_single_part_file(
-                p, model_id, alignment_checker_template, utility_template, lang, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
+                p,
+                model_id,
+                alignment_checker_template,
+                utility_template,
+                extracted_task_str,
+                lang,
+                run_id,
+                per_file_out_dir,
+                MODEL_LOGS_DIR,
+                stop_event,
             )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
@@ -419,6 +495,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
     except Exception as e:
         print(f"[WARN] Failed to remove temp folder {per_file_out_dir}: {e}")
 
+
 async def main():
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
@@ -434,6 +511,7 @@ async def main():
             listener_thread.join(timeout=0.2)
         except Exception:
             pass
+
 
 if __name__ == "__main__":
     try:
