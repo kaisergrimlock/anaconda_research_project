@@ -8,7 +8,9 @@ import sys
 import threading
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+from queue import Queue
+from threading import Lock
 
 from botocore.config import Config
 
@@ -52,15 +54,25 @@ ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker.txt")
 UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-LANG = "eng"          # "raw", "vi", "enclosed", ...
-START_PART = 1
-END_PART = 6
+LANGUAGES = [
+    "eng",
+    "eng_instruct"
+]                     # list of languages to process
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Models
 MODELS = ['openai.gpt-oss-20b-1:0']
 INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.0, "topP": 1.0}
+
+# ===== Concurrency knobs =====
+if MODELS[0].startswith("meta.llama3"):
+    ROW_CONCURRENCY = 2
+else:
+    ROW_CONCURRENCY = 50
+ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 # Debug options
 DEBUG_PRINT_PROMPT = True
@@ -201,6 +213,13 @@ def _label_single_part_file_blocking(
     total_rows = count_data_rows(part_csv)
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
     print(f"[HEADER] lang='{lang}' | output columns = {header_out}")
+    if ROW_CONCURRENCY > 1:
+        print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
+
+    write_lock = Lock()
+    next_to_write = 1
+    pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
+    row_queue: "Queue[Optional[Tuple[int, Dict[str, str]]]]" = Queue(maxsize=ROW_QUEUE_MAXSIZE)
 
     def append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
         if not path.exists():
@@ -209,111 +228,127 @@ def _label_single_part_file_blocking(
         with path.open("a", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(new_row)
 
-    for idx, row in enumerate(read_rows_stream(part_csv), start=1):
-        if stop_event is not None and stop_event.is_set():
-            print(f"\n[STOP] Halting early: {part_csv.name}")
-            break
-
-        row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
-
-        pr = (row_out_map.get("pid_resolved", "") or "").strip()
-        if not pr:
-            pr = (
-                row.get("docid", "")
-                or row.get("pid", "")
-                or row.get("pid_qrels", "")
-                or row.get("passage_id", "")
-                or ""
-            ).strip()
-            if pr and "pid_resolved" in header_in:
-                row_out_map["pid_resolved"] = pr
-
-        q_for_prompt = (row_out_map.get("query", "") or "").strip()
-        p_for_prompt = pick_passage_for_lang(row_out_map, lang)
-
-        if not q_for_prompt:
-            print(f"[FATAL] {part_csv.name}: missing 'query' at row {idx}.")
-            sys.exit(3)
-        if not p_for_prompt:
-            print(f"[FATAL] {part_csv.name}: could not find passage for lang='{lang}' at row {idx}.")
-            sys.exit(3)
-
-        prompt_with_query_and_passage = utility_template.format(
-            query=q_for_prompt,
-            passage=p_for_prompt
-        )
-        
-        prompt_content = f"{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
-        
-        prompt = alignment_checker_template.format(
-            extracted_task=extracted_task_str,
-            prompt=prompt_content
-        )
-
-        print_prompt_debug(
-            prompt=prompt,
-            model_id=model_id,
-            part_csv=part_csv,
-            idx=idx,
-            pr=pr,
-            inference_config=INFERENCE_CONFIG,
-        )
-
-        text = ""
-        reasoning = ""
-        score = ""
-        in_tok = out_tok = 0
-
-        try:
-            result = converse_prompt(
-                bedrock,
-                model_id=model_id,
-                prompt=prompt,
-                inference_config=INFERENCE_CONFIG,
-            )
-            text = result.text or ""
-            reasoning = result.reasoning or ""
-
-            try:
-                import ast
-                parsed_dict = ast.literal_eval(text.strip())
-                if isinstance(parsed_dict, dict) and "alignment" in parsed_dict:
-                    score = str(parsed_dict["alignment"])
-                else:
-                    try:
-                        parsed_json = json.loads(text.strip())
-                        if "alignment" in parsed_json:
-                            score = str(parsed_json["alignment"])
-                        else:
-                            score = text.strip()
-                    except json.JSONDecodeError:
-                        score = text.strip()
-            except Exception:
-                score = text.strip()
-
-            in_tok = int(result.input_tokens or 0)
-            out_tok = int(result.output_tokens or 0)
+    def flush_ready_locked():
+        nonlocal next_to_write, total_in, total_out
+        while next_to_write in pending:
+            row_values, log_obj, in_tok, out_tok = pending.pop(next_to_write)
+            append_row_csv(labels_path, header_out, row_values)
+            logs.append(log_obj)
             total_in += in_tok
             total_out += out_tok
-        except KeyboardInterrupt:
-            print(f"[INTERRUPTED] {part_csv.name} at row {idx}")
-            break
-        except Exception as api_err:
-            print(f"[ERROR] {part_csv.name}: API failed on row {idx}, pid_resolved={pr} :: {api_err}")
+            print(
+                f"[{part_csv.name}] [{next_to_write}/{total_rows}] tokens in/out += {in_tok}/{out_tok} "
+                f"(totals {total_in}/{total_out})",
+                end="\r",
+                flush=True,
+            )
+            next_to_write += 1
 
-        row_values = [row_out_map.get(col, "") for col in header_in]
-        if "alignment_score" in header_in:
-            if len(row_values) == len(header_out):
-                row_values[-1] = score
+    def worker():
+        while True:
+            item = row_queue.get()
+            if item is None:
+                row_queue.task_done()
+                break
+
+            idx, row = item
+
+            if stop_event is not None and stop_event.is_set():
+                row_queue.task_done()
+                continue
+
+            row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
+
+            pr = (row_out_map.get("pid_resolved", "") or "").strip()
+            if not pr:
+                pr = (
+                    row.get("docid", "")
+                    or row.get("pid", "")
+                    or row.get("pid_qrels", "")
+                    or row.get("passage_id", "")
+                    or ""
+                ).strip()
+                if pr and "pid_resolved" in header_in:
+                    row_out_map["pid_resolved"] = pr
+
+            q_for_prompt = (row_out_map.get("query", "") or "").strip()
+            p_for_prompt = pick_passage_for_lang(row_out_map, lang)
+
+            if not q_for_prompt or not p_for_prompt:
+                print(f"[FATAL] {part_csv.name}: missing prompt fields at row {idx}.")
+                if stop_event is not None:
+                    try:
+                        pass
+                    except Exception:
+                        pass
+                score, text, reasoning = "", "", ""
+                in_tok = out_tok = 0
+                prompt = ""
+            else:
+                prompt_with_query_and_passage = utility_template.format(
+                    query=q_for_prompt, passage=p_for_prompt
+                )
+                prompt_content = f"{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
+                prompt = alignment_checker_template.format(
+                    extracted_task=extracted_task_str, prompt=prompt_content
+                )
+
+                print_prompt_debug(
+                    prompt=prompt,
+                    model_id=model_id,
+                    part_csv=part_csv,
+                    idx=idx,
+                    pr=pr,
+                    inference_config=INFERENCE_CONFIG,
+                )
+
+                text = ""
+                reasoning = ""
+                score = ""
+                in_tok = out_tok = 0
+
+                try:
+                    result = converse_prompt(
+                        bedrock,
+                        model_id=model_id,
+                        prompt=prompt,
+                        inference_config=INFERENCE_CONFIG,
+                    )
+                    text = result.text or ""
+                    reasoning = result.reasoning or ""
+
+                    try:
+                        import ast
+                        parsed_dict = ast.literal_eval(text.strip())
+                        if isinstance(parsed_dict, dict) and "alignment" in parsed_dict:
+                            score = str(parsed_dict["alignment"])
+                        else:
+                            try:
+                                parsed_json = json.loads(text.strip())
+                                if "alignment" in parsed_json:
+                                    score = str(parsed_json["alignment"])
+                                else:
+                                    score = text.strip()
+                            except json.JSONDecodeError:
+                                score = text.strip()
+                    except Exception:
+                        score = text.strip()
+
+                    in_tok = int(result.input_tokens or 0)
+                    out_tok = int(result.output_tokens or 0)
+                except Exception as api_err:
+                    print(f"[ERROR] {part_csv.name}: API failed on row {idx}, pid_resolved={pr} :: {api_err}")
+
+            row_values = [row_out_map.get(col, "") for col in header_in]
+            if "alignment_score" in header_in:
+                if len(row_values) == len(header_out):
+                    row_values[-1] = score
+                else:
+                    row_values.append(score)
             else:
                 row_values.append(score)
-        else:
-            row_values.append(score)
 
-        append_row_csv(labels_path, header_out, row_values)
-
-        logs.append(
-            {
+            log_obj = {
                 "qid": (row_out_map.get("qid", "") or "").strip(),
                 "pid_qrels": (row_out_map.get("pid_qrels", "") or "").strip(),
                 "pid_resolved": pr,
@@ -323,14 +358,32 @@ def _label_single_part_file_blocking(
                 "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
                 "alignment_score": score,
             }
-        )
 
-        print(
-            f"[{part_csv.name}] [{idx}/{total_rows}] tokens in/out += {in_tok}/{out_tok} "
-            f"(totals {total_in}/{total_out})",
-            end="\r",
-            flush=True,
-        )
+            with write_lock:
+                pending[idx] = (row_values, log_obj, in_tok, out_tok)
+                flush_ready_locked()
+
+            row_queue.task_done()
+
+    workers: List[threading.Thread] = []
+    for _ in range(max(1, ROW_CONCURRENCY)):
+        t = threading.Thread(target=worker, daemon=True)
+        t.start()
+        workers.append(t)
+
+    for idx, row in enumerate(read_rows_stream(part_csv), start=1):
+        if stop_event is not None and stop_event.is_set():
+            print(f"\n[STOP] Halting early: {part_csv.name}")
+            break
+        row_queue.put((idx, row))
+
+    for _ in workers:
+        row_queue.put(None)
+
+    row_queue.join()
+
+    with write_lock:
+        flush_ready_locked()
 
     per_file_log = logs_dir / f"{run_id}_alignment_responses_{safe_model}_{part_csv.stem}.json"
     with per_file_log.open("w", encoding="utf-8") as logf:
@@ -501,10 +554,13 @@ async def main():
     stop_event = asyncio.Event()
     listener_thread = start_stop_key_listener(loop, stop_event)
     try:
-        for model_id in MODELS:
+        for lang in LANGUAGES:
             if stop_event.is_set():
                 break
-            await run_for_model(model_id, LANG, stop_event, MODE)
+            for model_id in MODELS:
+                if stop_event.is_set():
+                    break
+                await run_for_model(model_id, lang, stop_event, MODE)
     finally:
         stop_event.set()
         try:
