@@ -1,0 +1,3 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20260411_023548,2026-04-11T02:39:34,qwen.qwen3-32b-v1:0,2549,1709048,45839,1754887,0.000000,outputs/alignment_checker/trec_dl_2021/qwen3-32b-v1/qwen3-32b-v1_trecdl_2021_eng_labels.csv,(see logs index)
+20260411_023558,2026-04-11T02:39:51,qwen.qwen3-32b-v1:0,2549,1733405,62485,1795890,0.000000,outputs/alignment_checker/trec_dl_2021/qwen3-32b-v1/qwen3-32b-v1_trecdl_2021_eng_instruct_labels.csv,(see logs index)

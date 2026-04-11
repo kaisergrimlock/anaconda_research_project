@@ -60,7 +60,7 @@ LANGUAGES = [
 ]                     # list of languages to process
 START_PART = 0
 END_PART = 0
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
 
 # Models
