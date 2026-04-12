@@ -23,7 +23,7 @@ from scripts.csv_helpers import bump_field_limit
 
 # -------- Config --------
 TREC_DL_YEAR = "2021"
-MODEL = "qwen3-32b-v1"
+MODEL = "llama3-8b-instruct"
 
 LANGUAGES = [
     "eng",

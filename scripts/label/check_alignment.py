@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import csv
 import json
+import re
 import sys
 import threading
 import shutil
@@ -55,17 +56,19 @@ UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
-    "eng",
-    "eng_instruct"
-]                     # list of languages to process
+    "vi",
+    "vi_instruct"
+]
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"       # "append" or "replace"
 
 # Models
-MODELS = ['qwen.qwen3-32b-v1:0']
-INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.0, "topP": 1.0}
+MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ['openai.gpt-oss-20b-1:0']
+#MODELS = ['meta.llama3-8b-instruct-v1:0']
+INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.6, "topP": 1.0}
 
 # ===== Concurrency knobs =====
 if MODELS[0].startswith("meta.llama3"):
@@ -162,6 +165,52 @@ def print_prompt_debug(
     print("=" * 80)
     print(shown_prompt)
     print("=" * 80 + "\n")
+
+
+def extract_alignment_score(text: str) -> str:
+    """
+    Try to extract alignment from a model response.
+
+    Supports:
+    - Python dict string via ast.literal_eval
+    - JSON via json.loads
+    - malformed JSON-like text via regex, e.g.
+      "alignment": 0.8
+      ""alignment"": 0.8
+
+    Returns:
+        alignment as string if found, else the stripped original text
+    """
+    if not isinstance(text, str):
+        return ""
+
+    raw = text.strip()
+    if not raw:
+        return ""
+
+    # 1) Try Python-literal style dict
+    try:
+        import ast
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, dict) and "alignment" in parsed:
+            return str(parsed["alignment"])
+    except Exception:
+        pass
+
+    # 2) Try JSON
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict) and "alignment" in parsed:
+            return str(parsed["alignment"])
+    except Exception:
+        pass
+
+    # 3) Regex fallback for normal or doubled quotes
+    match = re.search(r'"+alignment"+\s*:\s*(-?\d+(?:\.\d+)?)', raw)
+    if match:
+        return match.group(1)
+
+    return raw
 
 
 def _label_single_part_file_blocking(
@@ -276,11 +325,6 @@ def _label_single_part_file_blocking(
 
             if not q_for_prompt or not p_for_prompt:
                 print(f"[FATAL] {part_csv.name}: missing prompt fields at row {idx}.")
-                if stop_event is not None:
-                    try:
-                        pass
-                    except Exception:
-                        pass
                 score, text, reasoning = "", "", ""
                 in_tok = out_tok = 0
                 prompt = ""
@@ -317,22 +361,8 @@ def _label_single_part_file_blocking(
                     text = result.text or ""
                     reasoning = result.reasoning or ""
 
-                    try:
-                        import ast
-                        parsed_dict = ast.literal_eval(text.strip())
-                        if isinstance(parsed_dict, dict) and "alignment" in parsed_dict:
-                            score = str(parsed_dict["alignment"])
-                        else:
-                            try:
-                                parsed_json = json.loads(text.strip())
-                                if "alignment" in parsed_json:
-                                    score = str(parsed_json["alignment"])
-                                else:
-                                    score = text.strip()
-                            except json.JSONDecodeError:
-                                score = text.strip()
-                    except Exception:
-                        score = text.strip()
+                    # New robust extraction logic
+                    score = extract_alignment_score(text)
 
                     in_tok = int(result.input_tokens or 0)
                     out_tok = int(result.output_tokens or 0)

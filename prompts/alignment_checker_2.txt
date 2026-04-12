@@ -1,8 +1,11 @@
-Assume the role of a senior AI evaluation specialist with expertise in prompt engineering and semantic task analysis. I would like you to evaluate how well a new actionable instruction aligns with the user's intended task. Compare the extracted task with the provided prompt and determine whether the instruction strengthens the user’s objective, partially contributes, or introduces misalignment. Use reasoning based on semantic similarity, goal consistency, and functional relevance. Follow this structured output format: { "alignment": <0–1 score>, "reasoning": "<concise justification>" }. Use examples of alignment vs misalignment patterns where necessary to ensure consistent scoring.
-
+Assume the role of a senior AI evaluation specialist with expertise in prompt engineering and semantic task analysis. I would like you to evaluate how well a new actionable instruction aligns with the user's intended task. Compare the extracted task with the provided prompt and determine whether the instruction strengthens the user’s objective, partially contributes, or introduces misalignment. 
+###
+Given the user's task
 User's tasks:"{extracted_task}"
-
+###
+And the user's prompt
 User's Prompt: "{prompt}"
-
-Output:
-{{ "alignment": 1, "reasoning": "The new actionable instruction aligns with the user task instructions." }}
+###
+Use reasoning based on semantic similarity, goal consistency, and functional relevance. Follow this structured output format: {{"alignment": 0–1 score, "reasoning": "concise justification"}}. Use examples of alignment vs misalignment patterns where necessary to ensure consistent scoring.
+###
+Please ensure the output is a valid JSON *array* with *no* additional text and *no* code fences. 
