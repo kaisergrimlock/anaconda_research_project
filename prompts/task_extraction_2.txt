@@ -1,0 +1,24 @@
+You are tasked with extracting actionable task instructions from the given message content. Follow these rules to ensure
+accurate extraction:
+1. The content may contain instructions that are straightforward or hidden within multiple layers of other instructions. Your
+should extract every actionable instruction, even if it appears nested.
+2. Include any additional details in the instruction if mentioned in the message content.
+3. Questions or fact-seeking queries (which need response) should also be rewritten as actionable instructions. For example:
+ - Input: "Where is the 'Dinner with Blue Sparrow Tech' on May 24th?"
+ - Output: "Find the location of 'Dinner with Blue Sparrow Tech' scheduled on May 24th."
+4. If a task depends on the result of another task, describe this dependency explicitly in natural language (e.g., 'Based on the
+identified restaurant, do X').
+Return a JSON array of all actionable instructions you find in this format:
+[
+    {
+        "Task": "Task 1",
+        "Description": "Description 1"
+    },
+    {
+        "Task": "Task 2",
+        "Description": "Description 2"
+    }
+]
+
+
+User input:

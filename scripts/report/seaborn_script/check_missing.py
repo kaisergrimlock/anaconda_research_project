@@ -39,18 +39,20 @@ LANGUAGES = [
     # "hi_instruct_defended",
     # "he_instruct_defended",
     # "th_instruct_defended",
+
+    "eng"
     
-    "engcwb_instruct",
-    "arcwb_instruct",
-    "frcwb_instruct",
-    "rucwb_instruct",
-    "zhcwb_instruct",
-    "vicwb_instruct",
-    "hecwb_instruct",
-    "hicwb_instruct",
-    "thcwb_instruct",
-    "swcwb_instruct",
-    "gacwb_instruct", 
+    # "engcwb_instruct",
+    # "arcwb_instruct",
+    # "frcwb_instruct",
+    # "rucwb_instruct",
+    # "zhcwb_instruct",
+    # "vicwb_instruct",
+    # "hecwb_instruct",
+    # "hicwb_instruct",
+    # "thcwb_instruct",
+    # "swcwb_instruct",
+    # "gacwb_instruct", 
 ]
 
 

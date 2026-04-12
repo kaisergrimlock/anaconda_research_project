@@ -50,7 +50,7 @@ cfg = Config(
     retries={"max_attempts": 8, "mode": "standard"},
 )
 
-ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker.txt")
+ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker_2.txt")
 UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
