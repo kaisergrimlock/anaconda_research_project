@@ -1,3 +1,11 @@
 run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
 20260411_022746,2026-04-11T02:31:29,qwen.qwen3-32b-v1:0,3067,2024604,68285,2092889,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_instruct_labels.csv,(see logs index)
 20260411_022752,2026-04-11T02:31:39,qwen.qwen3-32b-v1:0,3069,1981218,50203,2031421,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_labels.csv,(see logs index)
+20260411_140539,2026-04-11T14:05:56,qwen.qwen3-32b-v1:0,3069,2033105,53927,2087032,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_labels.csv,(see logs index)
+20260411_140556,2026-04-11T14:06:09,qwen.qwen3-32b-v1:0,3067,2073541,104093,2177634,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_instruct_labels.csv,(see logs index)
+20260411_150258,2026-04-11T15:03:16,qwen.qwen3-32b-v1,3069,0,0,0,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_labels.csv,(see logs index)
+20260411_150317,2026-04-11T15:03:27,qwen.qwen3-32b-v1,3067,0,0,0,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_instruct_labels.csv,(see logs index)
+20260411_153214,2026-04-11T15:32:29,qwen.qwen3-32b-v1,3069,0,0,0,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_labels.csv,(see logs index)
+20260411_153229,2026-04-11T15:32:39,qwen.qwen3-32b-v1,3067,0,0,0,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_instruct_labels.csv,(see logs index)
+20260411_153447,2026-04-11T15:35:04,qwen.qwen3-32b-v1:0,3069,2060538,99610,2160148,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_labels.csv,(see logs index)
+20260411_153504,2026-04-11T15:35:22,qwen.qwen3-32b-v1:0,3067,2100081,203604,2303685,0.000000,outputs/alignment_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_instruct_labels.csv,(see logs index)
