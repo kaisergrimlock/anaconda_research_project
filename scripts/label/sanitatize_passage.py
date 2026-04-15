@@ -57,8 +57,8 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 LANGUAGES = [
     "eng_last",
     "vi_last",
-    "eng_start",
-    "vi_start"
+    "eng_first",
+    "vi_first"
 ]
 START_PART = 1
 END_PART = 6
@@ -318,14 +318,14 @@ def _label_single_part_file_blocking(
             else:
                 prompt = sanitation_template.format(prompt=passage_text)
 
-                print_prompt_debug(
-                    prompt=prompt,
-                    model_id=model_id,
-                    part_csv=part_csv,
-                    idx=idx,
-                    pr=pr,
-                    inference_config=INFERENCE_CONFIG,
-                )
+                # print_prompt_debug(
+                #     prompt=prompt,
+                #     model_id=model_id,
+                #     part_csv=part_csv,
+                #     idx=idx,
+                #     pr=pr,
+                #     inference_config=INFERENCE_CONFIG,
+                # )
 
                 response_text = ""
                 reasoning = ""
