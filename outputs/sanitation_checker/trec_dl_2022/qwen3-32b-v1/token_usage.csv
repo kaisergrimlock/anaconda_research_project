@@ -13,3 +13,5 @@ run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,esti
 20260415_124838,2026-04-15T12:48:59,qwen.qwen3-32b-v1:0,3067,410759,15339,426098,0.000000,outputs/sanitation_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_vi_last_labels.csv,(see logs index)
 20260415_124859,2026-04-15T12:49:25,qwen.qwen3-32b-v1:0,3067,402876,9294,412170,0.000000,outputs/sanitation_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_eng_first_labels.csv,(see logs index)
 20260415_124925,2026-04-15T12:49:40,qwen.qwen3-32b-v1:0,3067,412910,13099,426009,0.000000,outputs/sanitation_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_vi_first_labels.csv,(see logs index)
+20260415_142152,2026-04-15T14:22:13,qwen.qwen3-32b-v1:0,3067,619315,62039,681354,0.000000,outputs/sanitation_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_vicwb_instruct_labels.csv,(see logs index)
+20260415_142213,2026-04-15T14:22:46,qwen.qwen3-32b-v1:0,3067,640555,82981,723536,0.000000,outputs/sanitation_checker/trec_dl_2022/qwen3-32b-v1/qwen3-32b-v1_trecdl_2022_swcwb_instruct_labels.csv,(see logs index)

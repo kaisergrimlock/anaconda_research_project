@@ -55,17 +55,14 @@ SANITATION_PROMPT_FILE = Path("prompts/sanitize.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
-    "sw",
-    "sw_first"
-    "sw_last",
-    "ga",
-    "ga_first",
-    "ga_last",
+    "engcwb_instruct",
+    "vicwb_instruct",
+    "swcwb_instruct",
 ]
 
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 MODELS = ["qwen.qwen3-32b-v1:0"]
