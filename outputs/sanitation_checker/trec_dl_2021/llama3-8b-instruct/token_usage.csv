@@ -1,0 +1,7 @@
+run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
+20260412_223744,2026-04-12T22:38:08,meta.llama3-8b-instruct-v1:0,2549,0,0,0,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_vi_labels.csv,(see logs index)
+20260412_223808,2026-04-12T22:38:27,meta.llama3-8b-instruct-v1:0,2549,0,0,0,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_vi_instruct_labels.csv,(see logs index)
+20260412_223902,2026-04-12T22:44:27,meta.llama3-8b-instruct-v1:0,2549,323611,62473,386084,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_vi_labels.csv,(see logs index)
+20260412_224427,2026-04-12T22:50:40,meta.llama3-8b-instruct-v1:0,2549,308040,73267,381307,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_vi_instruct_labels.csv,(see logs index)
+20260412_231219,2026-04-12T23:17:45,meta.llama3-8b-instruct-v1:0,2549,287997,67843,355840,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_eng_labels.csv,(see logs index)
+20260412_231745,2026-04-12T23:23:48,meta.llama3-8b-instruct-v1:0,2549,298468,59563,358031,0.000000,outputs/sanitation_checker/trec_dl_2021/llama3-8b-instruct/llama3-8b-instruct_trecdl_2021_eng_instruct_labels.csv,(see logs index)

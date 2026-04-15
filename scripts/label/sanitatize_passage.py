@@ -37,7 +37,7 @@ from scripts.log_helpers import (
     write_run_log_index,
 )
 
-# ===== Bedrock helper (ONLY Bedrock stuff) =====
+# ===== Bedrock helper =====
 from scripts.bedrock_client import (
     make_bedrock_runtime_client,
     converse_prompt,
@@ -51,23 +51,21 @@ cfg = Config(
     retries={"max_attempts": 8, "mode": "standard"},
 )
 
-ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker_2.txt")
-UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
+SANITATION_PROMPT_FILE = Path("prompts/sanitize.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
     "vi",
-    "vi_instruct"
+    "vi_instruct",
 ]
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
-MODE = "replace"       # "append" or "replace"
+TREC_DL_YEAR = "2021"
+MODE = "replace"  # "append" or "replace"
 
-# Models
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 #MODELS = ['openai.gpt-oss-20b-1:0']
-MODELS = ['meta.llama3-8b-instruct-v1:0']
+#MODELS = ['meta.llama3-8b-instruct-v1:0']
 INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.6, "topP": 1.0}
 
 # ===== Concurrency knobs =====
@@ -77,12 +75,12 @@ else:
     ROW_CONCURRENCY = 50
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
-# Debug options
+# ===== Debug options =====
 DEBUG_PRINT_PROMPT = True
-DEBUG_PROMPT_CHAR_LIMIT = None   # Set to an int like 3000 to truncate printed prompt
+DEBUG_PROMPT_CHAR_LIMIT = None  # e.g. 3000 to truncate printed prompt
 
-# ===== functions =====
-bump_field_limit()  # Allow large fields to accommodate passages
+# ===== startup =====
+bump_field_limit()
 
 
 def iter_part_files(part_dir: Path, start: int, end: int, year: str):
@@ -110,10 +108,14 @@ def count_data_rows(path: Path) -> int:
         return max(0, sum(1 for _ in f) - 1)
 
 
-def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
+def start_stop_key_listener(
+    loop: asyncio.AbstractEventLoop,
+    stop_event: asyncio.Event,
+) -> threading.Thread:
     def _listen():
         try:
             import msvcrt
+
             print("[STOP] Press 'Q' to stop gracefully.")
             while not stop_event.is_set():
                 if msvcrt.kbhit():
@@ -167,58 +169,43 @@ def print_prompt_debug(
     print("=" * 80 + "\n")
 
 
-def extract_alignment_score(text: str) -> str:
+def parse_sanitation_response(text: str) -> Tuple[str, str]:
     """
-    Try to extract alignment from a model response.
+    Parse sanitation output.
 
-    Supports:
-    - Python dict string via ast.literal_eval
-    - JSON via json.loads
-    - malformed JSON-like text via regex, e.g.
-      "alignment": 0.8
-      ""alignment"": 0.8
+    Expected general forms:
+      - Yes
+      - No
+      - Yes Injection: <text>
+      - Yes\\nInjection: <text>
 
     Returns:
-        alignment as string if found, else the stripped original text
+        (has_injection, injection_text)
     """
     if not isinstance(text, str):
-        return ""
+        return "", ""
 
     raw = text.strip()
     if not raw:
-        return ""
+        return "", ""
 
-    # 1) Try Python-literal style dict
-    try:
-        import ast
-        parsed = ast.literal_eval(raw)
-        if isinstance(parsed, dict) and "alignment" in parsed:
-            return str(parsed["alignment"])
-    except Exception:
-        pass
+    yes_no_match = re.search(r"\b(Yes|No)\b", raw, flags=re.IGNORECASE)
+    has_injection = yes_no_match.group(1).capitalize() if yes_no_match else raw
 
-    # 2) Try JSON
-    try:
-        parsed = json.loads(raw)
-        if isinstance(parsed, dict) and "alignment" in parsed:
-            return str(parsed["alignment"])
-    except Exception:
-        pass
+    injection_match = re.search(
+        r"Injection\s*:\s*(.+)",
+        raw,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    injection_text = injection_match.group(1).strip() if injection_match else ""
 
-    # 3) Regex fallback for normal or doubled quotes
-    match = re.search(r'"+alignment"+\s*:\s*(-?\d+(?:\.\d+)?)', raw)
-    if match:
-        return match.group(1)
-
-    return raw
+    return has_injection, injection_text
 
 
 def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
-    alignment_checker_template: str,
-    utility_template: str,
-    extracted_task_str: str,
+    sanitation_template: str,
     lang: str,
     run_id: str,
     per_file_out_dir: Path,
@@ -231,7 +218,6 @@ def _label_single_part_file_blocking(
 
     header_in = _inspect_header(part_csv)
 
-    # ===== Minimal required columns =====
     required_cols = ["query"]
     if lang == "raw":
         required_cols.append("passage")
@@ -243,20 +229,16 @@ def _label_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
-    # ===== Output header = input header + alignment_score =====
-    if "alignment_score" in header_in:
-        print(f"[WARN] {part_csv.name}: 'alignment_score' already in header; will overwrite values.")
-        header_out = header_in
-    else:
-        header_out = header_in + ["alignment_score"]
+    extra_cols = ["has_prompt_injection", "detected_injection", "sanitation_response"]
+    header_out = [c for c in header_in if c not in extra_cols] + extra_cols
 
-    labels_path = per_file_out_dir / f"{part_csv.stem}_alignment_{safe_model}.csv"
+    labels_path = per_file_out_dir / f"{part_csv.stem}_sanitation_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
-    # ===== Bedrock client via helper =====
     bedrock = make_bedrock_runtime_client(cfg)
 
-    total_in = total_out = 0
+    total_in = 0
+    total_out = 0
     logs: List[Dict[str, Any]] = []
 
     total_rows = count_data_rows(part_csv)
@@ -286,8 +268,8 @@ def _label_single_part_file_blocking(
             total_in += in_tok
             total_out += out_tok
             print(
-                f"[{part_csv.name}] [{next_to_write}/{total_rows}] tokens in/out += {in_tok}/{out_tok} "
-                f"(totals {total_in}/{total_out})",
+                f"[{part_csv.name}] [{next_to_write}/{total_rows}] tokens in/out += "
+                f"{in_tok}/{out_tok} (totals {total_in}/{total_out})",
                 end="\r",
                 flush=True,
             )
@@ -320,22 +302,19 @@ def _label_single_part_file_blocking(
                 if pr and "pid_resolved" in header_in:
                     row_out_map["pid_resolved"] = pr
 
-            q_for_prompt = (row_out_map.get("query", "") or "").strip()
-            p_for_prompt = pick_passage_for_lang(row_out_map, lang)
+            passage_text = pick_passage_for_lang(row_out_map, lang)
 
-            if not q_for_prompt or not p_for_prompt:
-                print(f"[FATAL] {part_csv.name}: missing prompt fields at row {idx}.")
-                score, text, reasoning = "", "", ""
-                in_tok = out_tok = 0
+            if not passage_text:
+                print(f"[FATAL] {part_csv.name}: missing passage at row {idx}.")
+                has_injection = ""
+                detected_injection = ""
+                response_text = ""
+                reasoning = ""
+                in_tok = 0
+                out_tok = 0
                 prompt = ""
             else:
-                prompt_with_query_and_passage = utility_template.format(
-                    query=q_for_prompt, passage=p_for_prompt
-                )
-                prompt_content = f"{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
-                prompt = alignment_checker_template.format(
-                    extracted_task=extracted_task_str, prompt=prompt_content
-                )
+                prompt = sanitation_template.format(prompt=passage_text)
 
                 print_prompt_debug(
                     prompt=prompt,
@@ -346,10 +325,12 @@ def _label_single_part_file_blocking(
                     inference_config=INFERENCE_CONFIG,
                 )
 
-                text = ""
+                response_text = ""
                 reasoning = ""
-                score = ""
-                in_tok = out_tok = 0
+                has_injection = ""
+                detected_injection = ""
+                in_tok = 0
+                out_tok = 0
 
                 try:
                     result = converse_prompt(
@@ -358,35 +339,36 @@ def _label_single_part_file_blocking(
                         prompt=prompt,
                         inference_config=INFERENCE_CONFIG,
                     )
-                    text = result.text or ""
+                    response_text = result.text or ""
                     reasoning = result.reasoning or ""
 
-                    # New robust extraction logic
-                    score = extract_alignment_score(text)
+                    has_injection, detected_injection = parse_sanitation_response(response_text)
 
                     in_tok = int(result.input_tokens or 0)
                     out_tok = int(result.output_tokens or 0)
                 except Exception as api_err:
-                    print(f"[ERROR] {part_csv.name}: API failed on row {idx}, pid_resolved={pr} :: {api_err}")
+                    print(
+                        f"[ERROR] {part_csv.name}: API failed on row {idx}, "
+                        f"pid_resolved={pr} :: {api_err}"
+                    )
 
             row_values = [row_out_map.get(col, "") for col in header_in]
-            if "alignment_score" in header_in:
-                if len(row_values) == len(header_out):
-                    row_values[-1] = score
-                else:
-                    row_values.append(score)
-            else:
-                row_values.append(score)
+            row_values.extend([
+                has_injection,
+                detected_injection,
+                response_text,
+            ])
 
             log_obj = {
                 "qid": (row_out_map.get("qid", "") or "").strip(),
                 "pid_qrels": (row_out_map.get("pid_qrels", "") or "").strip(),
                 "pid_resolved": pr,
                 "prompt": prompt,
-                "response_text": text,
+                "response_text": response_text,
                 "reasoning": reasoning,
                 "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-                "alignment_score": score,
+                "has_prompt_injection": has_injection,
+                "detected_injection": detected_injection,
             }
 
             with write_lock:
@@ -415,7 +397,7 @@ def _label_single_part_file_blocking(
     with write_lock:
         flush_ready_locked()
 
-    per_file_log = logs_dir / f"{run_id}_alignment_responses_{safe_model}_{part_csv.stem}.json"
+    per_file_log = logs_dir / f"{run_id}_sanitation_responses_{safe_model}_{part_csv.stem}.json"
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
@@ -441,27 +423,12 @@ async def label_single_part_file(*args, **kwargs) -> dict:
 
 
 async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mode: str):
-    alignment_checker_template = ALIGNMENT_CHECKER_PROMPT_FILE.read_text(encoding="utf-8")
-    utility_template = UTILITY_PROMPT_FILE.read_text(encoding="utf-8")
+    sanitation_template = SANITATION_PROMPT_FILE.read_text(encoding="utf-8")
 
     short = model_short_name(model_id)
-    safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
-    task_file = Path(f"outputs/task_extraction/extracted_tasks_{safe_model}.json")
-    
-    extracted_task_str = ""
-    if task_file.exists():
-        with open(task_file, "r", encoding="utf-8") as f:
-            try:
-                tasks_data = json.load(f)
-                for t in tasks_data:
-                    extracted_task_str += f"\n- {t.get('Task', '')}: {t.get('Description', '')}"
-            except Exception as e:
-                print(f"[WARN] Failed to parse target task_extraction json: {e}")
-    else:
-        print(f"[WARN] Extracted tasks file not found: {task_file}")
 
-    MODEL_OUT_DIR = Path(f"outputs/alignment_checker/trec_dl_{TREC_DL_YEAR}/{short}/")
-    MODEL_LOGS_DIR = Path("logs/alignment_checker") / short
+    MODEL_OUT_DIR = Path(f"outputs/sanitation_checker/trec_dl_{TREC_DL_YEAR}/{short}/")
+    MODEL_LOGS_DIR = Path("logs/sanitation_checker") / short
     MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
     MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -477,7 +444,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
 
     run_id = timestamp_id()
     print(
-        f"\n--- Running alignment checker inference for model: {model_id} "
+        f"\n--- Running sanitation checker inference for model: {model_id} "
         f"(run_id={run_id}, lang={lang}, mode={mode}) ---"
     )
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
@@ -495,9 +462,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
             return await label_single_part_file(
                 p,
                 model_id,
-                alignment_checker_template,
-                utility_template,
-                extracted_task_str,
+                sanitation_template,
                 lang,
                 run_id,
                 per_file_out_dir,
@@ -514,6 +479,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
             await asyncio.gather(*tasks, return_exceptions=True)
             print("[STOP] Cancelled remaining files.")
             break
+
         r = await task
         if r:
             results.append(r)
@@ -527,6 +493,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
     header_out = list(next(iter(header_out_set)))
+
     per_file_labels = [r["labels_csv"] for r in results]
 
     combined_path = write_combined_dynamic(
@@ -550,7 +517,7 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
 
     write_run_log_index(
         [{"part": r["part"], "log_json": r["log_json"]} for r in results],
-        MODEL_LOGS_DIR / f"{run_id}_alignment_logs_index_{short}_{lang}.json",
+        MODEL_LOGS_DIR / f"{run_id}_sanitation_logs_index_{short}_{lang}.json",
     )
 
     append_token_row(
@@ -583,6 +550,7 @@ async def main():
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
     listener_thread = start_stop_key_listener(loop, stop_event)
+
     try:
         for lang in LANGUAGES:
             if stop_event.is_set():
