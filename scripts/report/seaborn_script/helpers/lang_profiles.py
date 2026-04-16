@@ -49,6 +49,15 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "engcwb_instruct", "arcwb_instruct", "vicwb_instruct", "thcwb_instruct", "frcwb_instruct", "rucwb_instruct",
         "hecwb_instruct", "swcwb_instruct", "gacwb_instruct", "hicwb_instruct", "zhcwb_instruct",
     ],
+
+    "cwb_instruct_only": [
+        "engcwb_instruct", "arcwb_instruct", "vicwb_instruct", "thcwb_instruct", "frcwb_instruct", "rucwb_instruct",
+        "hecwb_instruct", "swcwb_instruct", "gacwb_instruct", "hicwb_instruct", "zhcwb_instruct",
+    ],
+
+    "instruct_only": [
+        "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct"
+    ],
     
     "instruct": [
         "eng", "raw", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
