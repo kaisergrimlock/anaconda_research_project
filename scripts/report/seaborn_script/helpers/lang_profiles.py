@@ -70,6 +70,10 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "fr_instruct_defended", "th_instruct_defended", "ru_instruct_defended",
         "he_instruct_defended", "sw_instruct_defended", "ga_instruct_defended",
         "hi_instruct_defended", "zh_instruct_defended"
+    ],
+
+    "test": [
+        "engcwb", "raw", "swcwb_instruct", "swcwb_instruct_sanitized" 
     ]
 }
 
