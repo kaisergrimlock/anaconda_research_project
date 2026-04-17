@@ -59,15 +59,22 @@ PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
-LANG = "zhcwb_instruct"          # "raw", "vi", "enclosed", ...
+# ===== MULTI-LANGUAGE SUPPORT =====
+LANGS = [
+    "zhcwb_instruct",
+    "vicwb_instruct_sanitized",
+    "engcwb_instruct_sanitized",
+    "swcwb_instruct_sanitized"
+]
+
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
-MODE = "replace"           # "append" or "replace"
+TREC_DL_YEAR = "2022"
+MODE = "replace"  # "append" or "replace"
 
 # Models
-#MODELS = ["openai.gpt-oss-20b-1:0"]
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+# MODELS = ["openai.gpt-oss-20b-1:0"]
+# MODELS = ["meta.llama3-8b-instruct-v1:0"]
 MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -77,19 +84,12 @@ OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
 LOG_ROOT_DIR = Path("logs")
 
 # ===== Concurrency knobs =====
-# Part-level concurrency is handled by asyncio semaphore in run_for_model().
-# Row-level concurrency here speeds up Bedrock calls massively.
 if MODELS[0].startswith("meta.llama3"):
     ROW_CONCURRENCY = 2
 else:
     ROW_CONCURRENCY = 50
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
-# Input part files
-if LANG == "raw":
-    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
-else:
-    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
 bump_field_limit()  # Allow large fields to accommodate passages
@@ -98,13 +98,20 @@ bump_field_limit()  # Allow large fields to accommodate passages
 # =========================
 # Helpers
 # =========================
-def iter_part_files(start: int, end: int):
+def get_part_dir(lang: str) -> Path:
+    if lang == "raw":
+        return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
+    return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}/")
+
+
+def iter_part_files(lang: str, start: int, end: int):
+    part_dir = get_part_dir(lang)
     for n in range(start, end + 1):
-        p = PART_DIR / PART_PATTERN.format(n=n)
+        p = part_dir / PART_PATTERN.format(n=n)
         if p.exists():
             yield p
         else:
-            print(f"[WARN] Missing file: {p}")
+            print(f"[WARN] Missing file for lang={lang}: {p}")
 
 
 def read_rows_stream(path: Path):
@@ -165,7 +172,6 @@ def _resolve_pid(row: Dict[str, str]) -> str:
 
 
 def _append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
-    # Header already ensured by ensure_csv_with_header, but keep this safe.
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header)
@@ -183,6 +189,7 @@ def _label_single_part_file_blocking(
     run_id: str,
     per_file_out_dir: Path,
     logs_dir: Path,
+    lang: str,
     stop_event: Optional[asyncio.Event] = None,
 ) -> dict:
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
@@ -193,7 +200,7 @@ def _label_single_part_file_blocking(
 
     # Minimal required columns
     required_cols = ["query"]
-    required_cols.append("passage" if LANG == "raw" else "passage_injected")
+    required_cols.append("passage" if lang == "raw" else "passage_injected")
     missing = [c for c in required_cols if c not in header_in]
     if missing:
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
@@ -210,27 +217,24 @@ def _label_single_part_file_blocking(
     bedrock = make_bedrock_runtime_client(cfg)
 
     total_rows = count_data_rows(part_csv)
-    print(f"[{part_csv.name}] Loaded {total_rows} rows")
-    print(f"[HEADER] LANG='{LANG}' | output columns = {header_out}")
+    print(f"[{lang}] [{part_csv.name}] Loaded {total_rows} rows")
+    print(f"[HEADER] LANG='{lang}' | output columns = {header_out}")
     if ROW_CONCURRENCY > 1:
         print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
 
-    # Shared state (protected by lock)
+    # Shared state
     write_lock = Lock()
     total_in = 0
     total_out = 0
     logs: List[Dict[str, Any]] = []
 
-    # To keep CSV output deterministic by row order, we buffer completed row writes
-    # and flush them in order. This avoids race conditions and preserves the exact
-    # original line ordering, even with concurrency.
+    # Keep output row order deterministic
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
 
     row_queue: "Queue[Optional[Tuple[int, Dict[str, str]]]]" = Queue(maxsize=ROW_QUEUE_MAXSIZE)
 
     def flush_ready_locked():
-        """Write any completed rows that are ready in order."""
         nonlocal next_to_write, total_in, total_out
         while next_to_write in pending:
             row_values, log_obj, in_tok, out_tok = pending.pop(next_to_write)
@@ -242,7 +246,7 @@ def _label_single_part_file_blocking(
             total_out += out_tok
 
             print(
-                f"[{part_csv.name}] [{next_to_write}/{total_rows}] "
+                f"[{lang}] [{part_csv.name}] [{next_to_write}/{total_rows}] "
                 f"tokens in/out += {in_tok}/{out_tok} (totals {total_in}/{total_out})",
                 end="\r",
                 flush=True,
@@ -262,7 +266,6 @@ def _label_single_part_file_blocking(
                 row_queue.task_done()
                 continue
 
-            # Map of all input columns
             row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
 
             pr = _resolve_pid(row_out_map)
@@ -270,25 +273,15 @@ def _label_single_part_file_blocking(
                 row_out_map["pid_resolved"] = pr
 
             q_for_prompt = (row_out_map.get("query", "") or "").strip()
-            p_for_prompt = pick_passage_for_lang(row_out_map, LANG)
+            p_for_prompt = pick_passage_for_lang(row_out_map, lang)
 
             if not q_for_prompt or not p_for_prompt:
-                # Match prior behavior: hard fail (but do it safely with a clear message)
                 msg = (
                     f"[FATAL] {part_csv.name}: missing required prompt fields at row {idx} "
                     f"(query={'OK' if q_for_prompt else 'MISSING'}, "
                     f"passage={'OK' if p_for_prompt else 'MISSING'})"
                 )
                 print(msg)
-                # Signal stop to other workers; main thread will exit after join.
-                if stop_event is not None:
-                    try:
-                        # stop_event is an asyncio.Event; it is thread-safe for set() usage? Not guaranteed.
-                        # So we just print and proceed; the run will likely be aborted by sys.exit below in flush stage.
-                        pass
-                    except Exception:
-                        pass
-                # Store an empty score and continue; keeps output row count stable.
                 score = ""
                 text = ""
                 reasoning = ""
@@ -318,7 +311,6 @@ def _label_single_part_file_blocking(
                         f"pid_resolved={pr} :: {api_err}"
                     )
 
-            # Build output row
             row_values = [row_out_map.get(col, "") for col in header_in]
             if "llm_relevance" in header_in:
                 old_score = row_out_map.get("llm_relevance", "")
@@ -329,22 +321,22 @@ def _label_single_part_file_blocking(
             else:
                 row_values.append(score)
 
-            # Build log entry (match your existing fields)
             log_obj = {
                 "qid": (row_out_map.get("qid", "") or "").strip(),
                 "pid_qrels": (row_out_map.get("pid_qrels", "") or "").strip(),
                 "pid_resolved": pr,
-                "prompt": (prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
-                           if q_for_prompt and p_for_prompt else ""),
+                "prompt": (
+                    prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
+                    if q_for_prompt and p_for_prompt else ""
+                ),
                 "response_text": text,
                 "reasoning": reasoning,
                 "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-                "passage_prompt_used": "passage_injected" if LANG != "raw" else "passage",
+                "passage_prompt_used": "passage_injected" if lang != "raw" else "passage",
                 "query_prompt_used": "query",
                 "llm_relevance": score,
             }
 
-            # Save result; flush in order
             with write_lock:
                 pending[idx] = (row_values, log_obj, in_tok, out_tok)
                 flush_ready_locked()
@@ -371,7 +363,7 @@ def _label_single_part_file_blocking(
 
     row_queue.join()
 
-    # Final flush (in case some were pending)
+    # Final flush
     with write_lock:
         flush_ready_locked()
 
@@ -382,7 +374,7 @@ def _label_single_part_file_blocking(
 
     print()
     print(
-        f"[{part_csv.name}] Wrote labels: {labels_path.name} | "
+        f"[{lang}] [{part_csv.name}] Wrote labels: {labels_path.name} | "
         f"tokens in/out={total_in}/{total_out}"
     )
 
@@ -404,31 +396,31 @@ async def label_single_part_file(*args, **kwargs) -> dict:
 # =========================
 # Orchestrator
 # =========================
-async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
+async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.Event, mode: str):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
 
-    MODEL_OUT_DIR = OUTPUT_ROOT_DIR
-    MODEL_LOGS_DIR = LOG_ROOT_DIR / short
-    MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
-    MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    model_out_dir = OUTPUT_ROOT_DIR
+    model_logs_dir = LOG_ROOT_DIR / short
+    model_out_dir.mkdir(parents=True, exist_ok=True)
+    model_logs_dir.mkdir(parents=True, exist_ok=True)
 
-    part_files = list(iter_part_files(START_PART, END_PART))
+    part_files = list(iter_part_files(lang, START_PART, END_PART))
     if not part_files:
-        print("[INFO] No part files found in range.")
+        print(f"[INFO] No part files found in range for lang={lang}.")
         return
 
     run_id = timestamp_id()
     print(
         f"\n--- Running inference for model: {model_id} "
-        f"(run_id={run_id}, LANG={LANG}, mode={mode}) ---"
+        f"(run_id={run_id}, LANG={lang}, mode={mode}) ---"
     )
-    print("[STOP] Press 'Q' at any time to stop after the current in-flight items].")
+    print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
-    per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
+    per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{model_id.replace(':','_')}_{lang}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Part-level concurrency (keep yours)
+    # Part-level concurrency
     sem = asyncio.Semaphore(min(6, len(part_files)))
     results: List[Dict[str, Any]] = []
 
@@ -437,7 +429,14 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
             if stop_event.is_set():
                 return None
             return await label_single_part_file(
-                p, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
+                p,
+                model_id,
+                prompt_template,
+                run_id,
+                per_file_out_dir,
+                model_logs_dir,
+                lang,
+                stop_event,
             )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
@@ -454,13 +453,14 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
             results.append(r)
 
     if not results or stop_event.is_set():
-        print("[DONE] No outputs to merge.")
+        print(f"[DONE] No outputs to merge for lang={lang}.")
         return
 
     header_out_set = {tuple(r["header_out"]) for r in results}
     if len(header_out_set) != 1:
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
+
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
@@ -468,10 +468,10 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         per_file_labels=per_file_labels,
         header_out=header_out,
         model_short=short,
-        lang=LANG,
+        lang=lang,
         year=TREC_DL_YEAR,
         mode=mode,
-        out_dir=MODEL_OUT_DIR,
+        out_dir=model_out_dir,
     )
 
     total_in = sum(r["input_tokens"] for r in results)
@@ -485,11 +485,12 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 
     write_run_log_index(
         [{"part": r["part"], "log_json": r["log_json"]} for r in results],
-        MODEL_LOGS_DIR / f"{run_id}_llm_logs_index_{short}_{LANG}.json",
+        model_logs_dir / f"{run_id}_llm_logs_index_{short}_{lang}.json",
     )
 
+    # FIX: do not include "lang" here unless log_helpers.py header is also updated
     append_token_row(
-        MODEL_OUT_DIR / "token_usage.csv",
+        model_out_dir / "token_usage.csv",
         {
             "run_id": run_id,
             "timestamp": timestamp_iso(),
@@ -504,7 +505,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         },
     )
 
-    print(f"[DONE] Model: {model_id} | Rows: {num_rows} | Combined: {combined_path}")
+    print(f"[DONE] Model: {model_id} | Lang: {lang} | Rows: {num_rows} | Combined: {combined_path}")
     print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
     try:
@@ -522,7 +523,10 @@ async def main():
         for model_id in MODELS:
             if stop_event.is_set():
                 break
-            await run_for_model(model_id, stop_event, MODE)
+            for lang in LANGS:
+                if stop_event.is_set():
+                    break
+                await run_for_model_and_lang(model_id, lang, stop_event, MODE)
     finally:
         stop_event.set()
         try:

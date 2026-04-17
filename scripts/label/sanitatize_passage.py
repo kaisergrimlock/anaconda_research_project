@@ -55,12 +55,8 @@ SANITATION_PROMPT_FILE = Path("prompts/sanitize.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
-    "ga_instruct",
-    "ru_instruct",
-    "he_instruct",
-    "hi_instruct",
-    "fr_instruct",
-    "sw_instruct"
+    "zh_instruct",
+    "zhcwb_instruct"
 ]
 
 START_PART = 1
