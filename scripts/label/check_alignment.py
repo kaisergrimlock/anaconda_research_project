@@ -56,8 +56,10 @@ UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
-    "vi",
-    "vi_instruct"
+    "sw",
+    "ga",
+    "fr",
+    "ru"
 ]
 START_PART = 1
 END_PART = 6
@@ -65,9 +67,9 @@ TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
 
 # Models
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 #MODELS = ['openai.gpt-oss-20b-1:0']
-MODELS = ['meta.llama3-8b-instruct-v1:0']
+#MODELS = ['meta.llama3-8b-instruct-v1:0']
 INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.6, "topP": 1.0}
 
 # ===== Concurrency knobs =====
