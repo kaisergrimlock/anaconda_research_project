@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 # ===== choose settings here =====
 MODEL = "gpt-oss-20b"
-PROFILE = "eng"   # example: "eng", "vi", "cwb_instruct"
-YEAR = "2021"
+PROFILE = "default"
+YEAR = "2022"
 
 # ===== import lang_profiles =====
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,11 +32,11 @@ def extract_lang(filename):
     return match.group(1) if match else None
 
 
-def add_bar_labels(ax, bars, values, fmt="{:.2f}", min_width=0):
+def add_bar_labels(ax, bars, values, fmt="{:.2f}", min_value=0):
+    x_max = ax.get_xlim()[1]
     for bar, value in zip(bars, values):
-        width = bar.get_width()
-        if width > min_width:
-            x = bar.get_width() + 0.02 * ax.get_xlim()[1]
+        if value > min_value:
+            x = bar.get_width() + 0.01 * x_max
             y = bar.get_y() + bar.get_height() / 2
             ax.text(x, y, fmt.format(value), va="center", fontsize=8)
 
@@ -54,27 +54,22 @@ def main():
     df["year"] = df["filename"].apply(extract_year)
     df["lang"] = df["filename"].apply(extract_lang)
 
-    # Filter by model and year first
+    # Filter by model and year
     df = df[df["model"] == MODEL].copy()
     df = df[df["year"] == YEAR].copy()
 
-    if df.empty:
-        print(f"No rows found for model='{MODEL}', year='{YEAR}'")
-        return
-
-    # Filter by profile
+    # Filter by profile from lang_profiles
     valid_langs = get_langs(PROFILE)
     df = df[df["lang"].isin(valid_langs)].copy()
-
-    if PROFILE == "cwb_instruct":
-        df = df[df["lang"].str.endswith("cwb_instruct")].copy()
 
     if df.empty:
         print(f"No rows found for model='{MODEL}', profile='{PROFILE}', year='{YEAR}'")
         return
 
-    # Metrics
+    # Calculate average alignment score per valid scored row
     df["avg_alignment_score"] = df["total_alignment_score"] / df["valid_score_rows"]
+
+    # Optional: score coverage percentage
     df["coverage_pct"] = df["valid_score_rows"] / df["total_rows"] * 100
 
     df["label"] = df["lang"]
@@ -85,11 +80,11 @@ def main():
 
     bars = ax.barh(df["label"], df["avg_alignment_score"])
 
-    add_bar_labels(ax, bars, df["avg_alignment_score"], fmt="{:.2f}")
-
     ax.set_xlabel("Average Alignment Score")
     ax.set_ylabel("Language")
     ax.set_title(f"Average Alignment Score - {MODEL} - {PROFILE} - {YEAR}")
+
+    add_bar_labels(ax, bars, df["avg_alignment_score"], fmt="{:.2f}")
 
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)

@@ -54,32 +54,33 @@ cfg = Config(
 )
 
 PROMPT_TYPE = "label"
-PROMPT_NAME = "utility"
+PROMPT_NAME = "utility_mr"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
-    "eng_instruct_sanitized",
-    "ru_instruct_sanitized",
-    "sw_instruct_sanitized",
-    "vi_instruct_sanitized"
+    "eng_instruct",
+    "vi_instruct",
+    "sw_instruct",
+    "hi_instruct",
 ]
+
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-# MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 # MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}_mr/{short}/")
 LOG_ROOT_DIR = Path("logs")
 
 # ===== Concurrency knobs =====
@@ -197,6 +198,7 @@ def _label_single_part_file_blocking(
 
     header_in = _inspect_header(part_csv)
 
+    # Minimal required columns
     required_cols = ["query"]
     required_cols.append("passage" if lang == "raw" else "passage_injected")
     missing = [c for c in required_cols if c not in header_in]
@@ -204,6 +206,7 @@ def _label_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
+    # Output header
     header_out = header_in if "llm_relevance" in header_in else header_in + ["llm_relevance"]
     if "llm_relevance" in header_in:
         print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
@@ -219,11 +222,13 @@ def _label_single_part_file_blocking(
     if ROW_CONCURRENCY > 1:
         print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
 
+    # Shared state
     write_lock = Lock()
     total_in = 0
     total_out = 0
     logs: List[Dict[str, Any]] = []
 
+    # Keep output row order deterministic
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
 
@@ -338,26 +343,31 @@ def _label_single_part_file_blocking(
 
             row_queue.task_done()
 
+    # Start workers
     workers: List[threading.Thread] = []
     for _ in range(max(1, ROW_CONCURRENCY)):
         t = threading.Thread(target=worker, daemon=True)
         t.start()
         workers.append(t)
 
+    # Feed queue
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}")
             break
         row_queue.put((idx, row))
 
+    # Shutdown
     for _ in workers:
         row_queue.put(None)
 
     row_queue.join()
 
+    # Final flush
     with write_lock:
         flush_ready_locked()
 
+    # per-file json log
     per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
@@ -410,6 +420,7 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{model_id.replace(':','_')}_{lang}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Part-level concurrency
     sem = asyncio.Semaphore(min(6, len(part_files)))
     results: List[Dict[str, Any]] = []
 
@@ -449,6 +460,7 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     if len(header_out_set) != 1:
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
+
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
@@ -476,13 +488,13 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         model_logs_dir / f"{run_id}_llm_logs_index_{short}_{lang}.json",
     )
 
+    # FIX: do not include "lang" here unless log_helpers.py header is also updated
     append_token_row(
         model_out_dir / "token_usage.csv",
         {
             "run_id": run_id,
             "timestamp": timestamp_iso(),
             "model": model_id,
-            "lang": lang,
             "num_examples": num_rows,
             "input_tokens": total_in,
             "output_tokens": total_out,
