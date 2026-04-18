@@ -52,14 +52,14 @@ cfg = Config(
 )
 
 ALIGNMENT_CHECKER_PROMPT_FILE = Path("prompts/alignment_checker_2.txt")
-UTILITY_PROMPT_FILE = Path("prompts/label/utility.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
     "sw",
     "ga",
     "fr",
-    "ru"
+    "ru",
+    "vi",
 ]
 START_PART = 1
 END_PART = 6
@@ -67,10 +67,10 @@ TREC_DL_YEAR = "2022"
 MODE = "replace"       # "append" or "replace"
 
 # Models
-MODELS = ["qwen.qwen3-32b-v1:0"]
-#MODELS = ['openai.gpt-oss-20b-1:0']
-#MODELS = ['meta.llama3-8b-instruct-v1:0']
-INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.6, "topP": 1.0}
+# MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
+# MODELS = ["meta.llama3-8b-instruct-v1:0"]
+INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.6, "topP": 1.0}
 
 # ===== Concurrency knobs =====
 if MODELS[0].startswith("meta.llama3"):
@@ -219,7 +219,6 @@ def _label_single_part_file_blocking(
     part_csv: Path,
     model_id: str,
     alignment_checker_template: str,
-    utility_template: str,
     extracted_task_str: str,
     lang: str,
     run_id: str,
@@ -234,11 +233,10 @@ def _label_single_part_file_blocking(
     header_in = _inspect_header(part_csv)
 
     # ===== Minimal required columns =====
-    required_cols = ["query"]
     if lang == "raw":
-        required_cols.append("passage")
+        required_cols = ["passage"]
     else:
-        required_cols.append("passage_injected")
+        required_cols = ["passage_injected"]
 
     missing = [c for c in required_cols if c not in header_in]
     if missing:
@@ -322,21 +320,18 @@ def _label_single_part_file_blocking(
                 if pr and "pid_resolved" in header_in:
                     row_out_map["pid_resolved"] = pr
 
-            q_for_prompt = (row_out_map.get("query", "") or "").strip()
             p_for_prompt = pick_passage_for_lang(row_out_map, lang)
 
-            if not q_for_prompt or not p_for_prompt:
-                print(f"[FATAL] {part_csv.name}: missing prompt fields at row {idx}.")
+            if not p_for_prompt:
+                print(f"[FATAL] {part_csv.name}: missing passage at row {idx}.")
                 score, text, reasoning = "", "", ""
                 in_tok = out_tok = 0
                 prompt = ""
             else:
-                prompt_with_query_and_passage = utility_template.format(
-                    query=q_for_prompt, passage=p_for_prompt
-                )
-                prompt_content = f"{prompt_with_query_and_passage}\n\nPassage:\n{p_for_prompt}"
+                # Passage-only prompt
                 prompt = alignment_checker_template.format(
-                    extracted_task=extracted_task_str, prompt=prompt_content
+                    extracted_task=extracted_task_str,
+                    prompt=p_for_prompt
                 )
 
                 print_prompt_debug(
@@ -363,7 +358,6 @@ def _label_single_part_file_blocking(
                     text = result.text or ""
                     reasoning = result.reasoning or ""
 
-                    # New robust extraction logic
                     score = extract_alignment_score(text)
 
                     in_tok = int(result.input_tokens or 0)
@@ -444,12 +438,11 @@ async def label_single_part_file(*args, **kwargs) -> dict:
 
 async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mode: str):
     alignment_checker_template = ALIGNMENT_CHECKER_PROMPT_FILE.read_text(encoding="utf-8")
-    utility_template = UTILITY_PROMPT_FILE.read_text(encoding="utf-8")
 
     short = model_short_name(model_id)
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
     task_file = Path(f"outputs/task_extraction/extracted_tasks_{safe_model}.json")
-    
+
     extracted_task_str = ""
     if task_file.exists():
         with open(task_file, "r", encoding="utf-8") as f:
@@ -498,7 +491,6 @@ async def run_for_model(model_id: str, lang: str, stop_event: asyncio.Event, mod
                 p,
                 model_id,
                 alignment_checker_template,
-                utility_template,
                 extracted_task_str,
                 lang,
                 run_id,

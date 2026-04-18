@@ -55,17 +55,20 @@ SANITATION_PROMPT_FILE = Path("prompts/sanitize.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 LANGUAGES = [
+    "hi_instruct",
+    "sw_instruct",
+    "ga_instruct",
+    "he_instruct",
     "zh_instruct",
-    "zhcwb_instruct"
 ]
 
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
-#MODELS = ["qwen.qwen3-32b-v1:0"]
-MODELS = ['openai.gpt-oss-20b-1:0']
+MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ['openai.gpt-oss-20b-1:0']
 #MODELS = ['meta.llama3-8b-instruct-v1:0']
 INFERENCE_CONFIG = {"maxTokens": 1000, "temperature": 0.6, "topP": 1.0}
 
