@@ -63,11 +63,14 @@ FINAL_OUTPUT_SUFFIX = "_reminded"
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
     "eng_instruct",
+    "eng",
+    "vi_instruct",
+    "vi"
 ]
 
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"  # "append" or "replace"
 
 # Models
