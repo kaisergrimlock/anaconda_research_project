@@ -56,13 +56,13 @@ PROMPT_TYPE = "label"
 PROMPT_NAME = "utility_reminded"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
+
 ALLOW_BLANK_OVERWRITE = True
+FINAL_OUTPUT_SUFFIX = "_reminded"
 
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
     "eng_instruct",
-    "vi",
-    "vi_instruct"
 ]
 
 START_PART = 1
@@ -74,6 +74,7 @@ MODE = "replace"  # "append" or "replace"
 MODELS = ["openai.gpt-oss-20b-1:0"]
 # MODELS = ["meta.llama3-8b-instruct-v1:0"]
 # MODELS = ["qwen.qwen3-32b-v1:0"]
+
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
@@ -86,6 +87,7 @@ if MODELS[0].startswith("meta.llama3"):
     ROW_CONCURRENCY = 2
 else:
     ROW_CONCURRENCY = 50
+
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
@@ -127,7 +129,10 @@ def count_data_rows(path: Path) -> int:
         return max(0, sum(1 for _ in f) - 1)
 
 
-def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio.Event) -> threading.Thread:
+def start_stop_key_listener(
+    loop: asyncio.AbstractEventLoop,
+    stop_event: asyncio.Event,
+) -> threading.Thread:
     def _listen():
         try:
             import msvcrt
@@ -145,8 +150,10 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
                     line = sys.stdin.readline()
                 except Exception:
                     break
+
                 if not line:
                     break
+
                 if line.strip().lower() == "q":
                     loop.call_soon_threadsafe(stop_event.set)
                     break
@@ -160,6 +167,7 @@ def _resolve_pid(row: Dict[str, str]) -> str:
     pr = (row.get("pid_resolved", "") or "").strip()
     if pr:
         return pr
+
     return (
         row.get("docid", "")
         or row.get("pid", "")
@@ -173,6 +181,7 @@ def _append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
     if not path.exists():
         with path.open("w", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(header)
+
     with path.open("a", encoding="utf-8", newline="") as f:
         csv.writer(f).writerow(new_row)
 
@@ -191,6 +200,7 @@ def _label_single_part_file_blocking(
     stop_event: Optional[asyncio.Event] = None,
 ) -> dict:
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
+
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
 
@@ -198,25 +208,28 @@ def _label_single_part_file_blocking(
 
     required_cols = ["query"]
     required_cols.append("passage" if lang == "raw" else "passage_injected")
+
     missing = [c for c in required_cols if c not in header_in]
     if missing:
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
     header_out = header_in if "llm_relevance" in header_in else header_in + ["llm_relevance"]
+
     if "llm_relevance" in header_in:
         print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
 
-    # Temporary per-part files are still normal labels.
-    # Only the final combined file uses eng_reminded.
-    labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
+    # Temporary per-part files can include the suffix for clarity.
+    labels_path = per_file_out_dir / f"{part_csv.stem}{FINAL_OUTPUT_SUFFIX}_labels_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
     bedrock = make_bedrock_runtime_client(cfg)
 
     total_rows = count_data_rows(part_csv)
+
     print(f"[{lang}] [{part_csv.name}] Loaded {total_rows} rows")
     print(f"[HEADER] LANG='{lang}' | output columns = {header_out}")
+
     if ROW_CONCURRENCY > 1:
         print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
 
@@ -228,10 +241,13 @@ def _label_single_part_file_blocking(
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
 
-    row_queue: "Queue[Optional[Tuple[int, Dict[str, str]]]]" = Queue(maxsize=ROW_QUEUE_MAXSIZE)
+    row_queue: "Queue[Optional[Tuple[int, Dict[str, str]]]]" = Queue(
+        maxsize=ROW_QUEUE_MAXSIZE
+    )
 
     def flush_ready_locked():
         nonlocal next_to_write, total_in, total_out
+
         while next_to_write in pending:
             row_values, log_obj, in_tok, out_tok = pending.pop(next_to_write)
 
@@ -243,15 +259,18 @@ def _label_single_part_file_blocking(
 
             print(
                 f"[{lang}] [{part_csv.name}] [{next_to_write}/{total_rows}] "
-                f"tokens in/out += {in_tok}/{out_tok} (totals {total_in}/{total_out})",
+                f"tokens in/out += {in_tok}/{out_tok} "
+                f"(totals {total_in}/{total_out})",
                 end="\r",
                 flush=True,
             )
+
             next_to_write += 1
 
     def worker():
         while True:
             item = row_queue.get()
+
             if item is None:
                 row_queue.task_done()
                 break
@@ -262,14 +281,24 @@ def _label_single_part_file_blocking(
                 row_queue.task_done()
                 continue
 
-            row_out_map: Dict[str, str] = {k: (row.get(k, "") or "") for k in header_in}
+            row_out_map: Dict[str, str] = {
+                k: (row.get(k, "") or "") for k in header_in
+            }
 
             pr = _resolve_pid(row_out_map)
+
             if pr and "pid_resolved" in header_in and not row_out_map.get("pid_resolved"):
                 row_out_map["pid_resolved"] = pr
 
             q_for_prompt = (row_out_map.get("query", "") or "").strip()
             p_for_prompt = pick_passage_for_lang(row_out_map, lang)
+
+            prompt = ""
+            text = ""
+            reasoning = ""
+            score = ""
+            in_tok = 0
+            out_tok = 0
 
             if not q_for_prompt or not p_for_prompt:
                 print(
@@ -277,17 +306,12 @@ def _label_single_part_file_blocking(
                     f"(query={'OK' if q_for_prompt else 'MISSING'}, "
                     f"passage={'OK' if p_for_prompt else 'MISSING'})"
                 )
-                score = ""
-                text = ""
-                reasoning = ""
-                in_tok = out_tok = 0
             else:
-                prompt = prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
+                prompt = prompt_template.format(
+                    query=q_for_prompt,
+                    passage=p_for_prompt,
+                )
 
-                text = ""
-                reasoning = ""
-                score = ""
-                in_tok = out_tok = 0
                 try:
                     result = converse_prompt(
                         bedrock,
@@ -295,11 +319,13 @@ def _label_single_part_file_blocking(
                         prompt=prompt,
                         inference_config=INFERENCE_CONFIG,
                     )
+
                     text = result.text or ""
                     reasoning = result.reasoning or ""
                     score = result.score or ""
                     in_tok = int(result.input_tokens or 0)
                     out_tok = int(result.output_tokens or 0)
+
                 except Exception as api_err:
                     print(
                         f"[ERROR] {part_csv.name}: API failed on row {idx}, "
@@ -307,12 +333,15 @@ def _label_single_part_file_blocking(
                     )
 
             row_values = [row_out_map.get(col, "") for col in header_in]
+
             if "llm_relevance" in header_in:
+                llm_idx = header_in.index("llm_relevance")
                 old_score = row_out_map.get("llm_relevance", "")
+
                 if ALLOW_BLANK_OVERWRITE:
-                    row_values[-1] = score
+                    row_values[llm_idx] = score
                 else:
-                    row_values[-1] = score if str(score).strip() != "" else old_score
+                    row_values[llm_idx] = score if str(score).strip() != "" else old_score
             else:
                 row_values.append(score)
 
@@ -320,13 +349,15 @@ def _label_single_part_file_blocking(
                 "qid": (row_out_map.get("qid", "") or "").strip(),
                 "pid_qrels": (row_out_map.get("pid_qrels", "") or "").strip(),
                 "pid_resolved": pr,
-                "prompt": (
-                    prompt_template.format(query=q_for_prompt, passage=p_for_prompt)
-                    if q_for_prompt and p_for_prompt else ""
-                ),
+                "input_lang": lang,
+                "output_suffix": FINAL_OUTPUT_SUFFIX,
+                "prompt": prompt,
                 "response_text": text,
                 "reasoning": reasoning,
-                "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
+                "usage": {
+                    "inputTokens": in_tok,
+                    "outputTokens": out_tok,
+                },
                 "passage_prompt_used": "passage_injected" if lang != "raw" else "passage",
                 "query_prompt_used": "query",
                 "llm_relevance": score,
@@ -339,6 +370,7 @@ def _label_single_part_file_blocking(
             row_queue.task_done()
 
     workers: List[threading.Thread] = []
+
     for _ in range(max(1, ROW_CONCURRENCY)):
         t = threading.Thread(target=worker, daemon=True)
         t.start()
@@ -348,6 +380,7 @@ def _label_single_part_file_blocking(
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}")
             break
+
         row_queue.put((idx, row))
 
     for _ in workers:
@@ -358,7 +391,11 @@ def _label_single_part_file_blocking(
     with write_lock:
         flush_ready_locked()
 
-    per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
+    per_file_log = (
+        logs_dir
+        / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}{FINAL_OUTPUT_SUFFIX}.json"
+    )
+
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
@@ -386,22 +423,35 @@ async def label_single_part_file(*args, **kwargs) -> dict:
 # =========================
 # Orchestrator
 # =========================
-async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.Event, mode: str):
+async def run_for_model_and_lang(
+    model_id: str,
+    lang: str,
+    stop_event: asyncio.Event,
+    mode: str,
+):
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
     short = model_short_name(model_id)
 
     model_out_dir = OUTPUT_ROOT_DIR
     model_logs_dir = LOG_ROOT_DIR / short
+
     model_out_dir.mkdir(parents=True, exist_ok=True)
     model_logs_dir.mkdir(parents=True, exist_ok=True)
 
     part_files = list(iter_part_files(lang, START_PART, END_PART))
+
     if not part_files:
         print(f"[INFO] No part files found in range for lang={lang}.")
         return
 
     run_id = timestamp_id()
-    output_lang = f"{lang}_reminded"
+
+    # IMPORTANT:
+    # Preserve the full input language string, then append the suffix.
+    # Example:
+    #   eng          -> eng_reminded
+    #   eng_instruct -> eng_instruct_reminded
+    output_lang = f"{lang}{FINAL_OUTPUT_SUFFIX}"
 
     print(
         f"\n--- Running inference for model: {model_id} "
@@ -409,7 +459,10 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     )
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
-    per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{model_id.replace(':', '_')}_{lang}"
+    per_file_out_dir = (
+        model_out_dir
+        / f"_tmp_{run_id}_{model_id.replace(':', '_')}_{output_lang}"
+    )
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
     sem = asyncio.Semaphore(min(6, len(part_files)))
@@ -419,6 +472,7 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         async with sem:
             if stop_event.is_set():
                 return None
+
             return await label_single_part_file(
                 p,
                 model_id,
@@ -431,15 +485,19 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
             )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
+
     for task in asyncio.as_completed(tasks):
         if stop_event.is_set():
             for t in tasks:
                 if not t.done():
                     t.cancel()
+
             await asyncio.gather(*tasks, return_exceptions=True)
             print("[STOP] Cancelled remaining files.")
             break
+
         r = await task
+
         if r:
             results.append(r)
 
@@ -448,6 +506,7 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         return
 
     header_out_set = {tuple(r["header_out"]) for r in results}
+
     if len(header_out_set) != 1:
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
@@ -455,10 +514,8 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
-    # Critical fix:
-    # Pass output_lang into write_combined_dynamic directly.
-    # This makes it create *_eng_reminded_labels.csv directly.
-    # There is no rename(), copy2(), or with_name() after this.
+    # Same pattern as defended:
+    # pass the final output language name directly into write_combined_dynamic.
     combined_path = write_combined_dynamic(
         per_file_labels=per_file_labels,
         header_out=header_out,
@@ -515,17 +572,23 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
 async def main():
     loop = asyncio.get_running_loop()
     stop_event = asyncio.Event()
+
     listener_thread = start_stop_key_listener(loop, stop_event)
+
     try:
         for model_id in MODELS:
             if stop_event.is_set():
                 break
+
             for lang in LANGS:
                 if stop_event.is_set():
                     break
+
                 await run_for_model_and_lang(model_id, lang, stop_event, MODE)
+
     finally:
         stop_event.set()
+
         try:
             listener_thread.join(timeout=0.2)
         except Exception:
