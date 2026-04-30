@@ -60,14 +60,9 @@ ALLOW_BLANK_OVERWRITE = True
 
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
-    "eng",
-    "ru",
+    "eng_instruct",
     "vi",
-    "hi",
-    "th",
-    "he",
-    "sw",
-    "ga"
+    "vi_instruct"
 ]
 
 START_PART = 1
