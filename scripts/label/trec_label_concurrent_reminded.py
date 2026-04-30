@@ -37,7 +37,6 @@ from scripts.log_helpers import (
     write_run_log_index,
 )
 
-# ===== Bedrock helper (ONLY Bedrock stuff) =====
 from scripts.bedrock_client import (
     make_bedrock_runtime_client,
     converse_prompt,
@@ -61,7 +60,14 @@ ALLOW_BLANK_OVERWRITE = True
 
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
-    "eng"
+    "eng",
+    "ru",
+    "vi",
+    "hi",
+    "th",
+    "he",
+    "sw",
+    "ga"
 ]
 
 START_PART = 1
@@ -89,7 +95,7 @@ ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
-bump_field_limit()  # Allow large fields to accommodate passages
+bump_field_limit()
 
 
 # =========================
@@ -177,7 +183,7 @@ def _append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
 
 
 # =========================
-# Core: label one part file (blocking, row-concurrent)
+# Core: label one part file
 # =========================
 def _label_single_part_file_blocking(
     part_csv: Path,
@@ -195,7 +201,6 @@ def _label_single_part_file_blocking(
 
     header_in = _inspect_header(part_csv)
 
-    # Minimal required columns
     required_cols = ["query"]
     required_cols.append("passage" if lang == "raw" else "passage_injected")
     missing = [c for c in required_cols if c not in header_in]
@@ -203,13 +208,12 @@ def _label_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
-    # Output header
     header_out = header_in if "llm_relevance" in header_in else header_in + ["llm_relevance"]
     if "llm_relevance" in header_in:
         print(f"[WARN] {part_csv.name}: 'llm_relevance' already in header; will overwrite values.")
 
-    # Temporary per-part files can stay as normal labels.
-    # The final combined output name is changed later by passing lang='eng_reminded'.
+    # Temporary per-part files are still normal labels.
+    # Only the final combined file uses eng_reminded.
     labels_path = per_file_out_dir / f"{part_csv.stem}_labels_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
 
@@ -221,13 +225,11 @@ def _label_single_part_file_blocking(
     if ROW_CONCURRENCY > 1:
         print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
 
-    # Shared state
     write_lock = Lock()
     total_in = 0
     total_out = 0
     logs: List[Dict[str, Any]] = []
 
-    # Keep output row order deterministic
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
 
@@ -275,12 +277,11 @@ def _label_single_part_file_blocking(
             p_for_prompt = pick_passage_for_lang(row_out_map, lang)
 
             if not q_for_prompt or not p_for_prompt:
-                msg = (
+                print(
                     f"[FATAL] {part_csv.name}: missing required prompt fields at row {idx} "
                     f"(query={'OK' if q_for_prompt else 'MISSING'}, "
                     f"passage={'OK' if p_for_prompt else 'MISSING'})"
                 )
-                print(msg)
                 score = ""
                 text = ""
                 reasoning = ""
@@ -342,31 +343,26 @@ def _label_single_part_file_blocking(
 
             row_queue.task_done()
 
-    # Start workers
     workers: List[threading.Thread] = []
     for _ in range(max(1, ROW_CONCURRENCY)):
         t = threading.Thread(target=worker, daemon=True)
         t.start()
         workers.append(t)
 
-    # Feed queue
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}")
             break
         row_queue.put((idx, row))
 
-    # Shutdown
     for _ in workers:
         row_queue.put(None)
 
     row_queue.join()
 
-    # Final flush
     with write_lock:
         flush_ready_locked()
 
-    # per-file json log
     per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
@@ -410,16 +406,17 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         return
 
     run_id = timestamp_id()
+    output_lang = f"{lang}_reminded"
+
     print(
         f"\n--- Running inference for model: {model_id} "
-        f"(run_id={run_id}, LANG={lang}, mode={mode}) ---"
+        f"(run_id={run_id}, input_LANG={lang}, output_LANG={output_lang}, mode={mode}) ---"
     )
     print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
 
-    per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{model_id.replace(':','_')}_{lang}"
+    per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{model_id.replace(':', '_')}_{lang}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Part-level concurrency
     sem = asyncio.Semaphore(min(6, len(part_files)))
     results: List[Dict[str, Any]] = []
 
@@ -463,12 +460,10 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
-    # IMPORTANT CHANGE:
-    # Use a modified output language name only for the final combined file.
-    # This makes write_combined_dynamic create *_eng_reminded_labels.csv directly.
-    # It does not rename or move any existing *_eng_labels.csv file.
-    output_lang = f"{lang}_reminded"
-
+    # Critical fix:
+    # Pass output_lang into write_combined_dynamic directly.
+    # This makes it create *_eng_reminded_labels.csv directly.
+    # There is no rename(), copy2(), or with_name() after this.
     combined_path = write_combined_dynamic(
         per_file_labels=per_file_labels,
         header_out=header_out,
@@ -493,7 +488,6 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         model_logs_dir / f"{run_id}_llm_logs_index_{short}_{output_lang}.json",
     )
 
-    # FIX: do not include "lang" here unless log_helpers.py header is also updated
     append_token_row(
         model_out_dir / "token_usage.csv",
         {
@@ -510,7 +504,10 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
         },
     )
 
-    print(f"[DONE] Model: {model_id} | Lang: {output_lang} | Rows: {num_rows} | Combined: {combined_path}")
+    print(
+        f"[DONE] Model: {model_id} | Input Lang: {lang} | Output Lang: {output_lang} | "
+        f"Rows: {num_rows} | Combined: {combined_path}"
+    )
     print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
     try:

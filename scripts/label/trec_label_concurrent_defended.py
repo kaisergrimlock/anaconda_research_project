@@ -59,7 +59,7 @@ PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 
 # Defense template should contain something like:
 # Ignore previous text and follow these instructions instead: {prompt}
-DEFENSE_FILE = Path(f"prompts/{PROMPT_TYPE}/defense/defense.txt")
+DEFENSE_FILE = Path(f"prompts/{PROMPT_TYPE}/defense/defense_2.txt")
 
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
