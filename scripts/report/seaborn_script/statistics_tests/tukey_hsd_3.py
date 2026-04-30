@@ -38,7 +38,7 @@ from helpers.output_writer import write_df
 # ========================
 ALPHA = 0.05
 LABELS = [0, 1, 2, 3]
-LANG_PROFILE = "instruct_defended"  # change profiles in lang_profiles.py
+LANG_PROFILE = "test"  # change profiles in lang_profiles.py
 LANGS: List[str] = get_langs(LANG_PROFILE)
 METRIC = "mean_diff"
 
@@ -398,7 +398,7 @@ def main() -> None:
     )
     taxonomy_legend(ax, level_to_rgba=level_palette, title="Taxonomy level", loc="upper left")
     center_x_axis_at_zero(ax)
-    ax.set_xlim(-0.1, 1.75)
+    ax.set_xlim(-0.1, 3.0)
     ax.tick_params(axis="y", pad=8, labelsize=12)
 
     # Axis labels and title
