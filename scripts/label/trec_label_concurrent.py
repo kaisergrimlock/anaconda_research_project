@@ -54,14 +54,20 @@ cfg = Config(
 )
 
 PROMPT_TYPE = "label"
-PROMPT_NAME = "utility_reminded"
+PROMPT_NAME = "utility"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
 # ===== MULTI-LANGUAGE SUPPORT =====
+# LANGS = [
+#         "eng_distraction", "ar_distraction", "vi_distraction", "th_distraction", "fr_distraction",
+#         "ru_distraction", "he_distraction", "sw_distraction", "ga_distraction", "hi_distraction",
+#         "zh_distraction"
+# ]
+
 LANGS = [
-    "eng"
+    "eng_var", "ar_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var", "ga_var", "hi_var", "zh_var",
 ]
 
 START_PART = 1
@@ -70,8 +76,8 @@ TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
-# MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["meta.llama3-8b-instruct-v1:0"]
 # MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
@@ -467,7 +473,7 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     # Use a modified output language name only for the final combined file.
     # This makes write_combined_dynamic create *_eng_reminded_labels.csv directly.
     # It does not rename or move any existing *_eng_labels.csv file.
-    output_lang = f"{lang}_reminded"
+    output_lang = f"{lang}"
 
     combined_path = write_combined_dynamic(
         per_file_labels=per_file_labels,

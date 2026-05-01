@@ -58,7 +58,9 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 TREC_DL_YEAR = "2021"
 
-LANGS = ["vi_var", "th_var", "sw_var", "ga_var", "zh_var", "fr_var", "hi_var", "he_var", "ar_var", "ru_var", "eng_var"]
+LANGS = [
+    "zh_var",
+]
 
 START_PART = 1
 END_PART = 6

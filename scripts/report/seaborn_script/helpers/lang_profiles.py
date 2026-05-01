@@ -86,6 +86,16 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "ru_distraction", "he_distraction", "sw_distraction", "ga_distraction", "hi_distraction",
         "zh_distraction"
     ],
+    
+    "variation":[
+        "raw", "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+        "eng_var", "ar_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var", "ga_var", "hi_var", "zh_var",
+    ],
+    
+    "var_rem": [
+        "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
+        "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
+    ]
 }
 
 def get_langs(profile: str) -> List[str]:
