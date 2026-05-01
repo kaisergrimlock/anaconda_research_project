@@ -58,10 +58,10 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 TREC_DL_YEAR = "2021"
 
-LANGS = ["eng", "raw", "vi", "vi_word", "ga", "ga_word"]
-
+#LANGS = ["eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga", "raw"]
+LANGS = ["eng"]
 START_PART = 1
-END_PART = 6
+END_PART = 1
 
 ROWS_PER_OUTPUT_PART = 500
 OUTPUT_PART_START = 1
@@ -105,7 +105,7 @@ def get_part_dir(lang: str) -> Path:
 
 
 def get_output_dir(lang: str) -> Path:
-    return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}_qp_rem")
+    return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}_instruct_rem")
 
 
 def get_query_lang_col(lang: str) -> str:
