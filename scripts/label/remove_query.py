@@ -63,9 +63,13 @@ LANGS = ["eng", "raw", "vi", "vi_word", "ga", "ga_word"]
 START_PART = 1
 END_PART = 6
 
-#MODELS = ["meta.llama3-8b-instruct-v1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
-MODELS = ['openai.gpt-oss-20b-1:0']
+ROWS_PER_OUTPUT_PART = 500
+OUTPUT_PART_START = 1
+OUTPUT_PART_END = 6
+
+# MODELS = ["meta.llama3-8b-instruct-v1:0"]
+# MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 
 INFERENCE_CONFIG = {
     "maxTokens": 2000,
@@ -73,11 +77,10 @@ INFERENCE_CONFIG = {
     "topP": 1.0,
 }
 
-OUTPUT_COL = "passage_removed_query"
+OUTPUT_COL = "passage_removed"
 
 short = model_short_name(MODELS[0])
 
-OUTPUT_ROOT_DIR = Path(f"retrieved/removed_query/trec_dl_{TREC_DL_YEAR}/{short}")
 LOG_ROOT_DIR = Path("logs/removed_query") / short
 
 if MODELS[0].startswith("meta.llama3"):
@@ -99,6 +102,27 @@ def get_part_dir(lang: str) -> Path:
     if lang == "raw":
         return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
     return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}/")
+
+
+def get_output_dir(lang: str) -> Path:
+    return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}_qp_rem")
+
+
+def get_query_lang_col(lang: str) -> str:
+    return f"query_{lang}"
+
+
+def get_output_header(lang: str) -> List[str]:
+    return [
+        "qid",
+        "query",
+        "pid",
+        "passage",
+        "relevance",
+        get_query_lang_col(lang),
+        "passage_injected",
+        OUTPUT_COL,
+    ]
 
 
 def iter_part_files(lang: str, start: int, end: int):
@@ -216,31 +240,47 @@ def build_prompt(prompt_template: str, passage: str, query: str, row_idx: int) -
     return prompt
 
 
-def write_combined_csv(
+def write_split_csvs(
     per_file_csvs: List[str],
     header_out: List[str],
-    model_short: str,
     lang: str,
     year: str,
     out_dir: Path,
-) -> Path:
+) -> List[Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    combined_path = out_dir / f"{model_short}_trecdl_{year}_{lang}_removed_query.csv"
+    output_paths = [
+        out_dir / f"all_topics_trecdl_{year}_part{part_no}.csv"
+        for part_no in range(OUTPUT_PART_START, OUTPUT_PART_END + 1)
+    ]
 
-    with combined_path.open("w", encoding="utf-8", newline="") as fout:
-        writer = csv.writer(fout)
-        writer.writerow(header_out)
+    for path in output_paths:
+        with path.open("w", encoding="utf-8", newline="") as fout:
+            csv.writer(fout).writerow(header_out)
 
-        for file_path in per_file_csvs:
-            with Path(file_path).open("r", encoding="utf-8", newline="") as fin:
-                reader = csv.reader(fin)
-                next(reader, None)
+    part_index = 0
+    rows_written_to_part = 0
 
-                for row in reader:
-                    writer.writerow(row)
+    for file_path in sorted(per_file_csvs):
+        with Path(file_path).open("r", encoding="utf-8", newline="") as fin:
+            reader = csv.reader(fin)
+            next(reader, None)
 
-    return combined_path
+            for row in reader:
+                if part_index >= len(output_paths):
+                    print("[WARN] More than 3000 rows found; extra rows were not written.")
+                    return output_paths
+
+                with output_paths[part_index].open("a", encoding="utf-8", newline="") as fout:
+                    csv.writer(fout).writerow(row)
+
+                rows_written_to_part += 1
+
+                if rows_written_to_part >= ROWS_PER_OUTPUT_PART:
+                    part_index += 1
+                    rows_written_to_part = 0
+
+    return output_paths
 
 
 # =========================
@@ -263,10 +303,20 @@ def _process_single_part_file_blocking(
 
     header_in = _inspect_header(part_csv)
 
+    query_lang_col = get_query_lang_col(lang)
+    header_out = get_output_header(lang)
+
+    required_cols = [
+        "qid",
+        "query",
+        "passage",
+        "relevance",
+    ]
+
     if lang == "raw":
-        required_cols = ["query", "passage"]
+        required_cols.append("passage")
     else:
-        required_cols = ["query", "passage_injected"]
+        required_cols.append("passage_injected")
 
     missing = [c for c in required_cols if c not in header_in]
 
@@ -274,14 +324,6 @@ def _process_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         print(f"[HEADER FOUND] {header_in}")
         sys.exit(2)
-
-    if OUTPUT_COL in header_in:
-        header_out = header_in
-        output_col_index = header_in.index(OUTPUT_COL)
-        print(f"[WARN] {part_csv.name}: {OUTPUT_COL} already exists; values will be overwritten.")
-    else:
-        header_out = header_in + [OUTPUT_COL]
-        output_col_index = None
 
     labels_path = per_file_out_dir / f"{part_csv.stem}_removed_query_{safe_model}.csv"
     ensure_csv_with_header(labels_path, header_out)
@@ -349,17 +391,14 @@ def _process_single_part_file_blocking(
             }
 
             pid = _resolve_pid(row_out_map)
+            query = (row_out_map.get("query", "") or "").strip()
 
             if lang == "raw":
-                query = (row_out_map.get("query", "") or "").strip()
                 passage = (row_out_map.get("passage", "") or "").strip()
-                query_col_used = "query"
-                passage_col_used = "passage"
+                passage_injected = passage
             else:
-                query = (row_out_map.get("query", "") or "").strip()
                 passage = (row_out_map.get("passage_injected", "") or "").strip()
-                query_col_used = "query"
-                passage_col_used = "passage_injected"
+                passage_injected = passage
 
             response_text = ""
             reasoning = ""
@@ -400,12 +439,22 @@ def _process_single_part_file_blocking(
 
                 response_text = ""
 
-            row_values = [row_out_map.get(col, "") for col in header_in]
+            query_lang_value = (
+                row_out_map.get(query_lang_col, "")
+                or row_out_map.get("query_injected", "")
+                or row_out_map.get("query", "")
+            )
 
-            if output_col_index is not None:
-                row_values[output_col_index] = response_text
-            else:
-                row_values.append(response_text)
+            row_values = [
+                row_out_map.get("qid", ""),
+                row_out_map.get("query", ""),
+                pid,
+                row_out_map.get("passage", ""),
+                row_out_map.get("relevance", ""),
+                query_lang_value,
+                passage_injected,
+                response_text,
+            ]
 
             log_obj = {
                 "qid": (row_out_map.get("qid", "") or "").strip(),
@@ -502,8 +551,8 @@ async def run_for_model_and_lang(
 
     short = model_short_name(model_id)
 
-    model_out_dir = OUTPUT_ROOT_DIR
-    model_logs_dir = LOG_ROOT_DIR
+    model_out_dir = get_output_dir(lang)
+    model_logs_dir = LOG_ROOT_DIR / lang
 
     model_out_dir.mkdir(parents=True, exist_ok=True)
     model_logs_dir.mkdir(parents=True, exist_ok=True)
@@ -579,10 +628,9 @@ async def run_for_model_and_lang(
     header_out = list(next(iter(header_out_set)))
     per_file_csvs = [r["labels_csv"] for r in results]
 
-    combined_path = write_combined_csv(
+    split_paths = write_split_csvs(
         per_file_csvs=per_file_csvs,
         header_out=header_out,
-        model_short=short,
         lang=lang,
         year=TREC_DL_YEAR,
         out_dir=model_out_dir,
@@ -613,7 +661,7 @@ async def run_for_model_and_lang(
             "output_tokens": total_out,
             "total_tokens": total_in + total_out,
             "estimated_cost_usd": f"{cost_usd:.6f}",
-            "labels_csv": str(combined_path),
+            "labels_csv": ";".join(str(p) for p in split_paths),
             "log_json": "(see logs index)",
         },
     )
@@ -622,7 +670,9 @@ async def run_for_model_and_lang(
     print(f"[DONE] Model: {model_id}")
     print(f"[DONE] Lang: {lang}")
     print(f"[DONE] Rows: {num_rows}")
-    print(f"[OUTPUT] {combined_path}")
+    print("[OUTPUT FILES]")
+    for p in split_paths:
+        print(f"  {p}")
     print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
     try:
