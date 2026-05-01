@@ -1,7 +1,0 @@
-run_id,timestamp,model,num_examples,input_tokens,output_tokens,total_tokens,estimated_cost_usd,labels_csv,log_json
-20260430_234010,2026-04-30T23:41:19,openai.gpt-oss-20b-1:0,3069,548000,1483639,2031639,0.483452,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_eng_removed_query.csv,(see logs index)
-20260430_234120,2026-04-30T23:42:29,openai.gpt-oss-20b-1:0,2861,528900,1162848,1691748,0.385877,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_raw_removed_query.csv,(see logs index)
-20260430_234229,2026-04-30T23:43:51,openai.gpt-oss-20b-1:0,3069,557329,1868883,2426212,0.599678,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_vi_removed_query.csv,(see logs index)
-20260430_234351,2026-04-30T23:45:18,openai.gpt-oss-20b-1:0,3069,557339,2230943,2788282,0.708297,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_vi_word_removed_query.csv,(see logs index)
-20260430_234518,2026-04-30T23:46:34,openai.gpt-oss-20b-1:0,3067,561788,1966292,2528080,0.629213,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_ga_removed_query.csv,(see logs index)
-20260430_234634,2026-04-30T23:47:58,openai.gpt-oss-20b-1:0,3067,562362,2255444,2817806,0.715999,retrieved/removed_query/trec_dl_2022/gpt-oss-20b/gpt-oss-20b_trecdl_2022_ga_word_removed_query.csv,(see logs index)
