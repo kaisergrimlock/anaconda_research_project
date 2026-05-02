@@ -80,6 +80,11 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "raw", "eng", "eng_instruct", "eng_reminded", "eng_instruct_reminded", "vi", "vi_instruct", "vi_reminded", "vi_instruct_reminded"
     ],
     
+    "removed" : [
+        "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem", "he_qp_rem", "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
+        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+    ],
+    
     "distract": [
         "raw", "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
         "eng_distraction", "ar_distraction", "vi_distraction", "th_distraction", "fr_distraction",
@@ -98,9 +103,9 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
     ],
     
-    "var_rem_instruct": [
-        "eng_var_qp_rem_instruct", "ar_var_qp_rem_instruct", "vi_var_qp_rem_instruct", "th_var_qp_rem_instruct", "fr_var_qp_rem_instruct", "ru_var_qp_rem_instruct",
-        "he_var_qp_rem_instruct", "sw_var_qp_rem_instruct", "ga_var_qp_rem_instruct", "hi_var_qp_rem_instruct", "zh_var_qp_rem_instruct",
+    "rem_instruct": [
+        "eng_instruct_rem", "ar_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "fr_instruct_rem", "ru_instruct_rem",
+        "he_instruct_rem", "sw_instruct_rem", "ga_instruct_rem", "hi_instruct_rem", "zh_instruct_rem",
         "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
     ],
     
@@ -110,6 +115,13 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "zh_distraction_qp_rem",
         "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
     ],
+    
+    "reminded": [
+        "eng_instruct_reminded", "ar_instruct_reminded", "vi_instruct_reminded", "th_instruct_reminded", "fr_instruct_reminded", "ru_instruct_reminded",
+        "he_instruct_reminded", "sw_instruct_reminded", "ga_instruct_reminded", "hi_instruct_reminded", "zh_instruct_reminded",
+        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+    ],
+    
 }
 
 def get_langs(profile: str) -> List[str]:
