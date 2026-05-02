@@ -12,7 +12,7 @@ import pandas as pd
 # Configuration
 # =============================================================================
 MODEL = "gpt-oss-20b"
-YEAR = "2021"
+YEAR = "2022"
 LANGUAGE = None  # e.g. "arcwb_instruct", "vi", etc. Use None to process all.
 
 THIS_FILE = Path(__file__).resolve()

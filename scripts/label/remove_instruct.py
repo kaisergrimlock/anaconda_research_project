@@ -58,10 +58,10 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
 TREC_DL_YEAR = "2021"
 
-#LANGS = ["eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga", "raw"]
-LANGS = ["eng"]
+LANGS = ["eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga", "raw"]
+#LANGS = ["eng"]
 START_PART = 1
-END_PART = 1
+END_PART = 6
 
 ROWS_PER_OUTPUT_PART = 500
 OUTPUT_PART_START = 1
@@ -77,7 +77,7 @@ INFERENCE_CONFIG = {
     "topP": 1.0,
 }
 
-OUTPUT_COL = "instruct_removed"
+OUTPUT_COL = "passage_removed"
 
 short = model_short_name(MODELS[0])
 
@@ -307,7 +307,6 @@ def _process_single_part_file_blocking(
 
     required_cols = [
         "qid",
-        "passage",
         "relevance",
     ]
 
