@@ -62,7 +62,8 @@ FINAL_OUTPUT_SUFFIX = "_reminded"
 
 # ===== MULTI-LANGUAGE SUPPORT =====
 LANGS = [
-    "raw", "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga",
+    "eng_instruct_rem", "ar_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "fr_instruct_rem", "ru_instruct_rem",
+    "he_instruct_rem", "sw_instruct_rem", "ga_instruct_rem", "hi_instruct_rem", "zh_instruct_rem",
 ]
 
 START_PART = 1
@@ -71,8 +72,8 @@ TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-#MODELS = ["openai.gpt-oss-20b-1:0"]
-MODELS = ["meta.llama3-8b-instruct-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]
 #MODELS = ["qwen.qwen3-32b-v1:0"]
 
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}

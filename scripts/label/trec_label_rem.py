@@ -60,20 +60,20 @@ LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 ALLOW_BLANK_OVERWRITE = True
 
 # ===== MULTI-LANGUAGE SUPPORT =====
-LANGS = [
-    "eng_instruct_rem", "ar_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "fr_instruct_rem", "ru_instruct_rem",
-    "he_instruct_rem", "sw_instruct_rem", "ga_instruct_rem", "hi_instruct_rem", "zh_instruct_rem",
-]
+# LANGS = [
+#     "eng_var_instruct_rem", "ar_var_instruct_rem", "vi_var_instruct_rem", "th_var_instruct_rem", "fr_var_instruct_rem", "ru_var_instruct_rem",
+#     "he_var_instruct_rem", "sw_var_instruct_rem", "ga_var_instruct_rem", "hi_var_instruct_rem", "zh_var_instruct_rem",
+# ]
 
 # LANGS = [
 #     "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
 #     "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
 # ]
 
-# LANGS = [
-#     "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
-#     "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem", "zh_distraction_qp_rem",
-# ]
+LANGS = [
+    "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
+    "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem", "zh_distraction_qp_rem",
+]
 
 # LANGS = [
 #     "eng_var", "ar_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var", "ga_var", "hi_var", "zh_var",
@@ -81,13 +81,13 @@ LANGS = [
 
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots

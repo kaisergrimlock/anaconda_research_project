@@ -56,9 +56,9 @@ cfg = Config(
 PROMPT_FILE = Path("prompts/remove_instruct.txt")
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 
-LANGS = ["eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi", "ga", "raw"]
+LANGS = ["eng_var", "ru_var", "ar_var", "vi_var", "th_var", "sw_var", "he_var", "zh_var", "fr_var", "hi_Var", "ga_var", "raw"]
 #LANGS = ["eng"]
 START_PART = 1
 END_PART = 6
