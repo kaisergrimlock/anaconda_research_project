@@ -95,7 +95,21 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "var_rem": [
         "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
         "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
-    ]
+        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+    ],
+    
+    "var_rem_instruct": [
+        "eng_var_qp_rem_instruct", "ar_var_qp_rem_instruct", "vi_var_qp_rem_instruct", "th_var_qp_rem_instruct", "fr_var_qp_rem_instruct", "ru_var_qp_rem_instruct",
+        "he_var_qp_rem_instruct", "sw_var_qp_rem_instruct", "ga_var_qp_rem_instruct", "hi_var_qp_rem_instruct", "zh_var_qp_rem_instruct",
+        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+    ],
+    
+    "distract_rem": [
+        "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
+        "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem",
+        "zh_distraction_qp_rem",
+        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+    ],
 }
 
 def get_langs(profile: str) -> List[str]:
