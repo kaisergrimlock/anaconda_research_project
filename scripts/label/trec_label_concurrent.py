@@ -67,7 +67,8 @@ ALLOW_BLANK_OVERWRITE = True
 # ]
 
 LANGS = [
-    "eng_var", "ar_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var", "ga_var", "hi_var", "zh_var",
+    "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem",
+    "he_qp_rem", "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
 ]
 
 START_PART = 1
@@ -76,9 +77,9 @@ TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-#MODELS = ["openai.gpt-oss-20b-1:0"]
-MODELS = ["meta.llama3-8b-instruct-v1:0"]
-# MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
