@@ -86,10 +86,22 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     
     "distract": [
-        "raw", "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+        "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
+        "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem",
+        "zh_distraction_qp_rem",
+        "raw",
         "eng_distraction", "ar_distraction", "vi_distraction", "th_distraction", "fr_distraction",
         "ru_distraction", "he_distraction", "sw_distraction", "ga_distraction", "hi_distraction",
         "zh_distraction"
+    ],
+    
+        "distract_2": [
+        "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
+        "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem",
+        "zh_distraction_qp_rem",
+        "raw",
+        "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem", "he_qp_rem",
+        "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
     ],
     
     "variation":[
