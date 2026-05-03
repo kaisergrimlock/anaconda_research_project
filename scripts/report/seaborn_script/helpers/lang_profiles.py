@@ -134,6 +134,14 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
     ],
     
+    "instruct_rem" : [
+        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
+        "eng_instruct_rem", "ar_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "fr_instruct_rem", "ru_instruct_rem",
+        "he_instruct_rem", "sw_instruct_rem", "ga_instruct_rem", "hi_instruct_rem", "zh_instruct_rem",
+        "raw"
+    ]
+    
 }
 
 def get_langs(profile: str) -> List[str]:
