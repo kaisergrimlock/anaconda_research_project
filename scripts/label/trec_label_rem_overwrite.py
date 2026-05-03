@@ -192,6 +192,62 @@ def _append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
         csv.writer(f).writerow(new_row)
 
 
+def cleanup_model_level_outputs(model_out_dir: Path, model_logs_dir: Path) -> None:
+    """Clean model-level files that should not accumulate when MODE='replace'."""
+    token_usage = model_out_dir / "token_usage.csv"
+    if token_usage.exists():
+        token_usage.unlink()
+        print(f"[CLEANUP] Removed old token usage file: {token_usage}")
+
+    # Do not delete the whole logs directory blindly; only remove JSON logs created by this script.
+    if model_logs_dir.exists():
+        for log_file in model_logs_dir.glob("*_llm_*.json"):
+            log_file.unlink()
+            print(f"[CLEANUP] Removed old log file: {log_file}")
+
+
+def cleanup_previous_outputs(
+    model_out_dir: Path,
+    model_logs_dir: Path,
+    short: str,
+    model_id: str,
+    lang: str,
+) -> None:
+    """Remove stale output files for this model/language before a replace run.
+
+    This prevents write_combined_dynamic() from comparing the new header against an
+    old combined CSV with a different schema, such as instruct_removed vs
+    passage_removed.
+    """
+    safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
+
+    # Final combined output for this language.
+    combined_csv = model_out_dir / f"{short}_trecdl_{TREC_DL_YEAR}_{lang}_labels.csv"
+    if combined_csv.exists():
+        combined_csv.unlink()
+        print(f"[CLEANUP] Removed old combined CSV: {combined_csv}")
+
+    # Old temporary folders for this exact model/language.
+    tmp_pattern = f"_tmp_*_{safe_model}_{lang}"
+    for tmp_dir in model_out_dir.glob(tmp_pattern):
+        if tmp_dir.is_dir():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+            print(f"[CLEANUP] Removed old temp folder: {tmp_dir}")
+
+    # Old log index files for this language.
+    for log_index in model_logs_dir.glob(f"*_llm_logs_index_{short}_{lang}.json"):
+        log_index.unlink()
+        print(f"[CLEANUP] Removed old log index: {log_index}")
+
+    # Old per-part response logs from this script/model.
+    # These log names do not include lang, so this removes old part logs for the
+    # current model/year. That is intentional for clean replace runs.
+    response_pattern = f"*_llm_responses_{safe_model}_all_topics_trecdl_{TREC_DL_YEAR}_part*.json"
+    for log_file in model_logs_dir.glob(response_pattern):
+        log_file.unlink()
+        print(f"[CLEANUP] Removed old response log: {log_file}")
+
+
 # =========================
 # Core: label one part file (blocking, row-concurrent)
 # =========================
@@ -451,6 +507,9 @@ async def run_for_model_and_lang(model_id: str, lang: str, stop_event: asyncio.E
     model_out_dir.mkdir(parents=True, exist_ok=True)
     model_logs_dir.mkdir(parents=True, exist_ok=True)
 
+    if mode == "replace":
+        cleanup_previous_outputs(model_out_dir, model_logs_dir, short, model_id, lang)
+
     part_files = list(iter_part_files(lang, START_PART, END_PART))
     if not part_files:
         print(f"[INFO] No part files found in range for lang={lang}.")
@@ -575,6 +634,15 @@ async def main():
         for model_id in MODELS:
             if stop_event.is_set():
                 break
+
+            if MODE == "replace":
+                short = model_short_name(model_id)
+                model_out_dir = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/")
+                model_logs_dir = LOG_ROOT_DIR / short
+                model_out_dir.mkdir(parents=True, exist_ok=True)
+                model_logs_dir.mkdir(parents=True, exist_ok=True)
+                cleanup_model_level_outputs(model_out_dir, model_logs_dir)
+
             for lang in LANGS:
                 if stop_event.is_set():
                     break
