@@ -5,25 +5,21 @@ import json
 
 BASE_DIR = Path("retrieved")
 
-YEAR = "2021"
+YEAR = "2022"
 LANG = [
-        "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
-         "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct",
-        ]
+    "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+    "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct",
+    "th_instruct", "ru_instruct", "he_instruct", "sw_instruct",
+    "ga_instruct", "hi_instruct", "zh_instruct",
+    "eng_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var",
+    "ga_var", "hi_var", "zh_var"
+]
 
 KEEP_ALL_COLUMNS = False
 PARTS = range(7)  # 0 to 6
 
 
 def build_input_paths(year: str, language: str) -> list[Path]:
-    """
-    Build the list of input CSV paths for one language.
-
-    Expected structure:
-    retrieved/trec_dl_{year}/{language}/all_topics_trecdl_{year}_part0.csv
-    ...
-    retrieved/trec_dl_{year}/{language}/all_topics_trecdl_{year}_part6.csv
-    """
     base_lang_dir = BASE_DIR / f"trec_dl_{year}" / language
     return [
         base_lang_dir / f"all_topics_trecdl_{year}_part{i}.csv"
@@ -32,19 +28,10 @@ def build_input_paths(year: str, language: str) -> list[Path]:
 
 
 def build_output_path(year: str) -> Path:
-    """
-    Build the combined JSONL output path.
-
-    Expected structure:
-    retrieved/jsonl/{year}/trec_dl_{year}.jsonl
-    """
-    return BASE_DIR / "jsonl" / year / f"trec_dl_{year}.jsonl"
+    return BASE_DIR / "jsonl" / year / f"trec_dl_{year}_relevance_1.jsonl"
 
 
 def safe_int(value):
-    """
-    Convert value to int if possible, otherwise return None/original value.
-    """
     try:
         return int(value) if value is not None and value != "" else None
     except (ValueError, TypeError):
@@ -57,19 +44,6 @@ def convert_csv_to_jsonl(
     language: str,
     keep_all_columns: bool = False
 ) -> None:
-    """
-    Convert one CSV file and write its rows into an already-open JSONL file.
-
-    If keep_all_columns is False:
-        - keep selected columns only
-        - add language to pid
-
-    If keep_all_columns is True:
-        - keep all columns
-        - rename pid -> id
-        - add language to id
-        - remove original pid
-    """
     if not input_file.exists():
         raise FileNotFoundError(f"Input file not found: {input_file}")
 
@@ -77,6 +51,12 @@ def convert_csv_to_jsonl(
         reader = csv.DictReader(f_in)
 
         for row in reader:
+            relevance = safe_int(row.get("relevance"))
+
+            # Keep only rows where relevance = 1
+            if relevance != 1:
+                continue
+
             new_id = f"{row['pid']}_{language}"
 
             if keep_all_columns:
@@ -89,7 +69,7 @@ def convert_csv_to_jsonl(
                     "qid": row.get("qid"),
                     "query": row.get("query"),
                     "passage": row.get("passage"),
-                    "relevance": safe_int(row.get("relevance")),
+                    "relevance": relevance,
                     "passage_injected": row.get("passage_injected"),
                 }
 
@@ -122,7 +102,7 @@ def main():
                 except FileNotFoundError as e:
                     print(f"Skipped: {e}")
 
-    print("\nFinished writing combined JSONL file.")
+    print("\nFinished writing combined JSONL file with relevance = 1 only.")
 
 
 if __name__ == "__main__":

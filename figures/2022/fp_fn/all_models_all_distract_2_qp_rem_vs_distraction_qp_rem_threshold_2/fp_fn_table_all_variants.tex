@@ -1,0 +1,44 @@
+\begin{table}
+\caption{False-positive and false-negative counts/rates by model and language variant, using relevance threshold $\geq 2$.}
+\label{tab:fp_fn_all_variants_2022}
+\begin{tabular}{llllrrrrrlllll}
+\toprule
+Model & Language & Base_Language & Variant & n & TP & TN & FP & FN & FPR & FNR & Precision & Recall & Accuracy \\
+\midrule
+gpt-oss-20b & ar_distraction_qp_rem & ar & baseline & 2648 & 555 & 1401 & 526 & 166 & 0.2730 & 0.2302 & 0.5134 & 0.7698 & 0.7387 \\
+gpt-oss-20b & ar_qp_rem & ar & baseline & 2649 & 545 & 1447 & 481 & 176 & 0.2495 & 0.2441 & 0.5312 & 0.7559 & 0.7520 \\
+gpt-oss-20b & eng_distraction_qp_rem & eng & baseline & 2647 & 568 & 1335 & 592 & 152 & 0.3072 & 0.2111 & 0.4897 & 0.7889 & 0.7189 \\
+gpt-oss-20b & eng_qp_rem & eng & baseline & 2649 & 578 & 1425 & 503 & 143 & 0.2609 & 0.1983 & 0.5347 & 0.8017 & 0.7561 \\
+gpt-oss-20b & ga_distraction_qp_rem & ga & baseline & 2647 & 507 & 1469 & 457 & 214 & 0.2373 & 0.2968 & 0.5259 & 0.7032 & 0.7465 \\
+gpt-oss-20b & ga_qp_rem & ga & baseline & 2648 & 523 & 1469 & 458 & 198 & 0.2377 & 0.2746 & 0.5331 & 0.7254 & 0.7523 \\
+gpt-oss-20b & he_distraction_qp_rem & he & baseline & 2648 & 553 & 1453 & 474 & 168 & 0.2460 & 0.2330 & 0.5385 & 0.7670 & 0.7576 \\
+gpt-oss-20b & he_qp_rem & he & baseline & 2649 & 556 & 1448 & 480 & 165 & 0.2490 & 0.2288 & 0.5367 & 0.7712 & 0.7565 \\
+gpt-oss-20b & raw & raw & other & 2649 & 599 & 1403 & 525 & 122 & 0.2723 & 0.1692 & 0.5329 & 0.8308 & 0.7558 \\
+gpt-oss-20b & ru_distraction_qp_rem & ru & baseline & 2649 & 572 & 1391 & 537 & 149 & 0.2785 & 0.2067 & 0.5158 & 0.7933 & 0.7410 \\
+gpt-oss-20b & ru_qp_rem & ru & baseline & 2648 & 552 & 1448 & 479 & 169 & 0.2486 & 0.2344 & 0.5354 & 0.7656 & 0.7553 \\
+gpt-oss-20b & sw_distraction_qp_rem & sw & baseline & 2648 & 541 & 1431 & 496 & 180 & 0.2574 & 0.2497 & 0.5217 & 0.7503 & 0.7447 \\
+gpt-oss-20b & sw_qp_rem & sw & baseline & 2649 & 520 & 1449 & 479 & 201 & 0.2484 & 0.2788 & 0.5205 & 0.7212 & 0.7433 \\
+gpt-oss-20b & th_distraction_qp_rem & th & baseline & 2647 & 561 & 1395 & 531 & 160 & 0.2757 & 0.2219 & 0.5137 & 0.7781 & 0.7389 \\
+gpt-oss-20b & th_qp_rem & th & baseline & 2649 & 564 & 1467 & 461 & 157 & 0.2391 & 0.2178 & 0.5502 & 0.7822 & 0.7667 \\
+gpt-oss-20b & vi_distraction_qp_rem & vi & baseline & 2647 & 558 & 1376 & 550 & 163 & 0.2856 & 0.2261 & 0.5036 & 0.7739 & 0.7306 \\
+gpt-oss-20b & vi_qp_rem & vi & baseline & 2648 & 560 & 1453 & 474 & 161 & 0.2460 & 0.2233 & 0.5416 & 0.7767 & 0.7602 \\
+qwen3-32b-v1 & ar_distraction_qp_rem & ar & baseline & 2649 & 640 & 1029 & 899 & 81 & 0.4663 & 0.1123 & 0.4159 & 0.8877 & 0.6300 \\
+qwen3-32b-v1 & ar_qp_rem & ar & baseline & 2649 & 617 & 1238 & 690 & 104 & 0.3579 & 0.1442 & 0.4721 & 0.8558 & 0.7003 \\
+qwen3-32b-v1 & eng_distraction_qp_rem & eng & baseline & 2649 & 652 & 987 & 941 & 69 & 0.4881 & 0.0957 & 0.4093 & 0.9043 & 0.6187 \\
+qwen3-32b-v1 & eng_qp_rem & eng & baseline & 2649 & 629 & 1199 & 729 & 92 & 0.3781 & 0.1276 & 0.4632 & 0.8724 & 0.6901 \\
+qwen3-32b-v1 & ga_distraction_qp_rem & ga & baseline & 2649 & 604 & 1179 & 749 & 117 & 0.3885 & 0.1623 & 0.4464 & 0.8377 & 0.6731 \\
+qwen3-32b-v1 & ga_qp_rem & ga & baseline & 2649 & 613 & 1181 & 747 & 108 & 0.3874 & 0.1498 & 0.4507 & 0.8502 & 0.6772 \\
+qwen3-32b-v1 & he_distraction_qp_rem & he & baseline & 2649 & 606 & 1196 & 732 & 115 & 0.3797 & 0.1595 & 0.4529 & 0.8405 & 0.6803 \\
+qwen3-32b-v1 & he_qp_rem & he & baseline & 2649 & 614 & 1193 & 735 & 107 & 0.3812 & 0.1484 & 0.4552 & 0.8516 & 0.6821 \\
+qwen3-32b-v1 & raw & raw & other & 2649 & 617 & 1257 & 671 & 104 & 0.3480 & 0.1442 & 0.4790 & 0.8558 & 0.7074 \\
+qwen3-32b-v1 & ru_distraction_qp_rem & ru & baseline & 2649 & 644 & 1053 & 875 & 77 & 0.4538 & 0.1068 & 0.4240 & 0.8932 & 0.6406 \\
+qwen3-32b-v1 & ru_qp_rem & ru & baseline & 2649 & 606 & 1234 & 694 & 115 & 0.3600 & 0.1595 & 0.4662 & 0.8405 & 0.6946 \\
+qwen3-32b-v1 & sw_distraction_qp_rem & sw & baseline & 2649 & 622 & 1137 & 791 & 99 & 0.4103 & 0.1373 & 0.4402 & 0.8627 & 0.6640 \\
+qwen3-32b-v1 & sw_qp_rem & sw & baseline & 2649 & 607 & 1204 & 724 & 114 & 0.3755 & 0.1581 & 0.4560 & 0.8419 & 0.6837 \\
+qwen3-32b-v1 & th_distraction_qp_rem & th & baseline & 2649 & 637 & 1086 & 842 & 84 & 0.4367 & 0.1165 & 0.4307 & 0.8835 & 0.6504 \\
+qwen3-32b-v1 & th_qp_rem & th & baseline & 2649 & 612 & 1225 & 703 & 109 & 0.3646 & 0.1512 & 0.4654 & 0.8488 & 0.6935 \\
+qwen3-32b-v1 & vi_distraction_qp_rem & vi & baseline & 2649 & 644 & 1046 & 882 & 77 & 0.4575 & 0.1068 & 0.4220 & 0.8932 & 0.6380 \\
+qwen3-32b-v1 & vi_qp_rem & vi & baseline & 2649 & 614 & 1224 & 704 & 107 & 0.3651 & 0.1484 & 0.4659 & 0.8516 & 0.6938 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -96,12 +96,15 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     
         "distract_2": [
-        "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
-        "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem",
-        "zh_distraction_qp_rem",
-        "raw",
-        "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem", "he_qp_rem",
-        "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
+        "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem",
+        "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem",
+        "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "ru_qp_rem", "he_qp_rem",
+        "sw_qp_rem", "ga_qp_rem",
+        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
+        "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
+        "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
+        "raw"
     ],
     
     "variation":[
