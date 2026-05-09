@@ -40,17 +40,17 @@ from scripts.bedrock_client import (
 TREC_DL_YEAR = "2021"
 LANGS = [
     "ru_instruct",
-    "zh_instruct",
-    "ga_instruct",
-    "ar_instruct",
-    "fr_instruct",
-    "vi_instruct",
-    "sw_instruct",
-    "ga_instruct",
-    "eng_instruct",
-    "hi_instruct",
-    "he_instruct",
-    "th_instruct",
+    # "zh_instruct",
+    # "ga_instruct",
+    # "ar_instruct",
+    # "fr_instruct",
+    # "vi_instruct",
+    # "sw_instruct",
+    # "ga_instruct",
+    # "eng_instruct",
+    # "hi_instruct",
+    # "he_instruct",
+    # "th_instruct",
 ]
 
 #LANGS = ["he"]
@@ -69,7 +69,7 @@ FORCE_REBUILD_CACHE = False
 PROMPT_TYPE = "criterion"
 PROMPT_NAME = "composition_2"
 PROMPT_FILE = Path(f"prompts/{PROMPT_TYPE}/{PROMPT_NAME}.txt")
-OUTPUT_SUFFIX = "crit_2"
+OUTPUT_SUFFIX = "crit"
 
 cfg = Config(
     region_name="us-west-2",
