@@ -131,6 +131,12 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
     ],
     
+    "qp_rem": [
+        "eng_qp_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "ru_qp_rem", "he_qp_rem",
+        "sw_qp_rem", "ga_qp_rem", "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+        
+    ],
+    
     "reminded": [
         "eng_instruct_reminded", "ar_instruct_reminded", "vi_instruct_reminded", "th_instruct_reminded", "fr_instruct_reminded", "ru_instruct_reminded",
         "he_instruct_reminded", "sw_instruct_reminded", "ga_instruct_reminded", "hi_instruct_reminded", "zh_instruct_reminded",
@@ -140,8 +146,7 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "instruct_rem" : [
         "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
         "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
-        "eng_instruct_rem", "ar_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "fr_instruct_rem", "ru_instruct_rem",
-        "he_instruct_rem", "sw_instruct_rem", "ga_instruct_rem", "hi_instruct_rem", "zh_instruct_rem",
+        "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct"
         "raw"
     ]
     

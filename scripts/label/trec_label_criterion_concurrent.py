@@ -51,65 +51,71 @@ PROMPT_FILE = PROMPT_DIR / "prompt.txt"
 CRITERIA_CSV = PROMPT_DIR / "criteria.csv"
 LLM_COST_CSV = Path("scripts/report/llm_cost.csv")
 
-# Filled from criteria.csv at runtime
 CRITERION_NAME: str = ""
 CRITERION_DESC: str = ""
-CRITERION_COL: str = ""   # column name in output CSV (same as CRITERION_NAME)
+CRITERION_COL: str = ""
 
-# Input relevance column
-RELEVANCE_COL = "relevance"   # change if needed
+RELEVANCE_COL = "relevance"
 
 # =========================
 # Data / run config
 # =========================
-LANG = "eng_instruct"          # "raw", "vi", ...
+LANGS = [
+    "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct"
+]
+
 START_PART = 1
 END_PART = 6
 TREC_DL_YEAR = "2021"
-MODE = "replace"     # "append" or "replace"
+MODE = "replace"
 
-# Which criteria to run (names in criteria.csv; case-insensitive)
-CRITERION_KEYS = ["topicality", "contextuality", "coverage", "exactness"]  # e.g. ["contextuality"]
+CRITERION_KEYS = ["topicality", "contextuality", "coverage", "exactness"]
 
-# Input part files
-if LANG == "raw":
-    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
-else:
-    PART_DIR = Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{LANG}/")
 PART_PATTERN = f"all_topics_trecdl_{TREC_DL_YEAR}_part{{n}}.csv"
 
-# Models
-MODELS = ["meta.llama3-8b-instruct-v1:0"]
+#MODELS = ["meta.llama3-8b-instruct-v1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
-# Output roots
-short = model_short_name(MODELS[0])
-OUTPUT_ROOT_DIR = Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/criterion/")
 LOG_ROOT_DIR = Path("logs")
 
-# =========================
-# Concurrency knobs
-# =========================
-# Part-level concurrency is controlled in run_for_model via asyncio semaphore.
-# Row-level concurrency accelerates Bedrock calls within each part file.
 ROW_CONCURRENCY = 50
 ROW_QUEUE_MAXSIZE = 2 * ROW_CONCURRENCY
 
-# Allow large CSV fields
 bump_field_limit()
 
-# Global criterion key mutated in main loop (matches your current structure)
 CRITERION_KEY: str = ""
+
+
+# =========================
+# Path helpers
+# =========================
+def get_part_dir(lang: str) -> Path:
+    if lang == "raw":
+        return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/judged/")
+    return Path(f"retrieved/trec_dl_{TREC_DL_YEAR}/{lang}/")
+
+
+def get_output_root_dir(model_id: str) -> Path:
+    short = model_short_name(model_id)
+    return Path(f"outputs/llm_label/trec_dl_{TREC_DL_YEAR}/{short}/criterion/")
+
+
+def iter_part_files(lang: str, start: int, end: int):
+    part_dir = get_part_dir(lang)
+
+    for n in range(start, end + 1):
+        p = part_dir / PART_PATTERN.format(n=n)
+        if p.exists():
+            yield p
+        else:
+            print(f"[WARN] Missing file: {p}")
 
 
 # =========================
 # Utilities
 # =========================
 def load_criterion_from_csv() -> None:
-    """
-    Populate CRITERION_NAME, CRITERION_DESC, CRITERION_COL
-    from prompts/criterion/criteria.csv using CRITERION_KEY.
-    """
     global CRITERION_NAME, CRITERION_DESC, CRITERION_COL
 
     if not CRITERIA_CSV.exists():
@@ -186,18 +192,10 @@ def load_criterion_from_csv() -> None:
     print(f"[CRITERION] Description: {CRITERION_DESC}")
 
 
-def iter_part_files(start: int, end: int):
-    for n in range(start, end + 1):
-        p = PART_DIR / PART_PATTERN.format(n=n)
-        if p.exists():
-            yield p
-        else:
-            print(f"[WARN] Missing file: {p}")
-
-
 def parse_llm_text_to_score(text: str, model_id: str) -> str:
     if text is None:
         return ""
+
     text = str(text).strip()
 
     m = re.fullmatch(r"([0-3])", text)
@@ -290,7 +288,7 @@ def start_stop_key_listener(loop: asyncio.AbstractEventLoop, stop_event: asyncio
 
 
 # =========================
-# CSV merge (your same logic)
+# CSV merge
 # =========================
 def write_combined_dynamic(
     per_file_labels: List[str],
@@ -349,7 +347,7 @@ def write_combined_dynamic(
     def should_preserve_old(old: str, new: str) -> bool:
         old_s = (old or "").strip()
         new_s = (new or "").strip()
-        return (old_s != "") and is_blank_or_nan_like(new_s)
+        return old_s != "" and is_blank_or_nan_like(new_s)
 
     incoming: dict[str, list[str]] = {}
 
@@ -387,10 +385,12 @@ def write_combined_dynamic(
                 f"  got: {existing_header}\n"
                 f"  exp: {header_out}"
             )
+
         with combined_path.open("a", encoding="utf-8", newline="") as f_out:
             w = csv.writer(f_out)
             for r in incoming.values():
                 w.writerow(r)
+
         print(f"[APPEND] Appended {len(incoming)} rows to: {combined_path}")
         return combined_path
 
@@ -432,12 +432,14 @@ def write_combined_dynamic(
                 if crit_idx is not None:
                     old_val = crit_val(old_row)
                     new_val = crit_val(new_row)
+
                     if should_preserve_old(old_val, new_val):
                         new_row[crit_idx] = old_val
                         preserved_old += 1
                         print(
                             f"[REPLACE-PRESERVE] line={line_no} key={k} "
-                            f"{CRITERION_COL}: {old_val!r} -> {new_val!r} (kept {old_val!r})"
+                            f"{CRITERION_COL}: {old_val!r} -> {new_val!r} "
+                            f"(kept {old_val!r})"
                         )
                     else:
                         print(
@@ -458,6 +460,7 @@ def write_combined_dynamic(
                 r = norm_row_len(r)
                 appended_new += 1
                 writer.writerow(r)
+
                 if crit_idx is not None:
                     print(f"[ADD] key={k} {CRITERION_COL}={crit_val(r)!r} (not previously in file)")
                 else:
@@ -469,11 +472,12 @@ def write_combined_dynamic(
         f"[DONE replace] replaced={replaced} kept={kept} appended_new={appended_new} "
         f"preserved_old={preserved_old} key_cols=('qid','{pid_col}') file={combined_path}"
     )
+
     return combined_path
 
 
 # =========================
-# Core labelling logic (ROW-CONCURRENT)
+# Core labelling logic
 # =========================
 def _label_single_part_file_blocking(
     part_csv: Path,
@@ -482,16 +486,18 @@ def _label_single_part_file_blocking(
     run_id: str,
     per_file_out_dir: Path,
     logs_dir: Path,
+    lang: str,
     stop_event: Optional[asyncio.Event] = None,
 ) -> dict:
     safe_model = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
+
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
 
     header_in = _inspect_header(part_csv)
 
     required_cols = ["query"]
-    required_cols.append("passage" if LANG == "raw" else "passage_injected")
+    required_cols.append("passage" if lang == "raw" else "passage_injected")
 
     if RELEVANCE_COL not in header_in:
         print(
@@ -505,10 +511,9 @@ def _label_single_part_file_blocking(
         print(f"[FATAL] {part_csv.name}: missing required columns {missing}.")
         sys.exit(2)
 
-    # Output header: input + criterion column, then filter passage/passage_injected
     base_header = header_in if CRITERION_COL in header_in else header_in + [CRITERION_COL]
 
-    if LANG == "raw":
+    if lang == "raw":
         header_out = [c for c in base_header if c != "passage_injected"]
     else:
         header_out = [c for c in base_header if c != "passage"]
@@ -519,17 +524,16 @@ def _label_single_part_file_blocking(
     bedrock = boto3.client("bedrock-runtime", config=cfg)
 
     total_rows = count_data_rows(part_csv)
+
     print(f"[{part_csv.name}] Loaded {total_rows} rows")
-    print(f"[HEADER] LANG='{LANG}' | output columns = {header_out}")
+    print(f"[HEADER] LANG='{lang}' | output columns = {header_out}")
     print(f"[CONCURRENCY] row_workers={ROW_CONCURRENCY} queue_max={ROW_QUEUE_MAXSIZE}")
 
-    # Shared state
     lock = Lock()
     total_in = 0
     total_out = 0
     logs: List[Dict[str, Any]] = []
 
-    # Deterministic output ordering even with concurrency
     next_to_write = 1
     pending: Dict[int, Tuple[List[str], Dict[str, Any], int, int]] = {}
     done_count = 0
@@ -546,19 +550,21 @@ def _label_single_part_file_blocking(
     )
 
     def append_row_csv(path: Path, header: List[str], new_row: List[str]) -> None:
-        # Header already ensured by ensure_csv_with_header, but keep safe.
         if not path.exists():
             with path.open("w", encoding="utf-8", newline="") as f:
                 csv.writer(f).writerow(header)
+
         with path.open("a", encoding="utf-8", newline="") as f:
             csv.writer(f).writerow(new_row)
 
     def flush_ready_locked():
         nonlocal next_to_write, total_in, total_out
+
         while next_to_write in pending:
             row_values, log_obj, in_tok, out_tok = pending.pop(next_to_write)
 
             append_row_csv(output_file, header_out, row_values)
+
             logs.append(log_obj)
             total_in += in_tok
             total_out += out_tok
@@ -566,16 +572,20 @@ def _label_single_part_file_blocking(
             print(
                 f"[{part_csv.name}] done={done_count}/{total_rows} | "
                 f"written={next_to_write}/{total_rows} | "
-                f"+tok {in_tok}/{out_tok} (totals {total_in}/{total_out})",
+                f"+tok {in_tok}/{out_tok} "
+                f"(totals {total_in}/{total_out})",
                 end="\r",
                 flush=True,
             )
+
             next_to_write += 1
 
     def worker():
         nonlocal done_count
+
         while True:
             item = row_queue.get()
+
             if item is None:
                 row_queue.task_done()
                 break
@@ -597,11 +607,13 @@ def _label_single_part_file_blocking(
                     or row.get("passage_id", "")
                     or ""
                 ).strip()
+
                 if pr and "pid_resolved" in header_in:
                     row_out_map["pid_resolved"] = pr
 
             q_for_prompt = (row_out_map.get("query", "") or "").strip()
-            if LANG == "raw":
+
+            if lang == "raw":
                 p_for_prompt = (row_out_map.get("passage", "") or "").strip()
             else:
                 p_for_prompt = (row_out_map.get("passage_injected", "") or "").strip()
@@ -615,6 +627,7 @@ def _label_single_part_file_blocking(
             )
 
             messages = [{"role": "user", "content": [{"text": prompt}]}]
+
             kwargs = {
                 "modelId": model_id,
                 "messages": messages,
@@ -639,13 +652,12 @@ def _label_single_part_file_blocking(
                     f"pid_resolved={pr} :: {api_err}"
                 )
 
-            # Build output row in the same order as header_out
             row_values = [row_out_map.get(col, "") for col in header_out]
+
             try:
                 idx_col = header_out.index(CRITERION_COL)
                 row_values[idx_col] = score
             except ValueError:
-                # should not happen
                 pass
 
             log_obj = {
@@ -656,13 +668,14 @@ def _label_single_part_file_blocking(
                 "response_text": text,
                 "reasoning": reasoning,
                 "usage": {"inputTokens": in_tok, "outputTokens": out_tok},
-                "passage_prompt_used": "passage" if LANG == "raw" else "passage_injected",
+                "passage_prompt_used": "passage" if lang == "raw" else "passage_injected",
                 "query_prompt_used": "query",
                 "criterion_name": CRITERION_NAME,
                 "criterion_desc": CRITERION_DESC,
                 "criterion_score": score,
                 "relevance_column": RELEVANCE_COL,
                 "relevance_score": (row_out_map.get(RELEVANCE_COL, "") or "").strip(),
+                "lang": lang,
             }
 
             with lock:
@@ -672,32 +685,30 @@ def _label_single_part_file_blocking(
 
             row_queue.task_done()
 
-    # Start workers
     workers: List[threading.Thread] = []
+
     for _ in range(max(1, ROW_CONCURRENCY)):
         t = threading.Thread(target=worker, daemon=True)
         t.start()
         workers.append(t)
 
-    # Feed queue
     for idx, row in enumerate(read_rows_stream(part_csv), start=1):
         if stop_event is not None and stop_event.is_set():
             print(f"\n[STOP] Halting early: {part_csv.name}")
             break
+
         row_queue.put((idx, row))
 
-    # Shutdown
     for _ in workers:
         row_queue.put(None)
 
     row_queue.join()
 
-    # Final flush
     with lock:
         flush_ready_locked()
 
-    # per-file json log
-    per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{part_csv.stem}.json"
+    per_file_log = logs_dir / f"{run_id}_llm_responses_{safe_model}_{lang}_{part_csv.stem}.json"
+
     with per_file_log.open("w", encoding="utf-8") as logf:
         json.dump(logs, logf, indent=2, ensure_ascii=False)
 
@@ -723,37 +734,47 @@ async def label_single_part_file(*args, **kwargs) -> dict:
 
 
 # =========================
-# Runner per model
+# Runner per model/language
 # =========================
-async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
+async def run_for_model(
+    model_id: str,
+    stop_event: asyncio.Event,
+    mode: str,
+    lang: str,
+):
     if not PROMPT_FILE.exists():
         print(f"[FATAL] Prompt template not found: {PROMPT_FILE}")
         sys.exit(1)
+
     prompt_template = PROMPT_FILE.read_text(encoding="utf-8")
 
     short = model_short_name(model_id)
 
-    MODEL_OUT_DIR = OUTPUT_ROOT_DIR
-    MODEL_LOGS_DIR = LOG_ROOT_DIR / short
-    MODEL_OUT_DIR.mkdir(parents=True, exist_ok=True)
-    MODEL_LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    model_out_dir = get_output_root_dir(model_id)
+    model_logs_dir = LOG_ROOT_DIR / short
 
-    part_files = list(iter_part_files(START_PART, END_PART))
+    model_out_dir.mkdir(parents=True, exist_ok=True)
+    model_logs_dir.mkdir(parents=True, exist_ok=True)
+
+    part_files = list(iter_part_files(lang, START_PART, END_PART))
+
     if not part_files:
-        print("[INFO] No part files found in range.")
+        print(f"[INFO] No part files found for lang={lang!r}.")
         return
 
     run_id = timestamp_id()
+
     print(
         f"\n--- Running inference for model: {model_id} "
-        f"(run_id={run_id}, LANG={LANG}, mode={mode}) ---"
+        f"(run_id={run_id}, LANG={lang}, criterion={CRITERION_KEY}, mode={mode}) ---"
     )
-    print("[STOP] Press 'Q' at any time to stop after the current in-flight items].")
 
-    per_file_out_dir = MODEL_OUT_DIR / f"_tmp_{run_id}_{model_id.replace(':','_')}_{LANG}"
+    print("[STOP] Press 'Q' at any time to stop after the current in-flight items.")
+
+    safe_model_for_path = model_id.replace(":", "_").replace("/", "_").replace("\\", "_")
+    per_file_out_dir = model_out_dir / f"_tmp_{run_id}_{safe_model_for_path}_{lang}_{CRITERION_KEY}"
     per_file_out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Part-level concurrency (same behavior as you had)
     sem = asyncio.Semaphore(min(6, len(part_files)))
     results: List[Dict[str, Any]] = []
 
@@ -761,20 +782,32 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         async with sem:
             if stop_event.is_set():
                 return None
+
             return await label_single_part_file(
-                p, model_id, prompt_template, run_id, per_file_out_dir, MODEL_LOGS_DIR, stop_event
+                p,
+                model_id,
+                prompt_template,
+                run_id,
+                per_file_out_dir,
+                model_logs_dir,
+                lang,
+                stop_event,
             )
 
     tasks = [asyncio.create_task(sem_task(p)) for p in part_files]
+
     for task in asyncio.as_completed(tasks):
         if stop_event.is_set():
             for t in tasks:
                 if not t.done():
                     t.cancel()
+
             await asyncio.gather(*tasks, return_exceptions=True)
             print("[STOP] Cancelled remaining files.")
             break
+
         r = await task
+
         if r:
             results.append(r)
 
@@ -783,9 +816,11 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         return
 
     header_out_set = {tuple(r["header_out"]) for r in results}
+
     if len(header_out_set) != 1:
         print(f"[FATAL] Inconsistent output headers across parts: {header_out_set}")
         sys.exit(4)
+
     header_out = list(next(iter(header_out_set)))
     per_file_labels = [r["labels_csv"] for r in results]
 
@@ -793,10 +828,10 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         per_file_labels=per_file_labels,
         header_out=header_out,
         model_short=short,
-        lang=LANG,
+        lang=lang,
         year=TREC_DL_YEAR,
         mode=mode,
-        out_dir=MODEL_OUT_DIR,
+        out_dir=model_out_dir,
     )
 
     total_in = sum(r["input_tokens"] for r in results)
@@ -811,15 +846,17 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
 
     write_run_log_index(
         [{"part": r["part"], "log_json": r["log_json"]} for r in results],
-        MODEL_LOGS_DIR / f"{run_id}_llm_logs_index_{short}_{LANG}.json",
+        model_logs_dir / f"{run_id}_llm_logs_index_{short}_{lang}_{CRITERION_KEY}.json",
     )
 
     append_token_row(
-        MODEL_OUT_DIR / "token_usage.csv",
+        model_out_dir / "token_usage.csv",
         {
             "run_id": run_id,
             "timestamp": timestamp_iso(),
             "model": model_id,
+            "lang": lang,
+            "criterion": CRITERION_KEY,
             "num_examples": num_rows,
             "input_tokens": total_in,
             "output_tokens": total_out,
@@ -830,7 +867,7 @@ async def run_for_model(model_id: str, stop_event: asyncio.Event, mode: str):
         },
     )
 
-    print(f"[DONE] Model: {model_id} | Rows: {num_rows} | Combined: {combined_path}")
+    print(f"[DONE] Model: {model_id} | Lang: {lang} | Rows: {num_rows} | Combined: {combined_path}")
     print(f"[TOKENS] in={total_in:,} out={total_out:,} total={total_in + total_out:,}")
 
     try:
@@ -858,15 +895,30 @@ async def main():
                 break
 
             CRITERION_KEY = crit_key
+
             print(f"\n=== Running for criterion: {CRITERION_KEY!r} ===")
             load_criterion_from_csv()
 
-            for model_id in MODELS:
+            for lang in LANGS:
                 if stop_event.is_set():
                     break
-                await run_for_model(model_id, stop_event, MODE)
+
+                print(f"\n=== Running for language: {lang!r} ===")
+
+                for model_id in MODELS:
+                    if stop_event.is_set():
+                        break
+
+                    await run_for_model(
+                        model_id=model_id,
+                        stop_event=stop_event,
+                        mode=MODE,
+                        lang=lang,
+                    )
+
     finally:
         stop_event.set()
+
         try:
             listener_thread.join(timeout=0.2)
         except Exception:

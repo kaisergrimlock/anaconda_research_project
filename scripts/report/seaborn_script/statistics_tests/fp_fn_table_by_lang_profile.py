@@ -44,7 +44,7 @@ from scripts.csv_helpers import bump_field_limit
 # CONFIG
 # -------------------------------------------------------------------
 TREC_DL_YEAR = "2022"
-LANG_PROFILE = "distract_2"  # change to the profile you want
+LANG_PROFILE = "qp_rem"  # change to the profile you want
 LANGS = get_langs(LANG_PROFILE)
 
 LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
@@ -52,6 +52,7 @@ LABEL_ROOT = Path("outputs/llm_label") / f"trec_dl_{TREC_DL_YEAR}"
 ALLOWED_MODELS = {
     "gpt-oss-20b",
     "qwen3-32b-v1",
+    "llama3_8b"
 }
 
 THRESHOLD = 2

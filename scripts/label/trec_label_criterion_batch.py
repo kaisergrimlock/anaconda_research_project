@@ -85,7 +85,7 @@ LANGS = [
 ]
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2021"
+TREC_DL_YEAR = "2022"
 MODE = "replace"     # "append" or "replace"
 
 # Which criteria to run (names in criteria.csv; case-insensitive)
