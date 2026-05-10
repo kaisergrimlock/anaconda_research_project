@@ -75,20 +75,25 @@ ALLOW_BLANK_OVERWRITE = True
 #     "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem", "zh_distraction_qp_rem",
 # ]
 
+# LANGS = [
+#     "eng_instruct_instruct_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem",
+#     "he_qp_rem", "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
+# ]
+
 LANGS = [
-    "eng_instruct_instruct_rem", "ar_qp_rem", "vi_qp_rem", "th_qp_rem", "fr_qp_rem", "ru_qp_rem",
-    "he_qp_rem", "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
+        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
 ]
 
 START_PART = 1
 END_PART = 6
-TREC_DL_YEAR = "2022"
+TREC_DL_YEAR = "2021"
 MODE = "replace"  # "append" or "replace"
 
 # Models
 #MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots
