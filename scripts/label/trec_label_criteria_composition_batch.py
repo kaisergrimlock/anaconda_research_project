@@ -40,20 +40,20 @@ from scripts.bedrock_client import (
 TREC_DL_YEAR = "2021"
 LANGS = [
     "ru_instruct",
-    # "zh_instruct",
-    # "ga_instruct",
-    # "ar_instruct",
-    # "fr_instruct",
-    # "vi_instruct",
-    # "sw_instruct",
-    # "ga_instruct",
-    # "eng_instruct",
-    # "hi_instruct",
-    # "he_instruct",
-    # "th_instruct",
+    "zh_instruct",
+    "ga_instruct",
+    "ar_instruct",
+    "fr_instruct",
+    "vi_instruct",
+    "sw_instruct",
+    "ga_instruct",
+    "eng_instruct",
+    "hi_instruct",
+    "he_instruct",
+    "th_instruct",
 ]
 
-#LANGS = ["he"]
+
 START_PART = 1
 END_PART = 6
 MODE = "replace"

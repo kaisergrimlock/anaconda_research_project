@@ -65,10 +65,10 @@ ALLOW_BLANK_OVERWRITE = True
 #     "he_var_instruct_rem", "sw_var_instruct_rem", "ga_var_instruct_rem", "hi_var_instruct_rem", "zh_var_instruct_rem",
 # ]
 
-# LANGS = [
-#     "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
-#     "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
-# ]
+LANGS = [
+    "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
+    "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
+]
 
 # LANGS = [
 #     "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
@@ -80,21 +80,21 @@ ALLOW_BLANK_OVERWRITE = True
 #     "he_qp_rem", "sw_qp_rem", "ga_qp_rem", "hi_qp_rem", "zh_qp_rem",
 # ]
 
-LANGS = [
-        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
-        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
-]
+# LANGS = [
+#         "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+#         "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
+# ]
 
-START_PART = 1
-END_PART = 6
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2021"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["qwen.qwen3-32b-v1:0"]
-INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
+#MODELS = ["qwen.qwen3-32b-v1:0"]
+INFERENCE_CONFIG = {"maxTokens": 10000, "temperature": 0.6, "topP": 1.0}
 
 # Output roots
 short = model_short_name(MODELS[0])
