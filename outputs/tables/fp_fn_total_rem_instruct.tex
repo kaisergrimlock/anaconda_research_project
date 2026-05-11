@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Total False Positive (FP) and False Negative (FN) rates across TREC-DL 2021 and 2022.}
+\label{tab:promptarmor_total}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc}
+\hline
+\textbf{Model} & \textbf{Setting} & \multicolumn{2}{c|}{\textbf{AR}} & \multicolumn{2}{c|}{\textbf{ENG}} & \multicolumn{2}{c|}{\textbf{FR}} & \multicolumn{2}{c|}{\textbf{GA}} & \multicolumn{2}{c|}{\textbf{HE}} & \multicolumn{2}{c|}{\textbf{HI}} & \multicolumn{2}{c|}{\textbf{RU}} & \multicolumn{2}{c|}{\textbf{SW}} & \multicolumn{2}{c|}{\textbf{TH}} & \multicolumn{2}{c|}{\textbf{VI}} & \multicolumn{2}{c}{\textbf{ZH}} \\
+ &  & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} \\
+\hline
+\multirow{1}{*}{\textbf{GPT-OSS}} & Filtered & \textcolor{blue}{17\%} & \textcolor{red}{6\%} & \textcolor{blue}{24\%} & \textcolor{red}{6\%} & \textcolor{blue}{17\%} & \textcolor{red}{6\%} & \textcolor{blue}{17\%} & \textcolor{red}{5\%} & \textcolor{blue}{16\%} & \textcolor{red}{7\%} & \textcolor{blue}{16\%} & \textcolor{red}{6\%} & \textcolor{blue}{17\%} & \textcolor{red}{7\%} & \textcolor{blue}{17\%} & \textcolor{red}{6\%} & \textcolor{blue}{18\%} & \textcolor{red}{5\%} & \textcolor{blue}{17\%} & \textcolor{red}{6\%} & \textcolor{blue}{17\%} & \textcolor{red}{6\%} \\
+\hline
+\multirow{1}{*}{\textbf{QWEN}} & Filtered & \textcolor{blue}{26\%} & \textcolor{red}{4\%} & \textcolor{blue}{28\%} & \textcolor{red}{4\%} & \textcolor{blue}{27\%} & \textcolor{red}{3\%} & \textcolor{blue}{26\%} & \textcolor{red}{3\%} & \textcolor{blue}{26\%} & \textcolor{red}{5\%} & \textcolor{blue}{26\%} & \textcolor{red}{5\%} & \textcolor{blue}{26\%} & \textcolor{red}{5\%} & \textcolor{blue}{27\%} & \textcolor{red}{3\%} & \textcolor{blue}{26\%} & \textcolor{red}{3\%} & \textcolor{blue}{26\%} & \textcolor{red}{4\%} & \textcolor{blue}{26\%} & \textcolor{red}{4\%} \\
+\hline
+\multirow{1}{*}{\textbf{LLAMA}} & Filtered & \textcolor{blue}{38\%} & \textcolor{red}{5\%} & \textcolor{blue}{39\%} & \textcolor{red}{5\%} & \textcolor{blue}{37\%} & \textcolor{red}{4\%} & \textcolor{blue}{38\%} & \textcolor{red}{4\%} & \textcolor{blue}{35\%} & \textcolor{red}{6\%} & \textcolor{blue}{37\%} & \textcolor{red}{5\%} & \textcolor{blue}{34\%} & \textcolor{red}{6\%} & \textcolor{blue}{39\%} & \textcolor{red}{4\%} & \textcolor{blue}{37\%} & \textcolor{red}{4\%} & \textcolor{blue}{37\%} & \textcolor{red}{5\%} & \textcolor{blue}{36\%} & \textcolor{red}{4\%} \\
+\hline
+\end{tabular}%
+}
+\end{table*}

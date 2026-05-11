@@ -1,0 +1,8 @@
+model,language,FP,FN
+gpt-oss-20b,eng_instruct,65,0
+gpt-oss-20b,ru_instruct,38,1
+gpt-oss-20b,ru_instruct_crit,27,5
+llama3-8b-instruct,eng_instruct,56,0
+llama3-8b-instruct,ru_instruct,65,0
+qwen3-32b-v1,eng_instruct,53,0
+qwen3-32b-v1,ru_instruct,60,0

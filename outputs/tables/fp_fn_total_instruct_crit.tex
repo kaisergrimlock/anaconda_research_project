@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Total False Positive (FP) and False Negative (FN) rates across TREC-DL 2021 and 2022.}
+\label{tab:promptarmor_total}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|cc|cc|cc}
+\hline
+\textbf{Model} & \textbf{Setting} & \multicolumn{2}{c|}{\textbf{ENG}} & \multicolumn{2}{c|}{\textbf{RU}} & \multicolumn{2}{c}{\textbf{RU_CRIT}} \\
+ &  & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} \\
+\hline
+\multirow{1}{*}{\textbf{GPT-OSS}} & Unfiltered & 65\% & 0\% & 38\% & 1\% & -- & -- \\
+\hline
+\multirow{1}{*}{\textbf{QWEN}} & Unfiltered & 53\% & 0\% & 60\% & 0\% & -- & -- \\
+\hline
+\multirow{1}{*}{\textbf{LLAMA}} & Unfiltered & 56\% & 0\% & 65\% & 0\% & -- & -- \\
+\hline
+\end{tabular}%
+}
+\end{table*}

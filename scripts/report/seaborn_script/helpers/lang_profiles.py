@@ -115,7 +115,8 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "var_rem": [
         "eng_var_qp_rem", "ar_var_qp_rem", "vi_var_qp_rem", "th_var_qp_rem", "fr_var_qp_rem", "ru_var_qp_rem",
         "he_var_qp_rem", "sw_var_qp_rem", "ga_var_qp_rem", "hi_var_qp_rem", "zh_var_qp_rem",
-        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
     ],
     
     "rem_instruct": [
@@ -128,7 +129,8 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng_distraction_qp_rem", "ar_distraction_qp_rem", "vi_distraction_qp_rem", "th_distraction_qp_rem", "fr_distraction_qp_rem",
         "ru_distraction_qp_rem", "he_distraction_qp_rem", "sw_distraction_qp_rem", "ga_distraction_qp_rem", "hi_distraction_qp_rem",
         "zh_distraction_qp_rem",
-        "eng", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh", "raw"
+        "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
+        "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
     ],
     
     "qp_rem": [
@@ -146,8 +148,13 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "instruct_rem" : [
         "eng_instruct_instruct_rem", "ar_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "fr_instruct_instruct_rem",
         "ru_instruct_instruct_rem", "he_instruct_instruct_rem", "sw_instruct_instruct_rem", "ga_instruct_instruct_rem", "hi_instruct_instruct_rem", "zh_instruct_instruct_rem",
-        "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct"
+        "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct",
         "raw"
+    ],
+    
+    "instruct_crit": [
+        "eng_instruct_crit", "ru_instruct_crit",
+        "eng_instruct", "ru_instruct", "raw"
     ]
     
 }
