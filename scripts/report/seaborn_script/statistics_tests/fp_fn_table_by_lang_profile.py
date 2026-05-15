@@ -46,12 +46,12 @@ from scripts.csv_helpers import bump_field_limit
 # -------------------------------------------------------------------
 TREC_DL_YEARS = ["2021", "2022"]
 
-LANG_PROFILE = "var_rem"
+LANG_PROFILE = "qp_rem"
 
 # Configure the two rows here.
 # Format: (suffix_in_filename, display_name_in_table)
-SUFFIX_1 = ("_var_qp_rem", "Variant")
-SUFFIX_2 = ("_instruct_instruct_rem", "Default")
+SUFFIX_1 = ("qp_rem", "Variant")
+SUFFIX_2 = ("", "Default")
 
 # Example:
 # SUFFIX_1 = ("_var_qp_rem", "Variant")

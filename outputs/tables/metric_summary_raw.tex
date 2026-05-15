@@ -1,0 +1,37 @@
+\begin{wraptable}{r}{0.48\textwidth}
+\centering
+\caption{Agreement between LLM-generated relevance labels and NIST judgments for the non-injected dataset on TREC-DL 2021 and 2022.}
+\label{tab:metrics_raw}
+\setlength{\tabcolsep}{3.5pt}
+\footnotesize
+
+\textbf{TREC-DL 2021} \\
+\vspace{0.2em}
+
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{gpt-20b} & \textbf{llama3-8b} & \textbf{qwen-32b} \\
+\midrule
+\textbf{MAE} & 0.7692 & 0.9729 & 0.8843 \\
+\textbf{Alpha} & 0.4994 & 0.2118 & 0.4131 \\
+\textbf{Kappa} & 0.5291 & 0.3183 & 0.4770 \\
+\textbf{Mean-Diff} & 0.6106 & 0.7825 & 0.7833 \\
+\bottomrule
+\end{tabular}
+
+\vspace{1em}
+
+\textbf{TREC-DL 2022} \\
+\vspace{0.2em}
+
+\begin{tabular}{lccc}
+\toprule
+ & \textbf{gpt-20b} & \textbf{llama3-8b} & \textbf{qwen-32b} \\
+\midrule
+\textbf{MAE} & 0.6768 & 0.9751 & 0.8377 \\
+\textbf{Alpha} & 0.5256 & 0.1487 & 0.3700 \\
+\textbf{Kappa} & 0.5443 & 0.2739 & 0.4412 \\
+\textbf{Mean-Diff} & 0.3906 & 0.7586 & 0.6614 \\
+\bottomrule
+\end{tabular}
+\end{wraptable}

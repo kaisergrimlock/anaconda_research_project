@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\caption{Total False Positive (FP) and False Negative (FN) rates across TREC-DL 2021 and 2022.}
+\label{tab:promptarmor_total}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|cc|cc|cc|cc|cc|cc|cc|cc|cc}
+\hline
+\textbf{Model} & \textbf{Setting} & \multicolumn{2}{c|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{AR\_}} & \multicolumn{2}{c|}{\textbf{ENG\_}} & \multicolumn{2}{c|}{\textbf{GA\_}} & \multicolumn{2}{c|}{\textbf{HE\_}} & \multicolumn{2}{c|}{\textbf{RU\_}} & \multicolumn{2}{c|}{\textbf{SW\_}} & \multicolumn{2}{c|}{\textbf{TH\_}} & \multicolumn{2}{c}{\textbf{VI\_}} \\
+ &  & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} \\
+\hline
+\multirow{2}{*}{\textbf{GPT-OSS}} & Default & $28\%$ & $3\%$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+ & Variant & \textemdash & \textemdash & \textcolor{blue}{$18\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$22\%$} & \textcolor{red}{$4\%$} & \textcolor{blue}{$21\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$18\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$18\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$18\%$} & \textcolor{red}{$7\%$} & \textcolor{blue}{$17\%$} & \textcolor{red}{$5\%$} & \textcolor{blue}{$23\%$} & \textcolor{red}{$5\%$} \\
+\hline
+\multirow{2}{*}{\textbf{QWEN}} & Default & $35\%$ & $2\%$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+ & Variant & \textemdash & \textemdash & \textcolor{blue}{$28\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$29\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$30\%$} & \textcolor{red}{$4\%$} & \textcolor{blue}{$29\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$28\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$29\%$} & \textcolor{red}{$4\%$} & \textcolor{blue}{$28\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$28\%$} & \textcolor{red}{$3\%$} \\
+\hline
+\multirow{2}{*}{\textbf{LLAMA}} & Default & $42\%$ & $3\%$ & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash & \textemdash \\
+ & Variant & \textemdash & \textemdash & \textcolor{blue}{$36\%$} & \textcolor{red}{$4\%$} & \textcolor{blue}{$38\%$} & \textcolor{red}{$3\%$} & \textcolor{blue}{$33\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$36\%$} & \textcolor{red}{$4\%$} & \textcolor{blue}{$36\%$} & \textcolor{red}{$5\%$} & \textcolor{blue}{$33\%$} & \textcolor{red}{$6\%$} & \textcolor{blue}{$36\%$} & \textcolor{red}{$5\%$} & \textcolor{blue}{$35\%$} & \textcolor{red}{$5\%$} \\
+\hline
+\end{tabular}%
+}
+\end{table*}
