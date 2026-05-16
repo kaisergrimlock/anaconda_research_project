@@ -67,7 +67,8 @@ ALLOW_BLANK_OVERWRITE = True
 # ]
 
 LANGS = [
-    "zh_instruct"
+        "engcwb_instruct", "arcwb_instruct", "vicwb_instruct", "thcwb_instruct", "frcwb_instruct", "rucwb_instruct",
+        "hecwb_instruct", "swcwb_instruct", "gacwb_instruct", "hicwb_instruct", "zhcwb_instruct",
 ]
 
 # LANGS = [
@@ -79,15 +80,15 @@ LANGS = [
 #     "eng_var", "ar_var", "vi_var", "th_var", "fr_var", "ru_var", "he_var", "sw_var", "ga_var", "hi_var", "zh_var",
 # ]
 
-START_PART = 1
-END_PART = 6
+START_PART = 0
+END_PART = 0
 TREC_DL_YEAR = "2022"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-MODELS = ["openai.gpt-oss-20b-1:0"]
+#MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-#MODELS = ["qwen.qwen3-32b-v1:0"]
+MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.0, "topP": 1.0}
 
 # Output roots

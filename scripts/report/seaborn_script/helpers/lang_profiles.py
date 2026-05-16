@@ -39,6 +39,7 @@ LANG_PROFILES: Dict[str, List[str]] = {
     "lang": ["raw", "eng", "fr", "ru", "vi", "he", "ar", "th", "sw", "ga", "zh", "hi"],
     "mult": ["raw", "eng", "eng_mult_2", "eng_mult_3"],
     "script": ["eng", "fr", "ru", "uk", "zh", "ja", "ar", "ur"],
+    
     "cwb": [
         "eng", "raw", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
         "engcwb", "vicwb", "thcwb", "frcwb", "rucwb", "hecwb", "swcwb", "gacwb", "hicwb", "zhcwb",
@@ -46,6 +47,7 @@ LANG_PROFILES: Dict[str, List[str]] = {
     
     "cwb_instruct": [
         "eng", "raw", "vi", "ar" "th", "fr", "ru", "he", "th", "sw", "ga", "hi", "zh",
+        "engcwb", "vicwb", "thcwb", "frcwb", "rucwb", "hecwb", "swcwb", "gacwb", "hicwb", "zhcwb",
         "engcwb_instruct", "arcwb_instruct", "vicwb_instruct", "thcwb_instruct", "frcwb_instruct", "rucwb_instruct",
         "hecwb_instruct", "swcwb_instruct", "gacwb_instruct", "hicwb_instruct", "zhcwb_instruct",
     ],
@@ -177,6 +179,17 @@ LANG_PROFILES: Dict[str, List[str]] = {
         "eng_instruct", "vi_instruct", "ar_instruct", "fr_instruct", "th_instruct", "ru_instruct", "he_instruct", "sw_instruct", "ga_instruct", "hi_instruct", "zh_instruct",
         "raw"
     ],
+    
+    "crit_combined" : [
+        "eng", "raw", "ar", "vi", "th", "fr", "ru", "he", "sw", "ga", "hi", "zh",
+        "eng_instruct_crit", "ar_instruct_crit", "vi_instruct_crit",
+        "th_instruct_crit", "fr_instruct_crit", "ru_instruct_crit",
+        "he_instruct_crit", "sw_instruct_crit", "ga_instruct_crit",
+        "hi_instruct_crit", "zh_instruct_crit",
+        "eng_crit", "ar_crit", "fr_crit", "ru_crit", "zh_crit", "vi_crit",
+        "hi_crit", "he_crit", "th_crit", "sw_crit", "ga_crit",
+        
+    ]
     
 }
 
