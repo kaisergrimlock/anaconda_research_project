@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\caption{Total False Positive (FP) and False Negative (FN) rates of QP (Phrase) and QW (Word) across TREC-DL 2021 and 2022. Darker cells indicate higher percentages.}
+\label{tab:fp_fn_total_word}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{ll|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc|cc}
+\hline
+\textbf{Model} & \textbf{Setting} & \multicolumn{2}{c|}{\textbf{AR}} & \multicolumn{2}{c|}{\textbf{ENG}} & \multicolumn{2}{c|}{\textbf{FR}} & \multicolumn{2}{c|}{\textbf{GA}} & \multicolumn{2}{c|}{\textbf{HE}} & \multicolumn{2}{c|}{\textbf{HI}} & \multicolumn{2}{c|}{\textbf{RU}} & \multicolumn{2}{c|}{\textbf{SW}} & \multicolumn{2}{c|}{\textbf{TH}} & \multicolumn{2}{c|}{\textbf{VI}} & \multicolumn{2}{c}{\textbf{ZH}} \\
+ &  & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} & \textbf{FP} & \textbf{FN} \\
+\hline
+\multirow{2}{*}{\textbf{GPT-OSS}} & Instruct & \cellcolor{red!25}$25\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!69}$69\%$ & $0\%$ & \cellcolor{red!29}$29\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!21}$21\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!28}$28\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!25}$25\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!38}$38\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!18}$18\%$ & \cellcolor{orange!6}$6\%$ & \cellcolor{red!22}$22\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!28}$28\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!25}$25\%$ & \cellcolor{orange!5}$3\%$ \\
+ & QP & \cellcolor{red!28}$28\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!27}$27\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!30}$30\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!25}$25\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!27}$27\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!25}$25\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!30}$30\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!26}$26\%$ & \cellcolor{orange!5}$4\%$ & \cellcolor{red!30}$30\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!31}$31\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!27}$27\%$ & \cellcolor{orange!5}$4\%$ \\
+\hline
+\multirow{2}{*}{\textbf{QWEN}} & Instruct & \cellcolor{red!50}$50\%$ & $0\%$ & \cellcolor{red!54}$54\%$ & $0\%$ & \cellcolor{red!60}$60\%$ & $0\%$ & \cellcolor{red!31}$31\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!51}$51\%$ & $0\%$ & \cellcolor{red!36}$36\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!62}$62\%$ & $0\%$ & \cellcolor{red!35}$35\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!43}$43\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!54}$54\%$ & $0\%$ & \cellcolor{red!57}$57\%$ & $0\%$ \\
+ & QP & \cellcolor{red!35}$35\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!38}$38\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!34}$34\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!31}$31\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!34}$34\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!36}$36\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!35}$35\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!30}$30\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!35}$35\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!36}$36\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!37}$37\%$ & \cellcolor{orange!5}$2\%$ \\
+\hline
+\multirow{2}{*}{\textbf{LLAMA}} & Instruct & \cellcolor{red!54}$54\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!59}$59\%$ & $0\%$ & \cellcolor{red!64}$64\%$ & $0\%$ & \cellcolor{red!30}$30\%$ & \cellcolor{orange!8}$8\%$ & \cellcolor{red!58}$58\%$ & $0\%$ & \cellcolor{red!58}$58\%$ & $0\%$ & \cellcolor{red!69}$69\%$ & $0\%$ & \cellcolor{red!50}$50\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!49}$49\%$ & $0\%$ & \cellcolor{red!65}$65\%$ & $0\%$ & \cellcolor{red!66}$66\%$ & $0\%$ \\
+ & QP & \cellcolor{red!42}$42\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!49}$49\%$ & \cellcolor{orange!5}$1\%$ & \cellcolor{red!48}$48\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!45}$45\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!49}$49\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!41}$41\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!48}$48\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!42}$42\%$ & \cellcolor{orange!5}$3\%$ & \cellcolor{red!48}$48\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!46}$46\%$ & \cellcolor{orange!5}$2\%$ & \cellcolor{red!42}$42\%$ & \cellcolor{orange!5}$2\%$ \\
+\hline
+\end{tabular}%
+}
+\end{table*}
