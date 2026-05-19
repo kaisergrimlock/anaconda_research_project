@@ -52,13 +52,13 @@ from scripts.csv_helpers import bump_field_limit
 TREC_DL_YEARS = ["2021", "2022"]
 
 # This should match the profile defined in helpers.lang_profiles.
-LANG_PROFILE = "instruct_rem"
+LANG_PROFILE = "instruct"
 
 # Format: (suffix_in_filename, display_name_in_table)
 # Phrase files usually have no suffix: ar, eng, fr, ...
 # Word files usually have _word suffix: ar_word, eng_word, fr_word, ...
 SUFFIX_PHRASE = ("_instruct", "Instruct")
-SUFFIX_WORD = ("_instruct_instruct_rem", "Filtered")
+SUFFIX_WORD = ("", "QP")
 
 SUFFIX_CONFIGS: List[Tuple[str, str]] = [
     SUFFIX_WORD,
