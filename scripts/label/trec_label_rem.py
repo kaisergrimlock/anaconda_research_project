@@ -76,7 +76,7 @@ ALLOW_BLANK_OVERWRITE = True
 # ]
 
 LANGS = [
-    "ar_qp_rem", "zh_qp_rem"
+    "fr_qp_rem", "ru_qp_rem", "he_qp_rem", "sw_qp_rem", "hi_qp_rem", "th_qp_rem", "eng_qp_rem", "vi_qp_rem", "ga_qp_rem", "zh_qp_rem", "ar_qp_rem",
 ]
 
 # LANGS = [
