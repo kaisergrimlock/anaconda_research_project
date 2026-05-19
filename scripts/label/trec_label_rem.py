@@ -91,9 +91,9 @@ TREC_DL_YEAR = "2021"
 MODE = "replace"  # "append" or "replace"
 
 # Models
-#MODELS = ["openai.gpt-oss-20b-1:0"]
+MODELS = ["openai.gpt-oss-20b-1:0"]
 #MODELS = ["meta.llama3-8b-instruct-v1:0"]
-MODELS = ["qwen.qwen3-32b-v1:0"]
+#MODELS = ["qwen.qwen3-32b-v1:0"]
 INFERENCE_CONFIG = {"maxTokens": 2000, "temperature": 0.6, "topP": 1.0}
 
 # Output roots
