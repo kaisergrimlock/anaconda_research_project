@@ -18,9 +18,60 @@ LANG_PROFILES: Dict[str, List[str]] = {
     ],
     
     "word": [
-        "raw", "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi",
+        "eng", "ru", "ar", "vi", "th", "sw", "he", "zh", "fr", "hi",
         "eng_word", "ru_word", "ar_word", "vi_word", "th_word", "sw_word", "he_word", "zh_word", "fr_word", "hi_word",
     ],
+    
+    "word_test": [
+        "eng", "ru", "vi", "th", "sw",
+        "eng_word", "ru_word", "vi_word", "th_word", "sw_word",
+    ],
+    
+    "instruct_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_instruct", "ru_instruct", "vi_instruct", "th_instruct", "sw_instruct",
+    ],
+    
+    "start_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_first", "ru_first", "vi_first", "th_first", "sw_first",
+    ],
+    
+    "crit_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_crit", "ru_crit", "vi_crit", "th_crit", "sw_crit",
+    ],
+    
+    "crit_instruct_test":[
+        "eng_instruct", "ru_instruct", "vi_instruct", "th_instruct", "sw_instruct",
+        "eng_instruct_crit", "ru_instruct_crit", "vi_instruct_crit", "th_instruct_crit", "sw_instruct_crit",
+    ],
+    
+    "qp_rem_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_qp_rem", "ru_qp_rem", "vi_qp_rem", "th_qp_rem", "sw_qp_rem",
+    ],
+    
+    "instruct_instruct_rem_test":[
+        "eng_instruct", "ru_instruct", "vi_instruct", "th_instruct", "sw_instruct",
+        "eng_instruct_instruct_rem", "ru_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "sw_instruct_instruct_rem",
+    ],
+    
+    "instruct_qp_rem_test":[
+        "eng_instruct_instruct_rem", "ru_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "sw_instruct_instruct_rem",
+        "eng_instruct_qp_rem", "ru_instruct_qp_rem", "vi_instruct_qp_rem", "th_instruct_qp_rem", "sw_instruct_qp_rem",
+    ],
+    
+    "fn_fp_qp_rem_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_instruct_rem", "ru_instruct_rem", "vi_instruct_rem", "th_instruct_rem", "sw_instruct_rem",
+    ],
+    
+    "fn_fp_qp_rem_instruct_test":[
+        "eng", "ru", "vi", "th", "sw",
+        "eng_instruct_instruct_rem", "ru_instruct_instruct_rem", "vi_instruct_instruct_rem", "th_instruct_instruct_rem", "sw_instruct_instruct_rem",
+    ],
+    
     "crit": [
         "raw", "eng", "ar", "fr", "ru", "zh", "vi", "hi", "he", "th", "sw", "ga",
         "eng_crit", "ar_crit", "fr_crit", "ru_crit", "zh_crit", "vi_crit",
