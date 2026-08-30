@@ -1,0 +1,4 @@
+interface:
+  display_name: "LLM Relevance Labeling"
+  short_description: "Run Bedrock relevance labeling experiments"
+  default_prompt: "Use $run-llm-relevance-labeling to run the requested relevance-labeling experiment."

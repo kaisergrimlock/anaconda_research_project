@@ -1,0 +1,4 @@
+interface:
+  display_name: "TREC Data Retrieval"
+  short_description: "Retrieve and prepare TREC DL passage data"
+  default_prompt: "Use $retrieve-trec-data to prepare the requested TREC DL retrieval dataset."

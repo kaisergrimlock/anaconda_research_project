@@ -1,0 +1,4 @@
+interface:
+  display_name: "Passage Injection Builder"
+  short_description: "Create controlled passage injection variants"
+  default_prompt: "Use $create-passage-injections to create the requested passage injection variant."

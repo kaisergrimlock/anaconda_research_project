@@ -1,0 +1,4 @@
+interface:
+  display_name: "Relevance Results Analysis"
+  short_description: "Analyze LLM and NIST relevance agreement"
+  default_prompt: "Use $analyze-relevance-results to analyze the requested relevance-labeling results."
